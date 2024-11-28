@@ -47,6 +47,10 @@ CREATE TYPE account_type AS ENUM ('assistant-teacher'
 CREATE TYPE center_mode AS ENUM ('in-person'
     , 'online'
     );
+CREATE TYPE teaching_eligibility_type AS ENUM ('primary'
+    , 'assistant'
+    );
+
 
 -- Create tables
 CREATE TABLE IF NOT EXISTS tenant (
@@ -217,6 +221,19 @@ CREATE INDEX idx_account_username ON account(username);
 CREATE INDEX idx_account_type ON account(type);
 CREATE INDEX idx_account_cognito_id ON account(cognito_id);
 CREATE INDEX idx_account_email ON account(email);
+
+-- COURSE ELIGIBLITY: Courses teacher can teach
+CREATE TABLE IF NOT EXISTS teacher_eligibility (
+    product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE RESTRICT,
+    teacher_id BIGINT NOT NULL REFERENCES account(id) ON DELETE RESTRICT,
+
+    type teaching_eligibility_type,
+
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX idx_teacher_eligibility_product_id ON teacher_eligibility(product_id);
+CREATE INDEX idx_teacher_eligibility_teacher_id ON teacher_eligibility(teacher_id);
 
 -- Notes: Max 3 organizers per course
 -- Notes: Organizer is not mandatory for a course (Confirm)
