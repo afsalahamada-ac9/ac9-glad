@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"sudhagar/glad/entity"
+	"sudhagar/glad/pkg/util"
 )
 
 // CoursePGSQL mysql repo
@@ -282,4 +283,143 @@ func (r *CoursePGSQL) scanRows(rows *sql.Rows) ([]*entity.Course, error) {
 		courses = append(courses, &course)
 	}
 	return courses, nil
+}
+
+// --------------------------------------------------------------------------------
+// Course Organizer
+// --------------------------------------------------------------------------------
+// CreateCourseOrganizer creates course to organizer mapping
+// TODO: We should map error value appropriately to the API client. Ex. foreign key violation implies
+// that request is a bad request, etc. or, maybe we don't. Something to think about.
+func (r *CoursePGSQL) CreateCourseOrganizer(courseID entity.ID, cos []*entity.CourseOrganizer) error {
+	values := func(index int) []interface{} {
+		return []interface{}{
+			courseID,
+			cos[index].ID,
+			util.DBTimeNow(),
+		}
+	}
+
+	query, valueArgs := util.GenBulkInsertPGSQL(
+		"course_organizer",
+		[]string{"course_id", "organizer_id", "updated_at"},
+		len(cos),
+		values,
+	)
+
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(valueArgs...)
+	if err != nil {
+		return err
+	}
+
+	err = stmt.Close()
+	return err
+}
+
+// --------------------------------------------------------------------------------
+// Course Teacher
+// --------------------------------------------------------------------------------
+// CreateCourseTeacher creates course to teacher mapping
+func (r *CoursePGSQL) CreateCourseTeacher(courseID entity.ID, cts []*entity.CourseTeacher) error {
+	values := func(index int) []interface{} {
+		return []interface{}{
+			courseID,
+			cts[index].ID,
+			cts[index].IsPrimary,
+			util.DBTimeNow(),
+		}
+	}
+
+	query, valueArgs := util.GenBulkInsertPGSQL(
+		"course_teacher",
+		[]string{"course_id", "teacher_id", "is_primary", "updated_at"},
+		len(cts),
+		values,
+	)
+
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(valueArgs...)
+	if err != nil {
+		return err
+	}
+
+	err = stmt.Close()
+	return err
+}
+
+// --------------------------------------------------------------------------------
+// Course Contact
+// --------------------------------------------------------------------------------
+// CreateCourseContact creates course to contact mapping
+func (r *CoursePGSQL) CreateCourseContact(courseID entity.ID, ccs []*entity.CourseContact) error {
+	values := func(index int) []interface{} {
+		return []interface{}{
+			courseID,
+			ccs[index].ID,
+			util.DBTimeNow(),
+		}
+	}
+
+	query, valueArgs := util.GenBulkInsertPGSQL(
+		"course_contact",
+		[]string{"course_id", "contact_id", "updated_at"},
+		len(ccs),
+		values,
+	)
+
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(valueArgs...)
+	if err != nil {
+		return err
+	}
+
+	err = stmt.Close()
+	return err
+}
+
+// --------------------------------------------------------------------------------
+// Course Notify
+// --------------------------------------------------------------------------------
+// CreateCourseNotify creates course to notify mapping
+func (r *CoursePGSQL) CreateCourseNotify(courseID entity.ID, cns []*entity.CourseNotify) error {
+	values := func(index int) []interface{} {
+		return []interface{}{
+			courseID,
+			cns[index].ID,
+			util.DBTimeNow(),
+		}
+	}
+
+	query, valueArgs := util.GenBulkInsertPGSQL(
+		"course_notify",
+		[]string{"course_id", "notify_id", "updated_at"},
+		len(cns),
+		values,
+	)
+
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(valueArgs...)
+	if err != nil {
+		return err
+	}
+
+	err = stmt.Close()
+	return err
 }

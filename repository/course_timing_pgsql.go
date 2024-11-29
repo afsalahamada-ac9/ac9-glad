@@ -122,7 +122,7 @@ func (r *CourseTimingPGSQL) Update(ct *entity.CourseTiming) error {
 }
 
 // GetByCourse retrieves course timing by course id
-func (r *CourseTimingPGSQL) GetByCourse(courseId entity.ID) ([]*entity.CourseTiming, error) {
+func (r *CourseTimingPGSQL) GetByCourse(courseID entity.ID) ([]*entity.CourseTiming, error) {
 	query := `
 		SELECT 
 			id, course_id, ext_id, course_date, start_time, end_time, created_at
@@ -135,7 +135,7 @@ func (r *CourseTimingPGSQL) GetByCourse(courseId entity.ID) ([]*entity.CourseTim
 		return nil, err
 	}
 
-	rows, err := stmt.Query(courseId)
+	rows, err := stmt.Query(courseID)
 	if err != nil {
 		return nil, err
 	}

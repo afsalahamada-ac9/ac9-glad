@@ -23,6 +23,10 @@ type CourseWriter interface {
 	Create(e *entity.Course) (entity.ID, error)
 	Update(e *entity.Course) error
 	Delete(id entity.ID) error
+	CreateCourseOrganizer(entity.ID, []*entity.CourseOrganizer) error
+	CreateCourseTeacher(entity.ID, []*entity.CourseTeacher) error
+	CreateCourseContact(entity.ID, []*entity.CourseContact) error
+	CreateCourseNotify(entity.ID, []*entity.CourseNotify) error
 }
 
 // Course repository interface
@@ -31,8 +35,24 @@ type CourseRepository interface {
 	CourseWriter
 }
 
+// CourseTimingReader course timing reader
+type CourseTimingReader interface {
+	Get(id entity.ID) (*entity.CourseTiming, error)
+	GetByCourse(courseID entity.ID) ([]*entity.CourseTiming, error)
+	GetCount() (int, error)
+}
+
+// CourseTimingWriter course timing writer
+type CourseTimingWriter interface {
+	Create(e *entity.CourseTiming) (entity.ID, error)
+	Update(e *entity.CourseTiming) error
+	Delete(id entity.ID) error
+}
+
 // Course timing repository interface
 type CourseTimingRepository interface {
+	CourseTimingReader
+	CourseTimingWriter
 }
 
 // UseCase interface

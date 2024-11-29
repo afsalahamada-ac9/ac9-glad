@@ -7,6 +7,7 @@
 package course
 
 import (
+	"log"
 	"strings"
 	"time"
 
@@ -28,6 +29,7 @@ func NewService(cr CourseRepository, ctr CourseTimingRepository) *Service {
 }
 
 // CreateCourse creates a course
+// TODO: Return course timing ID
 func (s *Service) CreateCourse(
 	course entity.Course,
 	cos []*entity.CourseOrganizer,
@@ -45,6 +47,46 @@ func (s *Service) CreateCourse(
 	if err != nil {
 		return courseID, err
 	}
+
+	for i, ct := range courseTimings {
+		ct.CourseID = courseID
+		courseTimings[i], err = ct.New()
+		if err != nil {
+			return entity.IDInvalid, err
+		}
+	}
+
+	// Note: These can be executed in parallel using go-routines
+	err = s.cRepo.CreateCourseOrganizer(courseID, cos)
+	if err != nil {
+		return courseID, err
+	}
+
+	err = s.cRepo.CreateCourseTeacher(courseID, cts)
+	if err != nil {
+		return courseID, err
+	}
+
+	err = s.cRepo.CreateCourseContact(courseID, ccs)
+	if err != nil {
+		return courseID, err
+	}
+
+	err = s.cRepo.CreateCourseNotify(courseID, cns)
+	if err != nil {
+		return courseID, err
+	}
+
+	var courseTimingID []entity.ID
+	for _, ct := range courseTimings {
+		ctID, err := s.ctRepo.Create(ct)
+		if err != nil {
+			return courseID, err
+		}
+		courseTimingID = append(courseTimingID, ctID)
+	}
+
+	log.Printf("courseTimingID=%#v", courseTimingID)
 
 	return courseID, err
 }

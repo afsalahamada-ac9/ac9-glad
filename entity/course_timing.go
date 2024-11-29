@@ -79,6 +79,21 @@ func NewCourseTiming(
 	return ct, nil
 }
 
+// New creates a new course timing from existing course timing and overrides id and created & updated date
+func (ct CourseTiming) New() (*CourseTiming, error) {
+	courseTiming := &ct
+
+	courseTiming.ID = NewID()
+	courseTiming.CreatedAt = time.Now()
+	courseTiming.UpdatedAt = courseTiming.CreatedAt
+
+	err := courseTiming.Validate()
+	if err != nil {
+		return nil, ErrInvalidEntity
+	}
+	return courseTiming, nil
+}
+
 // Validate validate course timings
 func (ct *CourseTiming) Validate() error {
 	if ct.CourseID == IDInvalid {

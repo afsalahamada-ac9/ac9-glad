@@ -107,3 +107,39 @@ func (r *inmemCourse) GetCount(tenantID entity.ID) (int, error) {
 	}
 	return count, nil
 }
+
+// --------------------------------------------------------------------------------
+// Course Organizer
+// --------------------------------------------------------------------------------
+// CreateCourseOrganizer creates course to organizer mapping
+func (r *inmemCourse) CreateCourseOrganizer(courseID entity.ID, cos []*entity.CourseOrganizer) error {
+	// TODO
+	return nil
+}
+
+// --------------------------------------------------------------------------------
+// Course Teacher
+// --------------------------------------------------------------------------------
+// CreateCourseTeacher creates course to teacher mapping
+func (r *inmemCourse) CreateCourseTeacher(courseID entity.ID, cts []*entity.CourseTeacher) error {
+	// TODO
+	return nil
+}
+
+// --------------------------------------------------------------------------------
+// Course Contact
+// --------------------------------------------------------------------------------
+// CreateCourseContact creates course to contact mapping
+func (r *inmemCourse) CreateCourseContact(courseID entity.ID, ccs []*entity.CourseContact) error {
+	// TODO
+	return nil
+}
+
+// --------------------------------------------------------------------------------
+// Course Notify
+// --------------------------------------------------------------------------------
+// CreateCourseNotify creates course to notify mapping
+func (r *inmemCourse) CreateCourseNotify(courseID entity.ID, cns []*entity.CourseNotify) error {
+	// TODO
+	return nil
+}
