@@ -10,25 +10,29 @@ import (
 	"sudhagar/glad/entity"
 )
 
-// Reader interface
-type Reader interface {
+// CourseReader course reader
+type CourseReader interface {
 	Get(id entity.ID) (*entity.Course, error)
 	Search(tenantID entity.ID, query string, page, limit int) ([]*entity.Course, error)
 	List(tenantID entity.ID, page, limit int) ([]*entity.Course, error)
 	GetCount(id entity.ID) (int, error)
 }
 
-// Writer course writer
-type Writer interface {
+// CourseWriter course writer
+type CourseWriter interface {
 	Create(e *entity.Course) (entity.ID, error)
 	Update(e *entity.Course) error
 	Delete(id entity.ID) error
 }
 
-// Repository interface
-type Repository interface {
-	Reader
-	Writer
+// Course repository interface
+type CourseRepository interface {
+	CourseReader
+	CourseWriter
+}
+
+// Course timing repository interface
+type CourseTimingRepository interface {
 }
 
 // UseCase interface
@@ -36,15 +40,13 @@ type UseCase interface {
 	GetCourse(id entity.ID) (*entity.Course, error)
 	SearchCourses(tenantID entity.ID, query string, page, limit int) ([]*entity.Course, error)
 	ListCourses(tenantID entity.ID, page, limit int) ([]*entity.Course, error)
-	CreateCourse(tenantID entity.ID,
-		extID *string,
-		centerID entity.ID,
-		productID entity.ID,
-		name, notes, timezone string,
-		address entity.CourseAddress,
-		status entity.CourseStatus,
-		mode entity.CourseMode,
-		maxAttendees, numAttendees int32,
+	CreateCourse(
+		course entity.Course,
+		cos []*entity.CourseOrganizer,
+		cts []*entity.CourseTeacher,
+		ccs []*entity.CourseContact,
+		cns []*entity.CourseNotify,
+		courseTimings []*entity.CourseTiming,
 	) (entity.ID, error)
 	UpdateCourse(e *entity.Course) error
 	DeleteCourse(id entity.ID) error

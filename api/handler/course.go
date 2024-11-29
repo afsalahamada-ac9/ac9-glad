@@ -92,23 +92,7 @@ func listCourses(service course.UseCase) http.Handler {
 func createCourse(service course.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error adding course"
-		var input struct {
-			ExtID        *string
-			Name         string                  `json:"name"`
-			CenterID     entity.ID               `json:"centerId"`
-			ProductID    entity.ID               `json:"productId"`
-			Organizer    []entity.ID             `json:"organizer"`
-			Contact      []entity.ID             `json:"contact"`
-			Teacher      []entity.ID             `json:"teacher"`
-			Notes        string                  `json:"notes"`
-			Status       entity.CourseStatus     `json:"status"`
-			MaxAttendees int32                   `json:"maxAttendees"`
-			Dates        []entity.CourseDateTime `json:"dates"`
-			Timezone     string                  `json:"timezone"`
-			Address      entity.CourseAddress    `json:"address"`
-			Mode         entity.CourseMode       `json:"mode"`
-			Notify       []entity.ID             `json:"notify"`
-		}
+		var input presenter.CourseReq
 
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
 		tenantID, err := entity.StringToID(tenant)
@@ -126,27 +110,39 @@ func createCourse(service course.UseCase) http.Handler {
 			return
 		}
 
+		course, err := input.ToCourse(tenantID)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Unable to copy to course entity"))
+			return
+		}
+
+		cos, _ := input.ToCourseOrganizer()
+		cts, _ := input.ToCourseTeacher()
+		ccs, _ := input.ToCourseContact()
+		cns, _ := input.ToCourseNotify()
+
+		courseTimings, err := input.ToCourseTiming()
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Unable to copy to course timing entity"))
+			return
+		}
+
 		id, err := service.CreateCourse(
-			tenantID,
-			input.ExtID,
-			input.CenterID,
-			input.ProductID,
-			input.Name,
-			input.Notes,
-			input.Timezone,
-			input.Address,
-			input.Status,
-			input.Mode,
-			input.MaxAttendees,
-			// numAttendees
-			0,
+			course,
+			cos,
+			cts,
+			ccs,
+			cns,
+			courseTimings,
 		)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
 		}
-		toJ := &presenter.Course{
+		toJ := &presenter.CourseResponse{
 			ID: id,
 		}
 

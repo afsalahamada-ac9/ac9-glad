@@ -47,11 +47,25 @@ type CourseAddress struct {
 	Country string
 }
 
-// Course date/time
-type CourseDateTime struct {
-	Date      string
-	StartTime string
-	EndTime   string
+// Course organizer
+type CourseOrganizer struct {
+	ID
+}
+
+// Course teacher
+type CourseTeacher struct {
+	ID        ID
+	IsPrimary bool
+}
+
+// Course contact
+type CourseContact struct {
+	ID
+}
+
+// Course notify
+type CourseNotify struct {
+	ID
 }
 
 // Course data
@@ -147,6 +161,21 @@ func NewCourse(tenantID ID,
 		return nil, ErrInvalidEntity
 	}
 	return c, nil
+}
+
+// New creates a new course from existing course and overrides id and created & updated date
+func (c Course) New() (*Course, error) {
+	course := &c
+
+	course.ID = NewID()
+	course.CreatedAt = time.Now()
+	course.UpdatedAt = course.CreatedAt
+
+	err := course.Validate()
+	if err != nil {
+		return nil, ErrInvalidEntity
+	}
+	return course, nil
 }
 
 // Validate validate course

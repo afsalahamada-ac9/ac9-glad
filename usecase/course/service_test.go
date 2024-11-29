@@ -26,6 +26,16 @@ const (
 	// tenantBob    entity.ID = 13790492210917015555
 	bobExtID    = "000bobExtID"
 	bobCenterID = 13790493495087075502
+
+	aliceOrganizer1ID = 100000001
+	aliceOrganizer2ID = 100000002
+
+	aliceTeacher1ID = 200000001
+	aliceTeacher2ID = 200000002
+
+	aliceTiming1ID = 300000001
+	aliceTiming2ID = 300000002
+	aliceTiming3ID = 300000003
 )
 
 func newFixtureCourse() *entity.Course {
@@ -56,37 +66,109 @@ func newFixtureCourse() *entity.Course {
 	}
 }
 
+func newCourseOrganizer() []*entity.CourseOrganizer {
+	co1 := entity.CourseOrganizer{ID: aliceOrganizer1ID}
+	co2 := entity.CourseOrganizer{ID: aliceOrganizer2ID}
+
+	var cos []*entity.CourseOrganizer
+	cos = append(cos, &co1)
+	cos = append(cos, &co2)
+
+	return cos
+}
+
+func newCourseTeacher() []*entity.CourseTeacher {
+	t1 := entity.CourseTeacher{ID: aliceTeacher1ID, IsPrimary: true}
+	t2 := entity.CourseTeacher{ID: aliceTeacher2ID, IsPrimary: false}
+
+	var cts []*entity.CourseTeacher
+	cts = append(cts, &t1)
+	cts = append(cts, &t2)
+
+	return cts
+}
+
+func newCourseContact() []*entity.CourseContact {
+	c1 := entity.CourseContact{ID: aliceTeacher1ID}
+	c2 := entity.CourseContact{ID: aliceOrganizer1ID}
+
+	var ccs []*entity.CourseContact
+	ccs = append(ccs, &c1)
+	ccs = append(ccs, &c2)
+
+	return ccs
+}
+
+func newCourseNotify() []*entity.CourseNotify {
+	cn1 := entity.CourseNotify{ID: aliceTeacher1ID}
+	cn2 := entity.CourseNotify{ID: aliceOrganizer1ID}
+	cn3 := entity.CourseNotify{ID: aliceTeacher2ID}
+
+	var cns []*entity.CourseNotify
+	cns = append(cns, &cn1)
+	cns = append(cns, &cn2)
+	cns = append(cns, &cn3)
+
+	return cns
+}
+
+// TODO: Need to set proper dates, time and verify the same
+func newCourseTimings() []*entity.CourseTiming {
+	ct1 := entity.CourseTiming{ID: aliceTiming1ID}
+	ct2 := entity.CourseTiming{ID: aliceTiming2ID}
+	ct3 := entity.CourseTiming{ID: aliceTiming3ID}
+
+	var cts []*entity.CourseTiming
+	cts = append(cts, &ct1)
+	cts = append(cts, &ct2)
+	cts = append(cts, &ct3)
+
+	return cts
+}
+
 func Test_Create(t *testing.T) {
-	repo := newInmem()
-	m := NewService(repo)
+	repo := newInmemCourse()
+	ctRepo := newInmemCourseTiming()
+	m := NewService(repo, ctRepo)
 	tmpl := newFixtureCourse()
-	_, err := m.CreateCourse(tmpl.TenantID, tmpl.ExtID, tmpl.CenterID,
-		tmpl.ProductID, tmpl.Name, tmpl.Notes, tmpl.Timezone,
-		tmpl.Address, tmpl.Status, tmpl.Mode,
-		tmpl.MaxAttendees, tmpl.NumAttendees,
+	_, err := m.CreateCourse(
+		*tmpl,
+		newCourseOrganizer(),
+		newCourseTeacher(),
+		newCourseContact(),
+		newCourseNotify(),
+		newCourseTimings(),
 	)
+
 	assert.Nil(t, err)
 	assert.False(t, tmpl.CreatedAt.IsZero())
 }
 
 func Test_SearchAndFind(t *testing.T) {
-	repo := newInmem()
-	m := NewService(repo)
+	repo := newInmemCourse()
+	ctRepo := newInmemCourseTiming()
+	m := NewService(repo, ctRepo)
 	tmpl1 := newFixtureCourse()
 	tmpl2 := newFixtureCourse()
 	tmpl2.Name = "Course Sahaj Meditation"
 	extID := bobExtID
 	tmpl2.ExtID = &extID
 
-	tID, _ := m.CreateCourse(tmpl1.TenantID, tmpl1.ExtID, tmpl1.CenterID,
-		tmpl1.ProductID, tmpl1.Name, tmpl1.Notes, tmpl1.Timezone,
-		tmpl1.Address, tmpl1.Status, tmpl1.Mode,
-		tmpl1.MaxAttendees, tmpl1.NumAttendees,
+	tID, _ := m.CreateCourse(
+		*tmpl1,
+		newCourseOrganizer(),
+		newCourseTeacher(),
+		newCourseContact(),
+		newCourseNotify(),
+		newCourseTimings(),
 	)
-	_, _ = m.CreateCourse(tmpl2.TenantID, tmpl2.ExtID, tmpl2.CenterID,
-		tmpl2.ProductID, tmpl2.Name, tmpl1.Notes, tmpl1.Timezone,
-		tmpl1.Address, tmpl1.Status, tmpl1.Mode,
-		tmpl1.MaxAttendees, tmpl1.NumAttendees,
+	_, _ = m.CreateCourse(
+		*tmpl2,
+		newCourseOrganizer(),
+		newCourseTeacher(),
+		newCourseContact(),
+		newCourseNotify(),
+		newCourseTimings(),
 	)
 
 	t.Run("search", func(t *testing.T) {
@@ -125,13 +207,17 @@ func Test_SearchAndFind(t *testing.T) {
 }
 
 func Test_Update(t *testing.T) {
-	repo := newInmem()
-	m := NewService(repo)
+	repo := newInmemCourse()
+	ctRepo := newInmemCourseTiming()
+	m := NewService(repo, ctRepo)
 	tmpl := newFixtureCourse()
-	id, err := m.CreateCourse(tmpl.TenantID, tmpl.ExtID, tmpl.CenterID,
-		tmpl.ProductID, tmpl.Name, tmpl.Notes, tmpl.Timezone,
-		tmpl.Address, tmpl.Status, tmpl.Mode,
-		tmpl.MaxAttendees, tmpl.NumAttendees,
+	id, err := m.CreateCourse(
+		*tmpl,
+		newCourseOrganizer(),
+		newCourseTeacher(),
+		newCourseContact(),
+		newCourseNotify(),
+		newCourseTimings(),
 	)
 
 	assert.Nil(t, err)
@@ -146,17 +232,21 @@ func Test_Update(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	repo := newInmem()
-	m := NewService(repo)
+	repo := newInmemCourse()
+	ctRepo := newInmemCourseTiming()
+	m := NewService(repo, ctRepo)
 
 	tmpl1 := newFixtureCourse()
 	tmpl2 := newFixtureCourse()
 	extID := bobExtID
 	tmpl2.ExtID = &extID
-	t2ID, _ := m.CreateCourse(tmpl2.TenantID, tmpl2.ExtID, tmpl2.CenterID,
-		tmpl2.ProductID, tmpl2.Name, tmpl1.Notes, tmpl1.Timezone,
-		tmpl1.Address, tmpl1.Status, tmpl1.Mode,
-		tmpl1.MaxAttendees, tmpl1.NumAttendees,
+	t2ID, _ := m.CreateCourse(
+		*tmpl2,
+		newCourseOrganizer(),
+		newCourseTeacher(),
+		newCourseContact(),
+		newCourseNotify(),
+		newCourseTimings(),
 	)
 
 	err := m.DeleteCourse(tmpl1.ID)

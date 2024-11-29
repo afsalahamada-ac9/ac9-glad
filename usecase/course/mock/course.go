@@ -11,31 +11,31 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockReader is a mock of Reader interface.
-type MockReader struct {
+// MockCourseReader is a mock of CourseReader interface.
+type MockCourseReader struct {
 	ctrl     *gomock.Controller
-	recorder *MockReaderMockRecorder
+	recorder *MockCourseReaderMockRecorder
 }
 
-// MockReaderMockRecorder is the mock recorder for MockReader.
-type MockReaderMockRecorder struct {
-	mock *MockReader
+// MockCourseReaderMockRecorder is the mock recorder for MockCourseReader.
+type MockCourseReaderMockRecorder struct {
+	mock *MockCourseReader
 }
 
-// NewMockReader creates a new mock instance.
-func NewMockReader(ctrl *gomock.Controller) *MockReader {
-	mock := &MockReader{ctrl: ctrl}
-	mock.recorder = &MockReaderMockRecorder{mock}
+// NewMockCourseReader creates a new mock instance.
+func NewMockCourseReader(ctrl *gomock.Controller) *MockCourseReader {
+	mock := &MockCourseReader{ctrl: ctrl}
+	mock.recorder = &MockCourseReaderMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockReader) EXPECT() *MockReaderMockRecorder {
+func (m *MockCourseReader) EXPECT() *MockCourseReaderMockRecorder {
 	return m.recorder
 }
 
 // Get mocks base method.
-func (m *MockReader) Get(id entity.ID) (*entity.Course, error) {
+func (m *MockCourseReader) Get(id entity.ID) (*entity.Course, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", id)
 	ret0, _ := ret[0].(*entity.Course)
@@ -44,13 +44,13 @@ func (m *MockReader) Get(id entity.ID) (*entity.Course, error) {
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockReaderMockRecorder) Get(id interface{}) *gomock.Call {
+func (mr *MockCourseReaderMockRecorder) Get(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockReader)(nil).Get), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockCourseReader)(nil).Get), id)
 }
 
 // GetCount mocks base method.
-func (m *MockReader) GetCount(id entity.ID) (int, error) {
+func (m *MockCourseReader) GetCount(id entity.ID) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCount", id)
 	ret0, _ := ret[0].(int)
@@ -59,13 +59,13 @@ func (m *MockReader) GetCount(id entity.ID) (int, error) {
 }
 
 // GetCount indicates an expected call of GetCount.
-func (mr *MockReaderMockRecorder) GetCount(id interface{}) *gomock.Call {
+func (mr *MockCourseReaderMockRecorder) GetCount(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCount", reflect.TypeOf((*MockReader)(nil).GetCount), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCount", reflect.TypeOf((*MockCourseReader)(nil).GetCount), id)
 }
 
 // List mocks base method.
-func (m *MockReader) List(tenantID entity.ID, page, limit int) ([]*entity.Course, error) {
+func (m *MockCourseReader) List(tenantID entity.ID, page, limit int) ([]*entity.Course, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", tenantID, page, limit)
 	ret0, _ := ret[0].([]*entity.Course)
@@ -74,13 +74,13 @@ func (m *MockReader) List(tenantID entity.ID, page, limit int) ([]*entity.Course
 }
 
 // List indicates an expected call of List.
-func (mr *MockReaderMockRecorder) List(tenantID, page, limit interface{}) *gomock.Call {
+func (mr *MockCourseReaderMockRecorder) List(tenantID, page, limit interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockReader)(nil).List), tenantID, page, limit)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockCourseReader)(nil).List), tenantID, page, limit)
 }
 
 // Search mocks base method.
-func (m *MockReader) Search(tenantID entity.ID, query string, page, limit int) ([]*entity.Course, error) {
+func (m *MockCourseReader) Search(tenantID entity.ID, query string, page, limit int) ([]*entity.Course, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Search", tenantID, query, page, limit)
 	ret0, _ := ret[0].([]*entity.Course)
@@ -89,36 +89,36 @@ func (m *MockReader) Search(tenantID entity.ID, query string, page, limit int) (
 }
 
 // Search indicates an expected call of Search.
-func (mr *MockReaderMockRecorder) Search(tenantID, query, page, limit interface{}) *gomock.Call {
+func (mr *MockCourseReaderMockRecorder) Search(tenantID, query, page, limit interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Search", reflect.TypeOf((*MockReader)(nil).Search), tenantID, query, page, limit)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Search", reflect.TypeOf((*MockCourseReader)(nil).Search), tenantID, query, page, limit)
 }
 
-// MockWriter is a mock of Writer interface.
-type MockWriter struct {
+// MockCourseWriter is a mock of CourseWriter interface.
+type MockCourseWriter struct {
 	ctrl     *gomock.Controller
-	recorder *MockWriterMockRecorder
+	recorder *MockCourseWriterMockRecorder
 }
 
-// MockWriterMockRecorder is the mock recorder for MockWriter.
-type MockWriterMockRecorder struct {
-	mock *MockWriter
+// MockCourseWriterMockRecorder is the mock recorder for MockCourseWriter.
+type MockCourseWriterMockRecorder struct {
+	mock *MockCourseWriter
 }
 
-// NewMockWriter creates a new mock instance.
-func NewMockWriter(ctrl *gomock.Controller) *MockWriter {
-	mock := &MockWriter{ctrl: ctrl}
-	mock.recorder = &MockWriterMockRecorder{mock}
+// NewMockCourseWriter creates a new mock instance.
+func NewMockCourseWriter(ctrl *gomock.Controller) *MockCourseWriter {
+	mock := &MockCourseWriter{ctrl: ctrl}
+	mock.recorder = &MockCourseWriterMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockWriter) EXPECT() *MockWriterMockRecorder {
+func (m *MockCourseWriter) EXPECT() *MockCourseWriterMockRecorder {
 	return m.recorder
 }
 
 // Create mocks base method.
-func (m *MockWriter) Create(e *entity.Course) (entity.ID, error) {
+func (m *MockCourseWriter) Create(e *entity.Course) (entity.ID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", e)
 	ret0, _ := ret[0].(entity.ID)
@@ -127,13 +127,13 @@ func (m *MockWriter) Create(e *entity.Course) (entity.ID, error) {
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockWriterMockRecorder) Create(e interface{}) *gomock.Call {
+func (mr *MockCourseWriterMockRecorder) Create(e interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockWriter)(nil).Create), e)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockCourseWriter)(nil).Create), e)
 }
 
 // Delete mocks base method.
-func (m *MockWriter) Delete(id entity.ID) error {
+func (m *MockCourseWriter) Delete(id entity.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", id)
 	ret0, _ := ret[0].(error)
@@ -141,13 +141,13 @@ func (m *MockWriter) Delete(id entity.ID) error {
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *MockWriterMockRecorder) Delete(id interface{}) *gomock.Call {
+func (mr *MockCourseWriterMockRecorder) Delete(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockWriter)(nil).Delete), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockCourseWriter)(nil).Delete), id)
 }
 
 // Update mocks base method.
-func (m *MockWriter) Update(e *entity.Course) error {
+func (m *MockCourseWriter) Update(e *entity.Course) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", e)
 	ret0, _ := ret[0].(error)
@@ -155,36 +155,36 @@ func (m *MockWriter) Update(e *entity.Course) error {
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockWriterMockRecorder) Update(e interface{}) *gomock.Call {
+func (mr *MockCourseWriterMockRecorder) Update(e interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockWriter)(nil).Update), e)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockCourseWriter)(nil).Update), e)
 }
 
-// MockRepository is a mock of Repository interface.
-type MockRepository struct {
+// MockCourseRepository is a mock of CourseRepository interface.
+type MockCourseRepository struct {
 	ctrl     *gomock.Controller
-	recorder *MockRepositoryMockRecorder
+	recorder *MockCourseRepositoryMockRecorder
 }
 
-// MockRepositoryMockRecorder is the mock recorder for MockRepository.
-type MockRepositoryMockRecorder struct {
-	mock *MockRepository
+// MockCourseRepositoryMockRecorder is the mock recorder for MockCourseRepository.
+type MockCourseRepositoryMockRecorder struct {
+	mock *MockCourseRepository
 }
 
-// NewMockRepository creates a new mock instance.
-func NewMockRepository(ctrl *gomock.Controller) *MockRepository {
-	mock := &MockRepository{ctrl: ctrl}
-	mock.recorder = &MockRepositoryMockRecorder{mock}
+// NewMockCourseRepository creates a new mock instance.
+func NewMockCourseRepository(ctrl *gomock.Controller) *MockCourseRepository {
+	mock := &MockCourseRepository{ctrl: ctrl}
+	mock.recorder = &MockCourseRepositoryMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
+func (m *MockCourseRepository) EXPECT() *MockCourseRepositoryMockRecorder {
 	return m.recorder
 }
 
 // Create mocks base method.
-func (m *MockRepository) Create(e *entity.Course) (entity.ID, error) {
+func (m *MockCourseRepository) Create(e *entity.Course) (entity.ID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", e)
 	ret0, _ := ret[0].(entity.ID)
@@ -193,13 +193,13 @@ func (m *MockRepository) Create(e *entity.Course) (entity.ID, error) {
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockRepositoryMockRecorder) Create(e interface{}) *gomock.Call {
+func (mr *MockCourseRepositoryMockRecorder) Create(e interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockRepository)(nil).Create), e)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockCourseRepository)(nil).Create), e)
 }
 
 // Delete mocks base method.
-func (m *MockRepository) Delete(id entity.ID) error {
+func (m *MockCourseRepository) Delete(id entity.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", id)
 	ret0, _ := ret[0].(error)
@@ -207,13 +207,13 @@ func (m *MockRepository) Delete(id entity.ID) error {
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *MockRepositoryMockRecorder) Delete(id interface{}) *gomock.Call {
+func (mr *MockCourseRepositoryMockRecorder) Delete(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockRepository)(nil).Delete), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockCourseRepository)(nil).Delete), id)
 }
 
 // Get mocks base method.
-func (m *MockRepository) Get(id entity.ID) (*entity.Course, error) {
+func (m *MockCourseRepository) Get(id entity.ID) (*entity.Course, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", id)
 	ret0, _ := ret[0].(*entity.Course)
@@ -222,13 +222,13 @@ func (m *MockRepository) Get(id entity.ID) (*entity.Course, error) {
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockRepositoryMockRecorder) Get(id interface{}) *gomock.Call {
+func (mr *MockCourseRepositoryMockRecorder) Get(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockRepository)(nil).Get), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockCourseRepository)(nil).Get), id)
 }
 
 // GetCount mocks base method.
-func (m *MockRepository) GetCount(id entity.ID) (int, error) {
+func (m *MockCourseRepository) GetCount(id entity.ID) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCount", id)
 	ret0, _ := ret[0].(int)
@@ -237,13 +237,13 @@ func (m *MockRepository) GetCount(id entity.ID) (int, error) {
 }
 
 // GetCount indicates an expected call of GetCount.
-func (mr *MockRepositoryMockRecorder) GetCount(id interface{}) *gomock.Call {
+func (mr *MockCourseRepositoryMockRecorder) GetCount(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCount", reflect.TypeOf((*MockRepository)(nil).GetCount), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCount", reflect.TypeOf((*MockCourseRepository)(nil).GetCount), id)
 }
 
 // List mocks base method.
-func (m *MockRepository) List(tenantID entity.ID, page, limit int) ([]*entity.Course, error) {
+func (m *MockCourseRepository) List(tenantID entity.ID, page, limit int) ([]*entity.Course, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", tenantID, page, limit)
 	ret0, _ := ret[0].([]*entity.Course)
@@ -252,13 +252,13 @@ func (m *MockRepository) List(tenantID entity.ID, page, limit int) ([]*entity.Co
 }
 
 // List indicates an expected call of List.
-func (mr *MockRepositoryMockRecorder) List(tenantID, page, limit interface{}) *gomock.Call {
+func (mr *MockCourseRepositoryMockRecorder) List(tenantID, page, limit interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockRepository)(nil).List), tenantID, page, limit)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockCourseRepository)(nil).List), tenantID, page, limit)
 }
 
 // Search mocks base method.
-func (m *MockRepository) Search(tenantID entity.ID, query string, page, limit int) ([]*entity.Course, error) {
+func (m *MockCourseRepository) Search(tenantID entity.ID, query string, page, limit int) ([]*entity.Course, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Search", tenantID, query, page, limit)
 	ret0, _ := ret[0].([]*entity.Course)
@@ -267,13 +267,13 @@ func (m *MockRepository) Search(tenantID entity.ID, query string, page, limit in
 }
 
 // Search indicates an expected call of Search.
-func (mr *MockRepositoryMockRecorder) Search(tenantID, query, page, limit interface{}) *gomock.Call {
+func (mr *MockCourseRepositoryMockRecorder) Search(tenantID, query, page, limit interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Search", reflect.TypeOf((*MockRepository)(nil).Search), tenantID, query, page, limit)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Search", reflect.TypeOf((*MockCourseRepository)(nil).Search), tenantID, query, page, limit)
 }
 
 // Update mocks base method.
-func (m *MockRepository) Update(e *entity.Course) error {
+func (m *MockCourseRepository) Update(e *entity.Course) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", e)
 	ret0, _ := ret[0].(error)
@@ -281,9 +281,32 @@ func (m *MockRepository) Update(e *entity.Course) error {
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockRepositoryMockRecorder) Update(e interface{}) *gomock.Call {
+func (mr *MockCourseRepositoryMockRecorder) Update(e interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockRepository)(nil).Update), e)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockCourseRepository)(nil).Update), e)
+}
+
+// MockCourseTimingRepository is a mock of CourseTimingRepository interface.
+type MockCourseTimingRepository struct {
+	ctrl     *gomock.Controller
+	recorder *MockCourseTimingRepositoryMockRecorder
+}
+
+// MockCourseTimingRepositoryMockRecorder is the mock recorder for MockCourseTimingRepository.
+type MockCourseTimingRepositoryMockRecorder struct {
+	mock *MockCourseTimingRepository
+}
+
+// NewMockCourseTimingRepository creates a new mock instance.
+func NewMockCourseTimingRepository(ctrl *gomock.Controller) *MockCourseTimingRepository {
+	mock := &MockCourseTimingRepository{ctrl: ctrl}
+	mock.recorder = &MockCourseTimingRepositoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCourseTimingRepository) EXPECT() *MockCourseTimingRepositoryMockRecorder {
+	return m.recorder
 }
 
 // MockUseCase is a mock of UseCase interface.
@@ -310,18 +333,18 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 }
 
 // CreateCourse mocks base method.
-func (m *MockUseCase) CreateCourse(tenantID entity.ID, extID *string, centerID, productID entity.ID, name, notes, timezone string, address entity.CourseAddress, status entity.CourseStatus, mode entity.CourseMode, maxAttendees, numAttendees int32) (entity.ID, error) {
+func (m *MockUseCase) CreateCourse(course entity.Course, cos []*entity.CourseOrganizer, cts []*entity.CourseTeacher, ccs []*entity.CourseContact, cns []*entity.CourseNotify, courseTimings []*entity.CourseTiming) (entity.ID, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateCourse", tenantID, extID, centerID, productID, name, notes, timezone, address, status, mode, maxAttendees, numAttendees)
+	ret := m.ctrl.Call(m, "CreateCourse", course, cos, cts, ccs, cns, courseTimings)
 	ret0, _ := ret[0].(entity.ID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateCourse indicates an expected call of CreateCourse.
-func (mr *MockUseCaseMockRecorder) CreateCourse(tenantID, extID, centerID, productID, name, notes, timezone, address, status, mode, maxAttendees, numAttendees interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) CreateCourse(course, cos, cts, ccs, cns, courseTimings interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCourse", reflect.TypeOf((*MockUseCase)(nil).CreateCourse), tenantID, extID, centerID, productID, name, notes, timezone, address, status, mode, maxAttendees, numAttendees)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCourse", reflect.TypeOf((*MockUseCase)(nil).CreateCourse), course, cos, cts, ccs, cns, courseTimings)
 }
 
 // DeleteCourse mocks base method.

@@ -47,7 +47,6 @@ func main() {
 		// util.GetIntEnvOrConfig("DB_PORT", config.DB_PORT),
 		util.GetStrEnvOrConfig("DB_DATABASE", config.DB_DATABASE),
 		util.GetStrEnvOrConfig("DB_SSLMODE", config.DB_SSLMODE))
-	log.Printf("Data source=%s", dataSourceName)
 	db, err := sql.Open("postgres", dataSourceName)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -67,7 +66,8 @@ func main() {
 	accountService := account.NewService(accountRepo)
 
 	courseRepo := repository.NewCoursePGSQL(db)
-	courseService := course.NewService(courseRepo)
+	courseTimingRepo := repository.NewCourseTimingPGSQL(db)
+	courseService := course.NewService(courseRepo, courseTimingRepo)
 
 	metricService, err := metric.NewPrometheusService()
 	if err != nil {
