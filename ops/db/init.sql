@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS tenant (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     country VARCHAR(128) NOT NULL,
-    is_default BOOLEAN UNIQUE DEFAULT NULL,
+    is_default BOOLEAN UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS center (
 CREATE INDEX idx_center_ext_id ON center(ext_id);
 CREATE INDEX idx_center_tenant_id ON center(tenant_id);
 CREATE INDEX idx_center_name ON center(name);
-CREATE INDEX idx_center_center_name ON center(center_name);
+CREATE INDEX idx_center_ext_name ON center(ext_name);
 
 CREATE TABLE IF NOT EXISTS center_contact (
     center_id INT NOT NULL REFERENCES center(id) ON DELETE CASCADE,
