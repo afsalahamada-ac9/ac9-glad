@@ -366,17 +366,17 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 }
 
 // CreateAccount mocks base method.
-func (m *MockUseCase) CreateAccount(tenantID entity.ID, extID, cognitoID, username, first_name, last_name, phone, email string, at entity.AccountType) error {
+func (m *MockUseCase) CreateAccount(tenantID entity.ID, extID, cognitoID, username, first_name, last_name, phone, email string, at entity.AccountType, as entity.AccountStatus) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateAccount", tenantID, extID, cognitoID, username, first_name, last_name, phone, email, at)
+	ret := m.ctrl.Call(m, "CreateAccount", tenantID, extID, cognitoID, username, first_name, last_name, phone, email, at, as)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateAccount indicates an expected call of CreateAccount.
-func (mr *MockUseCaseMockRecorder) CreateAccount(tenantID, extID, cognitoID, username, first_name, last_name, phone, email, at interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) CreateAccount(tenantID, extID, cognitoID, username, first_name, last_name, phone, email, at, as interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAccount", reflect.TypeOf((*MockUseCase)(nil).CreateAccount), tenantID, extID, cognitoID, username, first_name, last_name, phone, email, at)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAccount", reflect.TypeOf((*MockUseCase)(nil).CreateAccount), tenantID, extID, cognitoID, username, first_name, last_name, phone, email, at, as)
 }
 
 // DeleteAccount mocks base method.

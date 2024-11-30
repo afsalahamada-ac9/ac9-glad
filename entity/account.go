@@ -22,6 +22,16 @@ const (
 	// Add new types here
 )
 
+// Account status
+type AccountStatus string
+
+const (
+	AccountActive   AccountStatus = "active"
+	AccountInactive AccountStatus = "inactive"
+	AccountDisabled AccountStatus = "disabled"
+	// Add new types here
+)
+
 // Account data
 type Account struct {
 	ID        ID
@@ -35,6 +45,7 @@ type Account struct {
 	Phone     string
 	Email     string
 	Type      AccountType
+	Status    AccountStatus
 
 	// meta data
 	CreatedAt time.Time
@@ -51,6 +62,7 @@ func NewAccount(tenantID ID,
 	phone string,
 	email string,
 	at AccountType,
+	as AccountStatus,
 ) (*Account, error) {
 	t := &Account{
 		ID:        NewID(),
@@ -63,6 +75,7 @@ func NewAccount(tenantID ID,
 		Phone:     phone,
 		Email:     email,
 		Type:      at,
+		Status:    as,
 		CreatedAt: time.Now(),
 	}
 	err := t.Validate()

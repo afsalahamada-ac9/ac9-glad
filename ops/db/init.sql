@@ -44,6 +44,10 @@ CREATE TYPE account_type AS ENUM ('assistant-teacher'
     , 'teacher'
     , 'user'
     );
+CREATE TYPE account_status AS ENUM ('active'
+    , 'inactive'
+    , 'disabled'
+    );
 CREATE TYPE center_mode AS ENUM ('in-person'
     , 'online'
     );
@@ -210,6 +214,7 @@ CREATE TABLE IF NOT EXISTS account (
     phone VARCHAR(32),
     email VARCHAR(80),
     type account_type,
+    status account_status,
 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP

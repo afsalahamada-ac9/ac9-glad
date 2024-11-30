@@ -44,6 +44,7 @@ func newFixtureAccount() *entity.Account {
 		Phone:     "1235556789",
 		Email:     "alice@wonderland.ai",
 		Type:      entity.AccountTeacher,
+		Status:    entity.AccountActive,
 		CreatedAt: time.Now(),
 	}
 }
@@ -61,6 +62,7 @@ func Test_Create(t *testing.T) {
 		account.Phone,
 		account.Email,
 		account.Type,
+		account.Status,
 	)
 	assert.Nil(t, err)
 	assert.False(t, account.CreatedAt.IsZero())
@@ -85,6 +87,7 @@ func Test_SearchAndFind(t *testing.T) {
 		account1.Phone,
 		account1.Email,
 		account1.Type,
+		account1.Status,
 	)
 	_ = m.CreateAccount(tenantAlice,
 		account2.ExtID,
@@ -95,6 +98,7 @@ func Test_SearchAndFind(t *testing.T) {
 		account2.Phone,
 		account2.Email,
 		account2.Type,
+		account2.Status,
 	)
 
 	t.Run("list all", func(t *testing.T) {
@@ -127,6 +131,7 @@ func Test_Update(t *testing.T) {
 		account.Phone,
 		account.Email,
 		account.Type,
+		account.Status,
 	)
 	assert.Nil(t, err)
 
@@ -161,6 +166,7 @@ func TestDelete(t *testing.T) {
 		account2.Phone,
 		account2.Email,
 		account2.Type,
+		account2.Status,
 	)
 
 	err := m.DeleteAccountByName(tenantAlice, account1.Username)

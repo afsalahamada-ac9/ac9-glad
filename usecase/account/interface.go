@@ -44,7 +44,9 @@ type UseCase interface {
 		last_name string,
 		phone string,
 		email string,
-		at entity.AccountType) error
+		at entity.AccountType,
+		as entity.AccountStatus,
+	) error
 	GetAccount(id entity.ID) (*entity.Account, error)
 	GetAccountByName(tenantID entity.ID, username string) (*entity.Account, error)
 	ListAccounts(tenantID entity.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error)

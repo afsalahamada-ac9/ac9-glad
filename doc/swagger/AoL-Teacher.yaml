@@ -10,7 +10,7 @@ info:
 
   contact:
     email: sudhagar@abovecloud9.ai
-  version: 0.0.5
+  version: 0.0.6
 externalDocs:
   description: Find out more about AboveCloud9.AI
   url: https://abovecloud9.ai
@@ -558,7 +558,7 @@ components:
           type: integer
           format: int32
           example: 10
-        dates:
+        date:
           type: array
           items:
             $ref: '#/components/schemas/DateTime'
@@ -596,6 +596,12 @@ components:
           example: 10000000
         shortURL:
           type: string
+        dateId:
+          type: array
+          items:
+            type: integer
+            format: int64
+            example: 10000000
     Course:
       allOf: # Combines the CourseRequest and CourseResponse
         - $ref: "#/components/schemas/CourseRequest"

@@ -35,6 +35,7 @@ func (s *Service) CreateAccount(
 	phone string,
 	email string,
 	at entity.AccountType,
+	as entity.AccountStatus,
 ) error {
 	account, err := entity.NewAccount(tenantID,
 		extID,
@@ -44,7 +45,9 @@ func (s *Service) CreateAccount(
 		last_name,
 		phone,
 		email,
-		at)
+		at,
+		as,
+	)
 	if err != nil {
 		return err
 	}
