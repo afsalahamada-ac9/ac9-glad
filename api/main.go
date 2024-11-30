@@ -17,6 +17,9 @@ import (
 
 	"sudhagar/glad/repository"
 
+	// Uber zap logging
+	"sudhagar/glad/pkg/logger"
+
 	"sudhagar/glad/usecase/account"
 	"sudhagar/glad/usecase/center"
 	"sudhagar/glad/usecase/course"
@@ -39,6 +42,18 @@ import (
 )
 
 func main() {
+
+	err := logger.InitLogger()
+	if err != nil {
+		log.Fatalf("failed to initialize the logger %v", err)
+	}
+
+	// Defer the Sync to ensure logs are flushed out before program exits
+	defer func() {
+		if err := logger.Log.Sync(); err != nil {
+			logger.Log.Error("failed to sync logger: %v", err)
+		}
+	}()
 
 	dataSourceName := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s",
 		util.GetStrEnvOrConfig("DB_USER", config.DB_USER),
