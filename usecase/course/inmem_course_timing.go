@@ -7,6 +7,7 @@
 package course
 
 import (
+	"log"
 	"sudhagar/glad/entity"
 )
 
@@ -25,6 +26,7 @@ func newInmemCourseTiming() *inmemCourseTiming {
 
 // Create a course
 func (r *inmemCourseTiming) Create(e *entity.CourseTiming) (entity.ID, error) {
+	// log.Printf("Create course timing; id=%v, details=%#v", e.ID, e)
 	r.m[e.ID] = e
 	return e.ID, nil
 }
@@ -32,6 +34,7 @@ func (r *inmemCourseTiming) Create(e *entity.CourseTiming) (entity.ID, error) {
 // Get a course
 func (r *inmemCourseTiming) Get(id entity.ID) (*entity.CourseTiming, error) {
 	if r.m[id] == nil {
+		log.Printf("Inmem CourseTiming Get() id=%#v, not found", id)
 		return nil, entity.ErrNotFound
 	}
 	return r.m[id], nil
@@ -39,6 +42,7 @@ func (r *inmemCourseTiming) Get(id entity.ID) (*entity.CourseTiming, error) {
 
 // Update a course
 func (r *inmemCourseTiming) Update(e *entity.CourseTiming) error {
+	// log.Printf("Update course timing; id=%v, details=%#v", e.ID, e)
 	_, err := r.Get(e.ID)
 	if err != nil {
 		return err

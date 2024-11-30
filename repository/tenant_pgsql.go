@@ -137,7 +137,6 @@ func (r *TenantPGSQL) List(page, limit int) ([]*entity.Tenant, error) {
 
 	defer rows.Close()
 	return r.scanRows(rows)
-
 }
 
 // Delete a Tenant

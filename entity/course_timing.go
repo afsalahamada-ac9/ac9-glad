@@ -81,7 +81,8 @@ func NewCourseTiming(
 
 // New creates a new course timing from existing course timing and overrides id and created & updated date
 func (ct CourseTiming) New() (*CourseTiming, error) {
-	courseTiming := &ct
+	courseTiming := &CourseTiming{}
+	*courseTiming = ct
 
 	courseTiming.ID = NewID()
 	courseTiming.CreatedAt = time.Now()

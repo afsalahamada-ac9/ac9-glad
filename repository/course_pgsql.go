@@ -27,7 +27,7 @@ func NewCoursePGSQL(db *sql.DB) *CoursePGSQL {
 	}
 }
 
-// Create creates a course
+// Insert creates a course
 func (r *CoursePGSQL) Create(e *entity.Course) (entity.ID, error) {
 	addressJSON, err := json.Marshal(e.Address)
 	if err != nil {
@@ -288,10 +288,10 @@ func (r *CoursePGSQL) scanRows(rows *sql.Rows) ([]*entity.Course, error) {
 // --------------------------------------------------------------------------------
 // Course Organizer
 // --------------------------------------------------------------------------------
-// CreateCourseOrganizer creates course to organizer mapping
+// InsertCourseOrganizer creates course to organizer mapping
 // TODO: We should map error value appropriately to the API client. Ex. foreign key violation implies
 // that request is a bad request, etc. or, maybe we don't. Something to think about.
-func (r *CoursePGSQL) CreateCourseOrganizer(courseID entity.ID, cos []*entity.CourseOrganizer) error {
+func (r *CoursePGSQL) InsertCourseOrganizer(courseID entity.ID, cos []*entity.CourseOrganizer) error {
 	values := func(index int) []interface{} {
 		return []interface{}{
 			courseID,
@@ -321,11 +321,134 @@ func (r *CoursePGSQL) CreateCourseOrganizer(courseID entity.ID, cos []*entity.Co
 	return err
 }
 
+// GetCourseOrganizer gets course organizer for the given course id
+func (r *CoursePGSQL) GetCourseOrganizer(courseID entity.ID) ([]*entity.CourseOrganizer, error) {
+	query := `SELECT organizer_id FROM course_organizer where course_id = $1;`
+
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := stmt.Query(courseID)
+	if err != nil {
+		return nil, err
+	}
+
+	var cos []*entity.CourseOrganizer
+	for rows.Next() {
+		var co entity.CourseOrganizer
+
+		err := rows.Scan(&co.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		cos = append(cos, &co)
+	}
+
+	defer rows.Close()
+	return cos, err
+}
+
+// UpdateCourseOrganizer updates course organizer for the given course id and the organizer
+func (r *CoursePGSQL) UpdateCourseOrganizer(courseID entity.ID, cos []*entity.CourseOrganizer) error {
+	// Note: It's possible we could use reflection and make this
+	// split of add and remove items more generic.
+	currentCOs, err := r.GetCourseOrganizer(courseID)
+	if err != nil {
+		return err
+	}
+
+	mapOrgID := make(map[entity.ID]bool)
+	for _, co := range currentCOs {
+		mapOrgID[co.ID] = true
+	}
+
+	var addCOs []*entity.CourseOrganizer
+	var rmCOs []*entity.CourseOrganizer
+	for _, co := range cos {
+		if _, exists := mapOrgID[co.ID]; exists {
+			delete(mapOrgID, co.ID)
+		} else {
+			addCOs = append(addCOs, co)
+		}
+	}
+
+	for id := range mapOrgID {
+		co := entity.CourseOrganizer{
+			ID: id,
+		}
+		rmCOs = append(rmCOs, &co)
+	}
+
+	if len(addCOs) > 0 {
+		err = r.InsertCourseOrganizer(courseID, addCOs)
+		if err != nil {
+			return err
+		}
+	}
+
+	if len(rmCOs) > 0 {
+		err = r.DeleteCourseOrganizer(courseID, rmCOs)
+		if err != nil {
+			return err
+		}
+
+	}
+
+	return err
+}
+
+// DeleteCourseOrganizer deletes the given course organizers
+func (r *CoursePGSQL) DeleteCourseOrganizer(courseID entity.ID, cos []*entity.CourseOrganizer) error {
+	values := func(index int) []interface{} {
+		return []interface{}{
+			courseID,
+			cos[index].ID,
+		}
+	}
+
+	query, valueArgs := util.GenBulkDeletePGSQL(
+		"course_organizer",
+		[]string{"course_id", "organizer_id"},
+		len(cos),
+		values,
+	)
+
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(valueArgs...)
+	if err != nil {
+		return err
+	}
+
+	err = stmt.Close()
+	return err
+}
+
+// DeleteCourseOrganizerByCourse deletes course organizers using course id
+func (r *CoursePGSQL) DeleteCourseOrganizerByCourse(courseID entity.ID) error {
+	res, err := r.db.Exec(`DELETE FROM course_organizer WHERE course_id = $1;`, courseID)
+	if err != nil {
+		return err
+	}
+
+	if cnt, _ := res.RowsAffected(); cnt == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
+
 // --------------------------------------------------------------------------------
 // Course Teacher
 // --------------------------------------------------------------------------------
-// CreateCourseTeacher creates course to teacher mapping
-func (r *CoursePGSQL) CreateCourseTeacher(courseID entity.ID, cts []*entity.CourseTeacher) error {
+// InsertCourseTeacher creates course to teacher mapping
+func (r *CoursePGSQL) InsertCourseTeacher(courseID entity.ID, cts []*entity.CourseTeacher) error {
 	values := func(index int) []interface{} {
 		return []interface{}{
 			courseID,
@@ -359,8 +482,8 @@ func (r *CoursePGSQL) CreateCourseTeacher(courseID entity.ID, cts []*entity.Cour
 // --------------------------------------------------------------------------------
 // Course Contact
 // --------------------------------------------------------------------------------
-// CreateCourseContact creates course to contact mapping
-func (r *CoursePGSQL) CreateCourseContact(courseID entity.ID, ccs []*entity.CourseContact) error {
+// InsertCourseContact creates course to contact mapping
+func (r *CoursePGSQL) InsertCourseContact(courseID entity.ID, ccs []*entity.CourseContact) error {
 	values := func(index int) []interface{} {
 		return []interface{}{
 			courseID,
@@ -393,8 +516,8 @@ func (r *CoursePGSQL) CreateCourseContact(courseID entity.ID, ccs []*entity.Cour
 // --------------------------------------------------------------------------------
 // Course Notify
 // --------------------------------------------------------------------------------
-// CreateCourseNotify creates course to notify mapping
-func (r *CoursePGSQL) CreateCourseNotify(courseID entity.ID, cns []*entity.CourseNotify) error {
+// InsertCourseNotify creates course to notify mapping
+func (r *CoursePGSQL) InsertCourseNotify(courseID entity.ID, cns []*entity.CourseNotify) error {
 	values := func(index int) []interface{} {
 		return []interface{}{
 			courseID,

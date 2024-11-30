@@ -59,3 +59,41 @@ func GenBulkInsertPGSQL(
 	}
 	return queryBuilder.String(), valueArgs
 }
+
+// GenBulkDeletePGSQL generates bulk delete statement for postgres
+func GenBulkDeletePGSQL(
+	tableName string,
+	columns []string,
+	numRows int,
+	valueExtractor ValueExtractor,
+) (string, []interface{}) {
+	numCols := len(columns)
+	var queryBuilder strings.Builder
+	queryBuilder.WriteString("DELETE FROM ")
+	queryBuilder.WriteString(tableName)
+	queryBuilder.WriteString(" WHERE ")
+
+	var valueArgs []interface{}
+	valueArgs = make([]interface{}, 0, numRows*numCols)
+	for rowIndex := 0; rowIndex < numRows; rowIndex++ {
+		if rowIndex > 0 {
+			queryBuilder.WriteString(" OR (")
+		} else {
+			queryBuilder.WriteString("(")
+		}
+		for colIndex := 0; colIndex < numCols; colIndex++ {
+			queryBuilder.WriteString(columns[colIndex] + " = ")
+			queryBuilder.WriteString("$")
+			queryBuilder.WriteString(strconv.Itoa(rowIndex*numCols + colIndex + 1))
+			if colIndex < numCols-1 {
+				queryBuilder.WriteString(" AND ")
+			}
+		}
+		queryBuilder.WriteString(")")
+		if rowIndex == numRows-1 {
+			queryBuilder.WriteString(";")
+		}
+		valueArgs = append(valueArgs, valueExtractor(rowIndex)...)
+	}
+	return queryBuilder.String(), valueArgs
+}

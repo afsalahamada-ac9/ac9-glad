@@ -245,7 +245,7 @@ func updateCourse(service course.UseCase) http.Handler {
 			return
 		}
 
-		var input entity.Course
+		var input presenter.CourseReq
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
 		tenantID, err := entity.StringToID(tenant)
 		if err != nil {
@@ -262,9 +262,42 @@ func updateCourse(service course.UseCase) http.Handler {
 			return
 		}
 
-		input.ID = id
-		input.TenantID = tenantID
-		err = service.UpdateCourse(&input)
+		course, err := input.ToCourse(tenantID)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Unable to copy to course entity"))
+			return
+		}
+		// ID sent in the body will be ignored for update. Only the ID sent in path
+		// will be taken into consideration
+		// Bugs in client could cause more damage. We can add a check to see whether the
+		// ID sent in the body and the path are same.
+		course.ID = id
+
+		cos, _ := input.ToCourseOrganizer()
+		cts, _ := input.ToCourseTeacher()
+		ccs, _ := input.ToCourseContact()
+		cns, _ := input.ToCourseNotify()
+
+		// TODO: validation checks to be performed
+
+		// TODO: Course timings should contain ID
+		// Note: Once course is created, then additional day cannot be added via API
+		courseTimings, err := input.ToCourseTiming()
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Unable to copy to course timing entity"))
+			return
+		}
+
+		err = service.UpdateCourse(
+			course,
+			cos,
+			cts,
+			ccs,
+			cns,
+			courseTimings,
+		)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
@@ -272,7 +305,7 @@ func updateCourse(service course.UseCase) http.Handler {
 		}
 
 		toJ := &presenter.Course{
-			ID: input.ID,
+			ID: course.ID,
 		}
 
 		w.Header().Set(common.HttpHeaderTenantID, tenant)

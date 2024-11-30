@@ -113,7 +113,7 @@ func newCourseNotify() []*entity.CourseNotify {
 }
 
 // TODO: Need to set proper dates, time and verify the same
-func newCourseTimings() []*entity.CourseTiming {
+func newCourseTiming() []*entity.CourseTiming {
 	ct1 := entity.CourseTiming{ID: aliceTiming1ID}
 	ct2 := entity.CourseTiming{ID: aliceTiming2ID}
 	ct3 := entity.CourseTiming{ID: aliceTiming3ID}
@@ -137,7 +137,7 @@ func Test_Create(t *testing.T) {
 		newCourseTeacher(),
 		newCourseContact(),
 		newCourseNotify(),
-		newCourseTimings(),
+		newCourseTiming(),
 	)
 
 	assert.Nil(t, err)
@@ -160,7 +160,7 @@ func Test_SearchAndFind(t *testing.T) {
 		newCourseTeacher(),
 		newCourseContact(),
 		newCourseNotify(),
-		newCourseTimings(),
+		newCourseTiming(),
 	)
 	_, _, _ = m.CreateCourse(
 		*tmpl2,
@@ -168,7 +168,7 @@ func Test_SearchAndFind(t *testing.T) {
 		newCourseTeacher(),
 		newCourseContact(),
 		newCourseNotify(),
-		newCourseTimings(),
+		newCourseTiming(),
 	)
 
 	t.Run("search", func(t *testing.T) {
@@ -211,20 +211,33 @@ func Test_Update(t *testing.T) {
 	ctRepo := newInmemCourseTiming()
 	m := NewService(repo, ctRepo)
 	tmpl := newFixtureCourse()
-	id, _, err := m.CreateCourse(
+	courseTiming := newCourseTiming()
+
+	id, courseTimingIDs, err := m.CreateCourse(
 		*tmpl,
 		newCourseOrganizer(),
 		newCourseTeacher(),
 		newCourseContact(),
 		newCourseNotify(),
-		newCourseTimings(),
+		courseTiming,
 	)
-
 	assert.Nil(t, err)
 
 	saved, _ := m.GetCourse(id)
 	saved.Mode = entity.CourseOnline
-	assert.Nil(t, m.UpdateCourse(saved))
+	// Update the course timing ids as it is generated afresh
+	for i := range courseTiming {
+		courseTiming[i].ID = courseTimingIDs[i]
+	}
+
+	assert.Nil(t, m.UpdateCourse(
+		*saved,
+		newCourseOrganizer(),
+		newCourseTeacher(),
+		newCourseContact(),
+		newCourseNotify(),
+		courseTiming,
+	))
 
 	updated, err := m.GetCourse(id)
 	assert.Nil(t, err)
@@ -246,7 +259,7 @@ func TestDelete(t *testing.T) {
 		newCourseTeacher(),
 		newCourseContact(),
 		newCourseNotify(),
-		newCourseTimings(),
+		newCourseTiming(),
 	)
 
 	err := m.DeleteCourse(tmpl1.ID)

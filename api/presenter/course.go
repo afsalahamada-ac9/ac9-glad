@@ -34,7 +34,7 @@ type CourseTeacher struct {
 	IsPrimary bool      `json:"is_primary"`
 }
 
-// CourseReq struct used to create the course via REST API
+// CourseReq struct used to create & update the course via REST API
 // TODO: Salesforce will send additional details: extID, URL (to be converted to shortURL), numAttendees
 type CourseReq struct {
 	Name         string               `json:"name"`

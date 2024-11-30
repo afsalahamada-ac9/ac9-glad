@@ -28,14 +28,13 @@ func NewService(cr CourseRepository, ctr CourseTimingRepository) *Service {
 }
 
 // CreateCourse creates a course
-// TODO: Return course timing ID
 func (s *Service) CreateCourse(
 	course entity.Course,
 	cos []*entity.CourseOrganizer,
 	cts []*entity.CourseTeacher,
 	ccs []*entity.CourseContact,
 	cns []*entity.CourseNotify,
-	courseTimings []*entity.CourseTiming,
+	courseTiming []*entity.CourseTiming,
 ) (entity.ID, []entity.ID, error) {
 	c, err := course.New()
 	if err != nil {
@@ -47,37 +46,37 @@ func (s *Service) CreateCourse(
 		return courseID, nil, err
 	}
 
-	for i, ct := range courseTimings {
+	for i, ct := range courseTiming {
 		ct.CourseID = courseID
-		courseTimings[i], err = ct.New()
+		courseTiming[i], err = ct.New()
 		if err != nil {
 			return entity.IDInvalid, nil, err
 		}
 	}
 
 	// Note: These can be executed in parallel using go-routines
-	err = s.cRepo.CreateCourseOrganizer(courseID, cos)
+	err = s.cRepo.InsertCourseOrganizer(courseID, cos)
 	if err != nil {
 		return courseID, nil, err
 	}
 
-	err = s.cRepo.CreateCourseTeacher(courseID, cts)
+	err = s.cRepo.InsertCourseTeacher(courseID, cts)
 	if err != nil {
 		return courseID, nil, err
 	}
 
-	err = s.cRepo.CreateCourseContact(courseID, ccs)
+	err = s.cRepo.InsertCourseContact(courseID, ccs)
 	if err != nil {
 		return courseID, nil, err
 	}
 
-	err = s.cRepo.CreateCourseNotify(courseID, cns)
+	err = s.cRepo.InsertCourseNotify(courseID, cns)
 	if err != nil {
 		return courseID, nil, err
 	}
 
 	var courseTimingID []entity.ID
-	for _, ct := range courseTimings {
+	for _, ct := range courseTiming {
 		ctID, err := s.ctRepo.Create(ct)
 		if err != nil {
 			return courseID, nil, err
@@ -141,14 +140,14 @@ func (s *Service) DeleteCourse(id entity.ID) error {
 }
 
 // UpdateCourse updates course
-func (s *Service) UpdateCourse(c *entity.Course) error {
-	err := c.Validate()
-	if err != nil {
-		return err
-	}
-	c.UpdatedAt = time.Now()
-	return s.cRepo.Update(c)
-}
+// func (s *Service) UpdateCourse(c *entity.Course) error {
+// 	err := c.Validate()
+// 	if err != nil {
+// 		return err
+// 	}
+// 	c.UpdatedAt = time.Now()
+// 	return s.cRepo.Update(c)
+// }
 
 // GetCount gets total course count
 func (s *Service) GetCount(tenantID entity.ID) int {
@@ -158,4 +157,64 @@ func (s *Service) GetCount(tenantID entity.ID) int {
 	}
 
 	return count
+}
+
+// UpdateCourse updates course
+func (s *Service) UpdateCourse(
+	course entity.Course,
+	cos []*entity.CourseOrganizer,
+	cts []*entity.CourseTeacher,
+	ccs []*entity.CourseContact,
+	cns []*entity.CourseNotify,
+	courseTiming []*entity.CourseTiming,
+) error {
+
+	err := course.Validate()
+	if err != nil {
+		return err
+	}
+
+	courseID := course.ID
+
+	// This may not be needed
+	course.UpdatedAt = time.Now()
+	err = s.cRepo.Update(&course)
+	if err != nil {
+		return err
+	}
+
+	for _, ct := range courseTiming {
+		ct.CourseID = courseID
+	}
+
+	// Note: These can be executed in parallel using go-routines
+	err = s.cRepo.UpdateCourseOrganizer(courseID, cos)
+	if err != nil {
+		return err
+	}
+
+	// TODO: Uncomment once implementation is complete for these functions
+	// err = s.cRepo.UpdateCourseTeacher(courseID, cts)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// err = s.cRepo.UpdateCourseContact(courseID, ccs)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// err = s.cRepo.UpdateCourseNotify(courseID, cns)
+	// if err != nil {
+	// 	return err
+	// }
+
+	for _, ct := range courseTiming {
+		err := s.ctRepo.Update(ct)
+		if err != nil {
+			return err
+		}
+	}
+
+	return err
 }

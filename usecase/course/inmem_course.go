@@ -111,8 +111,32 @@ func (r *inmemCourse) GetCount(tenantID entity.ID) (int, error) {
 // --------------------------------------------------------------------------------
 // Course Organizer
 // --------------------------------------------------------------------------------
-// CreateCourseOrganizer creates course to organizer mapping
-func (r *inmemCourse) CreateCourseOrganizer(courseID entity.ID, cos []*entity.CourseOrganizer) error {
+// InsertCourseOrganizer creates course to organizer mapping
+func (r *inmemCourse) InsertCourseOrganizer(courseID entity.ID, cos []*entity.CourseOrganizer) error {
+	// TODO
+	return nil
+}
+
+// GetCourseOrganizer gets course organizer for the given course id
+func (r *inmemCourse) GetCourseOrganizer(courseID entity.ID) ([]*entity.CourseOrganizer, error) {
+	// TODO
+	return nil, nil
+}
+
+// UpdateCourseOrganizer updates course organizer for the given course id and the organizer
+func (r *inmemCourse) UpdateCourseOrganizer(courseID entity.ID, cos []*entity.CourseOrganizer) error {
+	// TODO
+	return nil
+}
+
+// DeleteCourseOrganizer deletes the given course organizers
+func (r *inmemCourse) DeleteCourseOrganizer(courseID entity.ID, cos []*entity.CourseOrganizer) error {
+	// TODO
+	return nil
+}
+
+// DeleteCourseOrganizerByCourse deletes course organizers using course id
+func (r *inmemCourse) DeleteCourseOrganizerByCourse(courseID entity.ID) error {
 	// TODO
 	return nil
 }
@@ -120,8 +144,8 @@ func (r *inmemCourse) CreateCourseOrganizer(courseID entity.ID, cos []*entity.Co
 // --------------------------------------------------------------------------------
 // Course Teacher
 // --------------------------------------------------------------------------------
-// CreateCourseTeacher creates course to teacher mapping
-func (r *inmemCourse) CreateCourseTeacher(courseID entity.ID, cts []*entity.CourseTeacher) error {
+// InsertCourseTeacher creates course to teacher mapping
+func (r *inmemCourse) InsertCourseTeacher(courseID entity.ID, cts []*entity.CourseTeacher) error {
 	// TODO
 	return nil
 }
@@ -129,8 +153,8 @@ func (r *inmemCourse) CreateCourseTeacher(courseID entity.ID, cts []*entity.Cour
 // --------------------------------------------------------------------------------
 // Course Contact
 // --------------------------------------------------------------------------------
-// CreateCourseContact creates course to contact mapping
-func (r *inmemCourse) CreateCourseContact(courseID entity.ID, ccs []*entity.CourseContact) error {
+// InsertCourseContact creates course to contact mapping
+func (r *inmemCourse) InsertCourseContact(courseID entity.ID, ccs []*entity.CourseContact) error {
 	// TODO
 	return nil
 }
@@ -138,8 +162,8 @@ func (r *inmemCourse) CreateCourseContact(courseID entity.ID, ccs []*entity.Cour
 // --------------------------------------------------------------------------------
 // Course Notify
 // --------------------------------------------------------------------------------
-// CreateCourseNotify creates course to notify mapping
-func (r *inmemCourse) CreateCourseNotify(courseID entity.ID, cns []*entity.CourseNotify) error {
+// InsertCourseNotify creates course to notify mapping
+func (r *inmemCourse) InsertCourseNotify(courseID entity.ID, cns []*entity.CourseNotify) error {
 	// TODO
 	return nil
 }
