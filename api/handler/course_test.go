@@ -116,6 +116,8 @@ func Test_createCourse(t *testing.T) {
 	assert.Equal(t, "/v1/courses", path)
 
 	id := entity.NewID()
+	// TODO: Check the length of the courseTimings and same number of
+	// courseTimingIDs to be returned
 	service.EXPECT().
 		CreateCourse(gomock.Any(),
 			gomock.Any(),
@@ -123,7 +125,7 @@ func Test_createCourse(t *testing.T) {
 			gomock.Any(),
 			gomock.Any(),
 			gomock.Any()).
-		Return(id, nil)
+		Return(id, nil, nil)
 	h := createCourse(service)
 
 	ts := httptest.NewServer(h)

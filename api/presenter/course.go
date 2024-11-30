@@ -35,7 +35,7 @@ type CourseTeacher struct {
 }
 
 // CourseReq struct used to create the course via REST API
-// TODO: Salesforce will send additional details: extID, URL (to be converted to shortURL, numAttendees)
+// TODO: Salesforce will send additional details: extID, URL (to be converted to shortURL), numAttendees
 type CourseReq struct {
 	Name         string               `json:"name"`
 	CenterID     entity.ID            `json:"centerId"`
@@ -48,15 +48,16 @@ type CourseReq struct {
 	Notes        *string              `json:"notes"`
 	Status       *entity.CourseStatus `json:"status"`
 	MaxAttendees *int32               `json:"maxAttendees"`
-	DateTime     []DateTime           `json:"dates"`
+	DateTime     []DateTime           `json:"date"`
 	Address      *Address             `json:"address"`
 	Notify       []entity.ID          `json:"notify"`
 }
 
 // CourseResponse struct used as response to the create course request (REST API)
 type CourseResponse struct {
-	ID       entity.ID `json:"id"`
-	ShortURL *string   `json:"shortURL,omitempty"`
+	ID         entity.ID   `json:"id"`
+	DateTimeID []entity.ID `json:"dateId"`
+	ShortURL   *string     `json:"shortURL,omitempty"`
 }
 
 // ToCourse creates course entity from course request

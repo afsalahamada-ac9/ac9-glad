@@ -122,6 +122,8 @@ func createCourse(service course.UseCase) http.Handler {
 		ccs, _ := input.ToCourseContact()
 		cns, _ := input.ToCourseNotify()
 
+		// TODO: validation checks to be performed
+
 		courseTimings, err := input.ToCourseTiming()
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -129,7 +131,7 @@ func createCourse(service course.UseCase) http.Handler {
 			return
 		}
 
-		id, err := service.CreateCourse(
+		courseID, courseTimingsID, err := service.CreateCourse(
 			course,
 			cos,
 			cts,
@@ -143,7 +145,8 @@ func createCourse(service course.UseCase) http.Handler {
 			return
 		}
 		toJ := &presenter.CourseResponse{
-			ID: id,
+			ID:         courseID,
+			DateTimeID: courseTimingsID,
 		}
 
 		w.Header().Set(common.HttpHeaderTenantID, tenant)

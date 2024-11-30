@@ -131,7 +131,7 @@ func Test_Create(t *testing.T) {
 	ctRepo := newInmemCourseTiming()
 	m := NewService(repo, ctRepo)
 	tmpl := newFixtureCourse()
-	_, err := m.CreateCourse(
+	_, _, err := m.CreateCourse(
 		*tmpl,
 		newCourseOrganizer(),
 		newCourseTeacher(),
@@ -154,7 +154,7 @@ func Test_SearchAndFind(t *testing.T) {
 	extID := bobExtID
 	tmpl2.ExtID = &extID
 
-	tID, _ := m.CreateCourse(
+	tID, _, _ := m.CreateCourse(
 		*tmpl1,
 		newCourseOrganizer(),
 		newCourseTeacher(),
@@ -162,7 +162,7 @@ func Test_SearchAndFind(t *testing.T) {
 		newCourseNotify(),
 		newCourseTimings(),
 	)
-	_, _ = m.CreateCourse(
+	_, _, _ = m.CreateCourse(
 		*tmpl2,
 		newCourseOrganizer(),
 		newCourseTeacher(),
@@ -211,7 +211,7 @@ func Test_Update(t *testing.T) {
 	ctRepo := newInmemCourseTiming()
 	m := NewService(repo, ctRepo)
 	tmpl := newFixtureCourse()
-	id, err := m.CreateCourse(
+	id, _, err := m.CreateCourse(
 		*tmpl,
 		newCourseOrganizer(),
 		newCourseTeacher(),
@@ -240,7 +240,7 @@ func TestDelete(t *testing.T) {
 	tmpl2 := newFixtureCourse()
 	extID := bobExtID
 	tmpl2.ExtID = &extID
-	t2ID, _ := m.CreateCourse(
+	t2ID, _, _ := m.CreateCourse(
 		*tmpl2,
 		newCourseOrganizer(),
 		newCourseTeacher(),

@@ -7,7 +7,6 @@
 package course
 
 import (
-	"log"
 	"strings"
 	"time"
 
@@ -37,58 +36,56 @@ func (s *Service) CreateCourse(
 	ccs []*entity.CourseContact,
 	cns []*entity.CourseNotify,
 	courseTimings []*entity.CourseTiming,
-) (entity.ID, error) {
+) (entity.ID, []entity.ID, error) {
 	c, err := course.New()
 	if err != nil {
-		return entity.IDInvalid, err
+		return entity.IDInvalid, nil, err
 	}
 
 	courseID, err := s.cRepo.Create(c)
 	if err != nil {
-		return courseID, err
+		return courseID, nil, err
 	}
 
 	for i, ct := range courseTimings {
 		ct.CourseID = courseID
 		courseTimings[i], err = ct.New()
 		if err != nil {
-			return entity.IDInvalid, err
+			return entity.IDInvalid, nil, err
 		}
 	}
 
 	// Note: These can be executed in parallel using go-routines
 	err = s.cRepo.CreateCourseOrganizer(courseID, cos)
 	if err != nil {
-		return courseID, err
+		return courseID, nil, err
 	}
 
 	err = s.cRepo.CreateCourseTeacher(courseID, cts)
 	if err != nil {
-		return courseID, err
+		return courseID, nil, err
 	}
 
 	err = s.cRepo.CreateCourseContact(courseID, ccs)
 	if err != nil {
-		return courseID, err
+		return courseID, nil, err
 	}
 
 	err = s.cRepo.CreateCourseNotify(courseID, cns)
 	if err != nil {
-		return courseID, err
+		return courseID, nil, err
 	}
 
 	var courseTimingID []entity.ID
 	for _, ct := range courseTimings {
 		ctID, err := s.ctRepo.Create(ct)
 		if err != nil {
-			return courseID, err
+			return courseID, nil, err
 		}
 		courseTimingID = append(courseTimingID, ctID)
 	}
 
-	log.Printf("courseTimingID=%#v", courseTimingID)
-
-	return courseID, err
+	return courseID, courseTimingID, err
 }
 
 // GetCourse retrieves a course

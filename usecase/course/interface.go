@@ -67,7 +67,7 @@ type UseCase interface {
 		ccs []*entity.CourseContact,
 		cns []*entity.CourseNotify,
 		courseTimings []*entity.CourseTiming,
-	) (entity.ID, error)
+	) (entity.ID, []entity.ID, error)
 	UpdateCourse(e *entity.Course) error
 	DeleteCourse(id entity.ID) error
 	GetCount(id entity.ID) int

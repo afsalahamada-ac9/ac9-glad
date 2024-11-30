@@ -75,6 +75,7 @@ type Course struct {
 	CenterID  ID
 	ProductID ID
 
+	// TODO: Check whether sql.NullString is a better option
 	ExtID *string
 
 	Name     string
