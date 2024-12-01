@@ -300,6 +300,34 @@ func (m *MockCourseTeacherWriter) EXPECT() *MockCourseTeacherWriterMockRecorder 
 	return m.recorder
 }
 
+// DeleteCourseTeacher mocks base method.
+func (m *MockCourseTeacherWriter) DeleteCourseTeacher(arg0 entity.ID, arg1 []*entity.CourseTeacher) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteCourseTeacher", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteCourseTeacher indicates an expected call of DeleteCourseTeacher.
+func (mr *MockCourseTeacherWriterMockRecorder) DeleteCourseTeacher(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCourseTeacher", reflect.TypeOf((*MockCourseTeacherWriter)(nil).DeleteCourseTeacher), arg0, arg1)
+}
+
+// DeleteCourseTeacherByCourse mocks base method.
+func (m *MockCourseTeacherWriter) DeleteCourseTeacherByCourse(arg0 entity.ID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteCourseTeacherByCourse", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteCourseTeacherByCourse indicates an expected call of DeleteCourseTeacherByCourse.
+func (mr *MockCourseTeacherWriterMockRecorder) DeleteCourseTeacherByCourse(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCourseTeacherByCourse", reflect.TypeOf((*MockCourseTeacherWriter)(nil).DeleteCourseTeacherByCourse), arg0)
+}
+
 // InsertCourseTeacher mocks base method.
 func (m *MockCourseTeacherWriter) InsertCourseTeacher(arg0 entity.ID, arg1 []*entity.CourseTeacher) error {
 	m.ctrl.T.Helper()
@@ -312,6 +340,20 @@ func (m *MockCourseTeacherWriter) InsertCourseTeacher(arg0 entity.ID, arg1 []*en
 func (mr *MockCourseTeacherWriterMockRecorder) InsertCourseTeacher(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertCourseTeacher", reflect.TypeOf((*MockCourseTeacherWriter)(nil).InsertCourseTeacher), arg0, arg1)
+}
+
+// UpdateCourseTeacher mocks base method.
+func (m *MockCourseTeacherWriter) UpdateCourseTeacher(arg0 entity.ID, arg1 []*entity.CourseTeacher) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateCourseTeacher", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateCourseTeacher indicates an expected call of UpdateCourseTeacher.
+func (mr *MockCourseTeacherWriterMockRecorder) UpdateCourseTeacher(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCourseTeacher", reflect.TypeOf((*MockCourseTeacherWriter)(nil).UpdateCourseTeacher), arg0, arg1)
 }
 
 // MockCourseTeacherReader is a mock of CourseTeacherReader interface.
@@ -337,6 +379,21 @@ func (m *MockCourseTeacherReader) EXPECT() *MockCourseTeacherReaderMockRecorder 
 	return m.recorder
 }
 
+// GetCourseTeacher mocks base method.
+func (m *MockCourseTeacherReader) GetCourseTeacher(arg0 entity.ID) ([]*entity.CourseTeacher, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCourseTeacher", arg0)
+	ret0, _ := ret[0].([]*entity.CourseTeacher)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCourseTeacher indicates an expected call of GetCourseTeacher.
+func (mr *MockCourseTeacherReaderMockRecorder) GetCourseTeacher(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCourseTeacher", reflect.TypeOf((*MockCourseTeacherReader)(nil).GetCourseTeacher), arg0)
+}
+
 // MockCourseContactWriter is a mock of CourseContactWriter interface.
 type MockCourseContactWriter struct {
 	ctrl     *gomock.Controller
@@ -360,6 +417,34 @@ func (m *MockCourseContactWriter) EXPECT() *MockCourseContactWriterMockRecorder 
 	return m.recorder
 }
 
+// DeleteCourseContact mocks base method.
+func (m *MockCourseContactWriter) DeleteCourseContact(arg0 entity.ID, arg1 []*entity.CourseContact) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteCourseContact", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteCourseContact indicates an expected call of DeleteCourseContact.
+func (mr *MockCourseContactWriterMockRecorder) DeleteCourseContact(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCourseContact", reflect.TypeOf((*MockCourseContactWriter)(nil).DeleteCourseContact), arg0, arg1)
+}
+
+// DeleteCourseContactByCourse mocks base method.
+func (m *MockCourseContactWriter) DeleteCourseContactByCourse(arg0 entity.ID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteCourseContactByCourse", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteCourseContactByCourse indicates an expected call of DeleteCourseContactByCourse.
+func (mr *MockCourseContactWriterMockRecorder) DeleteCourseContactByCourse(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCourseContactByCourse", reflect.TypeOf((*MockCourseContactWriter)(nil).DeleteCourseContactByCourse), arg0)
+}
+
 // InsertCourseContact mocks base method.
 func (m *MockCourseContactWriter) InsertCourseContact(arg0 entity.ID, arg1 []*entity.CourseContact) error {
 	m.ctrl.T.Helper()
@@ -372,6 +457,20 @@ func (m *MockCourseContactWriter) InsertCourseContact(arg0 entity.ID, arg1 []*en
 func (mr *MockCourseContactWriterMockRecorder) InsertCourseContact(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertCourseContact", reflect.TypeOf((*MockCourseContactWriter)(nil).InsertCourseContact), arg0, arg1)
+}
+
+// UpdateCourseContact mocks base method.
+func (m *MockCourseContactWriter) UpdateCourseContact(arg0 entity.ID, arg1 []*entity.CourseContact) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateCourseContact", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateCourseContact indicates an expected call of UpdateCourseContact.
+func (mr *MockCourseContactWriterMockRecorder) UpdateCourseContact(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCourseContact", reflect.TypeOf((*MockCourseContactWriter)(nil).UpdateCourseContact), arg0, arg1)
 }
 
 // MockCourseContactReader is a mock of CourseContactReader interface.
@@ -397,6 +496,21 @@ func (m *MockCourseContactReader) EXPECT() *MockCourseContactReaderMockRecorder 
 	return m.recorder
 }
 
+// GetCourseContact mocks base method.
+func (m *MockCourseContactReader) GetCourseContact(arg0 entity.ID) ([]*entity.CourseContact, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCourseContact", arg0)
+	ret0, _ := ret[0].([]*entity.CourseContact)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCourseContact indicates an expected call of GetCourseContact.
+func (mr *MockCourseContactReaderMockRecorder) GetCourseContact(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCourseContact", reflect.TypeOf((*MockCourseContactReader)(nil).GetCourseContact), arg0)
+}
+
 // MockCourseNotifyWriter is a mock of CourseNotifyWriter interface.
 type MockCourseNotifyWriter struct {
 	ctrl     *gomock.Controller
@@ -420,6 +534,34 @@ func (m *MockCourseNotifyWriter) EXPECT() *MockCourseNotifyWriterMockRecorder {
 	return m.recorder
 }
 
+// DeleteCourseNotify mocks base method.
+func (m *MockCourseNotifyWriter) DeleteCourseNotify(arg0 entity.ID, arg1 []*entity.CourseNotify) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteCourseNotify", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteCourseNotify indicates an expected call of DeleteCourseNotify.
+func (mr *MockCourseNotifyWriterMockRecorder) DeleteCourseNotify(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCourseNotify", reflect.TypeOf((*MockCourseNotifyWriter)(nil).DeleteCourseNotify), arg0, arg1)
+}
+
+// DeleteCourseNotifyByCourse mocks base method.
+func (m *MockCourseNotifyWriter) DeleteCourseNotifyByCourse(arg0 entity.ID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteCourseNotifyByCourse", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteCourseNotifyByCourse indicates an expected call of DeleteCourseNotifyByCourse.
+func (mr *MockCourseNotifyWriterMockRecorder) DeleteCourseNotifyByCourse(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCourseNotifyByCourse", reflect.TypeOf((*MockCourseNotifyWriter)(nil).DeleteCourseNotifyByCourse), arg0)
+}
+
 // InsertCourseNotify mocks base method.
 func (m *MockCourseNotifyWriter) InsertCourseNotify(arg0 entity.ID, arg1 []*entity.CourseNotify) error {
 	m.ctrl.T.Helper()
@@ -432,6 +574,20 @@ func (m *MockCourseNotifyWriter) InsertCourseNotify(arg0 entity.ID, arg1 []*enti
 func (mr *MockCourseNotifyWriterMockRecorder) InsertCourseNotify(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertCourseNotify", reflect.TypeOf((*MockCourseNotifyWriter)(nil).InsertCourseNotify), arg0, arg1)
+}
+
+// UpdateCourseNotify mocks base method.
+func (m *MockCourseNotifyWriter) UpdateCourseNotify(arg0 entity.ID, arg1 []*entity.CourseNotify) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateCourseNotify", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateCourseNotify indicates an expected call of UpdateCourseNotify.
+func (mr *MockCourseNotifyWriterMockRecorder) UpdateCourseNotify(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCourseNotify", reflect.TypeOf((*MockCourseNotifyWriter)(nil).UpdateCourseNotify), arg0, arg1)
 }
 
 // MockCourseNotifyReader is a mock of CourseNotifyReader interface.
@@ -455,6 +611,21 @@ func NewMockCourseNotifyReader(ctrl *gomock.Controller) *MockCourseNotifyReader 
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockCourseNotifyReader) EXPECT() *MockCourseNotifyReaderMockRecorder {
 	return m.recorder
+}
+
+// GetCourseNotify mocks base method.
+func (m *MockCourseNotifyReader) GetCourseNotify(arg0 entity.ID) ([]*entity.CourseNotify, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCourseNotify", arg0)
+	ret0, _ := ret[0].([]*entity.CourseNotify)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCourseNotify indicates an expected call of GetCourseNotify.
+func (mr *MockCourseNotifyReaderMockRecorder) GetCourseNotify(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCourseNotify", reflect.TypeOf((*MockCourseNotifyReader)(nil).GetCourseNotify), arg0)
 }
 
 // MockCourseRepository is a mock of CourseRepository interface.
@@ -509,6 +680,62 @@ func (mr *MockCourseRepositoryMockRecorder) Delete(id interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockCourseRepository)(nil).Delete), id)
 }
 
+// DeleteCourseContact mocks base method.
+func (m *MockCourseRepository) DeleteCourseContact(arg0 entity.ID, arg1 []*entity.CourseContact) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteCourseContact", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteCourseContact indicates an expected call of DeleteCourseContact.
+func (mr *MockCourseRepositoryMockRecorder) DeleteCourseContact(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCourseContact", reflect.TypeOf((*MockCourseRepository)(nil).DeleteCourseContact), arg0, arg1)
+}
+
+// DeleteCourseContactByCourse mocks base method.
+func (m *MockCourseRepository) DeleteCourseContactByCourse(arg0 entity.ID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteCourseContactByCourse", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteCourseContactByCourse indicates an expected call of DeleteCourseContactByCourse.
+func (mr *MockCourseRepositoryMockRecorder) DeleteCourseContactByCourse(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCourseContactByCourse", reflect.TypeOf((*MockCourseRepository)(nil).DeleteCourseContactByCourse), arg0)
+}
+
+// DeleteCourseNotify mocks base method.
+func (m *MockCourseRepository) DeleteCourseNotify(arg0 entity.ID, arg1 []*entity.CourseNotify) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteCourseNotify", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteCourseNotify indicates an expected call of DeleteCourseNotify.
+func (mr *MockCourseRepositoryMockRecorder) DeleteCourseNotify(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCourseNotify", reflect.TypeOf((*MockCourseRepository)(nil).DeleteCourseNotify), arg0, arg1)
+}
+
+// DeleteCourseNotifyByCourse mocks base method.
+func (m *MockCourseRepository) DeleteCourseNotifyByCourse(arg0 entity.ID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteCourseNotifyByCourse", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteCourseNotifyByCourse indicates an expected call of DeleteCourseNotifyByCourse.
+func (mr *MockCourseRepositoryMockRecorder) DeleteCourseNotifyByCourse(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCourseNotifyByCourse", reflect.TypeOf((*MockCourseRepository)(nil).DeleteCourseNotifyByCourse), arg0)
+}
+
 // DeleteCourseOrganizer mocks base method.
 func (m *MockCourseRepository) DeleteCourseOrganizer(arg0 entity.ID, arg1 []*entity.CourseOrganizer) error {
 	m.ctrl.T.Helper()
@@ -535,6 +762,34 @@ func (m *MockCourseRepository) DeleteCourseOrganizerByCourse(arg0 entity.ID) err
 func (mr *MockCourseRepositoryMockRecorder) DeleteCourseOrganizerByCourse(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCourseOrganizerByCourse", reflect.TypeOf((*MockCourseRepository)(nil).DeleteCourseOrganizerByCourse), arg0)
+}
+
+// DeleteCourseTeacher mocks base method.
+func (m *MockCourseRepository) DeleteCourseTeacher(arg0 entity.ID, arg1 []*entity.CourseTeacher) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteCourseTeacher", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteCourseTeacher indicates an expected call of DeleteCourseTeacher.
+func (mr *MockCourseRepositoryMockRecorder) DeleteCourseTeacher(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCourseTeacher", reflect.TypeOf((*MockCourseRepository)(nil).DeleteCourseTeacher), arg0, arg1)
+}
+
+// DeleteCourseTeacherByCourse mocks base method.
+func (m *MockCourseRepository) DeleteCourseTeacherByCourse(arg0 entity.ID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteCourseTeacherByCourse", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteCourseTeacherByCourse indicates an expected call of DeleteCourseTeacherByCourse.
+func (mr *MockCourseRepositoryMockRecorder) DeleteCourseTeacherByCourse(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCourseTeacherByCourse", reflect.TypeOf((*MockCourseRepository)(nil).DeleteCourseTeacherByCourse), arg0)
 }
 
 // Get mocks base method.
@@ -567,6 +822,36 @@ func (mr *MockCourseRepositoryMockRecorder) GetCount(id interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCount", reflect.TypeOf((*MockCourseRepository)(nil).GetCount), id)
 }
 
+// GetCourseContact mocks base method.
+func (m *MockCourseRepository) GetCourseContact(arg0 entity.ID) ([]*entity.CourseContact, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCourseContact", arg0)
+	ret0, _ := ret[0].([]*entity.CourseContact)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCourseContact indicates an expected call of GetCourseContact.
+func (mr *MockCourseRepositoryMockRecorder) GetCourseContact(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCourseContact", reflect.TypeOf((*MockCourseRepository)(nil).GetCourseContact), arg0)
+}
+
+// GetCourseNotify mocks base method.
+func (m *MockCourseRepository) GetCourseNotify(arg0 entity.ID) ([]*entity.CourseNotify, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCourseNotify", arg0)
+	ret0, _ := ret[0].([]*entity.CourseNotify)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCourseNotify indicates an expected call of GetCourseNotify.
+func (mr *MockCourseRepositoryMockRecorder) GetCourseNotify(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCourseNotify", reflect.TypeOf((*MockCourseRepository)(nil).GetCourseNotify), arg0)
+}
+
 // GetCourseOrganizer mocks base method.
 func (m *MockCourseRepository) GetCourseOrganizer(arg0 entity.ID) ([]*entity.CourseOrganizer, error) {
 	m.ctrl.T.Helper()
@@ -580,6 +865,21 @@ func (m *MockCourseRepository) GetCourseOrganizer(arg0 entity.ID) ([]*entity.Cou
 func (mr *MockCourseRepositoryMockRecorder) GetCourseOrganizer(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCourseOrganizer", reflect.TypeOf((*MockCourseRepository)(nil).GetCourseOrganizer), arg0)
+}
+
+// GetCourseTeacher mocks base method.
+func (m *MockCourseRepository) GetCourseTeacher(arg0 entity.ID) ([]*entity.CourseTeacher, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCourseTeacher", arg0)
+	ret0, _ := ret[0].([]*entity.CourseTeacher)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCourseTeacher indicates an expected call of GetCourseTeacher.
+func (mr *MockCourseRepositoryMockRecorder) GetCourseTeacher(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCourseTeacher", reflect.TypeOf((*MockCourseRepository)(nil).GetCourseTeacher), arg0)
 }
 
 // InsertCourseContact mocks base method.
@@ -682,6 +982,34 @@ func (mr *MockCourseRepositoryMockRecorder) Update(e interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockCourseRepository)(nil).Update), e)
 }
 
+// UpdateCourseContact mocks base method.
+func (m *MockCourseRepository) UpdateCourseContact(arg0 entity.ID, arg1 []*entity.CourseContact) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateCourseContact", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateCourseContact indicates an expected call of UpdateCourseContact.
+func (mr *MockCourseRepositoryMockRecorder) UpdateCourseContact(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCourseContact", reflect.TypeOf((*MockCourseRepository)(nil).UpdateCourseContact), arg0, arg1)
+}
+
+// UpdateCourseNotify mocks base method.
+func (m *MockCourseRepository) UpdateCourseNotify(arg0 entity.ID, arg1 []*entity.CourseNotify) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateCourseNotify", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateCourseNotify indicates an expected call of UpdateCourseNotify.
+func (mr *MockCourseRepositoryMockRecorder) UpdateCourseNotify(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCourseNotify", reflect.TypeOf((*MockCourseRepository)(nil).UpdateCourseNotify), arg0, arg1)
+}
+
 // UpdateCourseOrganizer mocks base method.
 func (m *MockCourseRepository) UpdateCourseOrganizer(arg0 entity.ID, arg1 []*entity.CourseOrganizer) error {
 	m.ctrl.T.Helper()
@@ -694,6 +1022,20 @@ func (m *MockCourseRepository) UpdateCourseOrganizer(arg0 entity.ID, arg1 []*ent
 func (mr *MockCourseRepositoryMockRecorder) UpdateCourseOrganizer(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCourseOrganizer", reflect.TypeOf((*MockCourseRepository)(nil).UpdateCourseOrganizer), arg0, arg1)
+}
+
+// UpdateCourseTeacher mocks base method.
+func (m *MockCourseRepository) UpdateCourseTeacher(arg0 entity.ID, arg1 []*entity.CourseTeacher) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateCourseTeacher", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateCourseTeacher indicates an expected call of UpdateCourseTeacher.
+func (mr *MockCourseRepositoryMockRecorder) UpdateCourseTeacher(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCourseTeacher", reflect.TypeOf((*MockCourseRepository)(nil).UpdateCourseTeacher), arg0, arg1)
 }
 
 // MockCourseTimingReader is a mock of CourseTimingReader interface.

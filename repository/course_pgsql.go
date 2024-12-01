@@ -400,7 +400,7 @@ func (r *CoursePGSQL) UpdateCourseOrganizer(courseID entity.ID, cos []*entity.Co
 	return err
 }
 
-// DeleteCourseOrganizer deletes the given course organizers
+// DeleteCourseOrganizer deletes the given course organizer
 func (r *CoursePGSQL) DeleteCourseOrganizer(courseID entity.ID, cos []*entity.CourseOrganizer) error {
 	values := func(index int) []interface{} {
 		return []interface{}{
@@ -430,7 +430,7 @@ func (r *CoursePGSQL) DeleteCourseOrganizer(courseID entity.ID, cos []*entity.Co
 	return err
 }
 
-// DeleteCourseOrganizerByCourse deletes course organizers using course id
+// DeleteCourseOrganizerByCourse deletes course organizer using course id
 func (r *CoursePGSQL) DeleteCourseOrganizerByCourse(courseID entity.ID) error {
 	res, err := r.db.Exec(`DELETE FROM course_organizer WHERE course_id = $1;`, courseID)
 	if err != nil {
@@ -479,8 +479,9 @@ func (r *CoursePGSQL) InsertCourseTeacher(courseID entity.ID, cts []*entity.Cour
 	return err
 }
 
+// GetCourseTeacher gets course teacher for the given course id
 func (r *CoursePGSQL) GetCourseTeacher(courseID entity.ID) ([]*entity.CourseTeacher, error) {
-	query := `SELECT teacher_id FROM course_teacher WHERE course_id = $1;`
+	query := `SELECT teacher_id, is_primary FROM course_teacher WHERE course_id = $1;`
 
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -496,32 +497,37 @@ func (r *CoursePGSQL) GetCourseTeacher(courseID entity.ID) ([]*entity.CourseTeac
 	for rows.Next() {
 		var ct entity.CourseTeacher
 
-		err := rows.Scan(&ct.ID)
+		err := rows.Scan(&ct.ID, &ct.IsPrimary)
 		if err != nil {
 			return nil, err
 		}
 
 		cts = append(cts, &ct)
 	}
+
 	defer rows.Close()
 	return cts, err
 }
 
+// UpdateCourseTeacher updates course teacher for the given course id and the teacher
 func (r *CoursePGSQL) UpdateCourseTeacher(courseID entity.ID, cts []*entity.CourseTeacher) error {
 	currentCTs, err := r.GetCourseTeacher(courseID)
 	if err != nil {
 		return err
 	}
 
-	mapTeacherID := make(map[entity.ID]bool)
+	mapTeacherID := make(map[entity.ID]*entity.CourseTeacher)
 	for _, ct := range currentCTs {
-		mapTeacherID[ct.ID] = true
+		mapTeacherID[ct.ID] = ct
 	}
 
 	var addCTs []*entity.CourseTeacher
 	var rmCTs []*entity.CourseTeacher
 	for _, ct := range cts {
 		if _, exists := mapTeacherID[ct.ID]; exists {
+			// TODO: There are 2 cases: is_primary is changed and unchanged.
+			// If is_primary is changed, then we need to update that entry instead
+			// of deleting it.
 			delete(mapTeacherID, ct.ID)
 		} else {
 			addCTs = append(addCTs, ct)
@@ -536,14 +542,23 @@ func (r *CoursePGSQL) UpdateCourseTeacher(courseID entity.ID, cts []*entity.Cour
 	}
 
 	if len(addCTs) > 0 {
-		err = r.InsertCourseTeacher(courseID, rmCTs)
+		err = r.InsertCourseTeacher(courseID, addCTs)
 		if err != nil {
 			return err
 		}
 	}
+
+	if len(rmCTs) > 0 {
+		err = r.DeleteCourseTeacher(courseID, rmCTs)
+		if err != nil {
+			return err
+		}
+	}
+
 	return err
 }
 
+// DeleteCourseTeacher deletes the given course teacher
 func (r *CoursePGSQL) DeleteCourseTeacher(courseID entity.ID, cts []*entity.CourseTeacher) error {
 	values := func(index int) []interface{} {
 		return []interface{}{
@@ -573,6 +588,7 @@ func (r *CoursePGSQL) DeleteCourseTeacher(courseID entity.ID, cts []*entity.Cour
 	return err
 }
 
+// DeleteCourseTeacherByCourse deletes course teachers using course id
 func (r *CoursePGSQL) DeleteCourseTeacherByCourse(courseID entity.ID) error {
 	res, err := r.db.Exec(`DELETE FROM course_teacher WHERE course_id = $1;`, courseID)
 	if err != nil {
@@ -619,6 +635,7 @@ func (r *CoursePGSQL) InsertCourseContact(courseID entity.ID, ccs []*entity.Cour
 	return err
 }
 
+// GetCourseContact gets course contact for the given course id
 func (r *CoursePGSQL) GetCourseContact(courseID entity.ID) ([]*entity.CourseContact, error) {
 	query := `SELECT contact_id FROM course_contact WHERE course_id = $1;`
 
@@ -632,52 +649,61 @@ func (r *CoursePGSQL) GetCourseContact(courseID entity.ID) ([]*entity.CourseCont
 		return nil, err
 	}
 
-	var ccts []*entity.CourseContact
+	var ccs []*entity.CourseContact
 	for rows.Next() {
-		var cct entity.CourseContact
+		var cc entity.CourseContact
 
-		err := rows.Scan(&cct.ID)
+		err := rows.Scan(&cc.ID)
 		if err != nil {
 			return nil, err
 		}
 
-		ccts = append(ccts, &cct)
+		ccs = append(ccs, &cc)
 	}
+
 	defer rows.Close()
-	return ccts, err
+	return ccs, err
 }
 
-func (r *CoursePGSQL) UpdateCourseContact(courseID entity.ID, ccts []*entity.CourseContact) error {
-	currentCCTs, err := r.GetCourseContact(courseID)
+// UpdateCourseContact updates course contact for the given course id and the contact
+func (r *CoursePGSQL) UpdateCourseContact(courseID entity.ID, ccs []*entity.CourseContact) error {
+	currentCCs, err := r.GetCourseContact(courseID)
 	if err != nil {
 		return err
 	}
 
 	mapContactID := make(map[entity.ID]bool)
-	for _, cct := range currentCCTs {
-		mapContactID[cct.ID] = true
+	for _, cc := range currentCCs {
+		mapContactID[cc.ID] = true
 	}
 
-	var addCCTs []*entity.CourseContact
-	var rmCCTs []*entity.CourseContact
+	var addCCs []*entity.CourseContact
+	var rmCCs []*entity.CourseContact
 
-	for _, cct := range ccts {
-		if _, exists := mapContactID[cct.ID]; exists {
-			delete(mapContactID, cct.ID)
+	for _, cc := range ccs {
+		if _, exists := mapContactID[cc.ID]; exists {
+			delete(mapContactID, cc.ID)
 		} else {
-			addCCTs = append(addCCTs, cct)
+			addCCs = append(addCCs, cc)
 		}
 	}
 
 	for id := range mapContactID {
-		cct := entity.CourseContact{
+		cc := entity.CourseContact{
 			ID: id,
 		}
-		rmCCTs = append(rmCCTs, &cct)
+		rmCCs = append(rmCCs, &cc)
 	}
 
-	if len(addCCTs) > 0 {
-		err = r.InsertCourseContact(courseID, rmCCTs)
+	if len(addCCs) > 0 {
+		err = r.InsertCourseContact(courseID, addCCs)
+		if err != nil {
+			return err
+		}
+	}
+
+	if len(rmCCs) > 0 {
+		err = r.DeleteCourseContact(courseID, rmCCs)
 		if err != nil {
 			return err
 		}
@@ -686,18 +712,19 @@ func (r *CoursePGSQL) UpdateCourseContact(courseID entity.ID, ccts []*entity.Cou
 	return err
 }
 
-func (r *CoursePGSQL) DeleteCourseContact(courseID entity.ID, ccts []*entity.CourseContact) error {
+// DeleteCourseContact deletes the given course contacts
+func (r *CoursePGSQL) DeleteCourseContact(courseID entity.ID, ccs []*entity.CourseContact) error {
 	values := func(index int) []interface{} {
 		return []interface{}{
 			courseID,
-			ccts[index].ID,
+			ccs[index].ID,
 		}
 	}
 
 	query, valueArgs := util.GenBulkDeletePGSQL(
 		"course_contact",
 		[]string{"course_id", "contact_id"},
-		len(ccts),
+		len(ccs),
 		values,
 	)
 
@@ -715,6 +742,7 @@ func (r *CoursePGSQL) DeleteCourseContact(courseID entity.ID, ccts []*entity.Cou
 	return err
 }
 
+// DeleteCourseContactByCourse deletes course contacts using course id
 func (r *CoursePGSQL) DeleteCourseContactByCourse(courseID entity.ID) error {
 	res, err := r.db.Exec(`DELETE FROM course_contact WHERE course_id = $1;`, courseID)
 	if err != nil {
@@ -761,8 +789,9 @@ func (r *CoursePGSQL) InsertCourseNotify(courseID entity.ID, cns []*entity.Cours
 	return err
 }
 
+// GetCourseNotify gets course notify for the given course id
 func (r *CoursePGSQL) GetCourseNotify(courseID entity.ID) ([]*entity.CourseNotify, error) {
-	query := `SELECT contact_id FROM course_notify WHERE course_id = $1;`
+	query := `SELECT notify_id FROM course_notify WHERE course_id = $1;`
 
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -785,10 +814,12 @@ func (r *CoursePGSQL) GetCourseNotify(courseID entity.ID) ([]*entity.CourseNotif
 
 		cns = append(cns, &cn)
 	}
+
 	defer rows.Close()
 	return cns, err
 }
 
+// UpdateCourseNotify updates course notify for the given course id and the notify
 func (r *CoursePGSQL) UpdateCourseNotify(courseID entity.ID, cns []*entity.CourseNotify) error {
 	currentCNs, err := r.GetCourseNotify(courseID)
 	if err != nil {
@@ -819,7 +850,14 @@ func (r *CoursePGSQL) UpdateCourseNotify(courseID entity.ID, cns []*entity.Cours
 	}
 
 	if len(addCNs) > 0 {
-		err = r.InsertCourseNotify(courseID, rmCNs)
+		err = r.InsertCourseNotify(courseID, addCNs)
+		if err != nil {
+			return err
+		}
+	}
+
+	if len(rmCNs) > 0 {
+		err = r.DeleteCourseNotify(courseID, rmCNs)
 		if err != nil {
 			return err
 		}
@@ -828,6 +866,7 @@ func (r *CoursePGSQL) UpdateCourseNotify(courseID entity.ID, cns []*entity.Cours
 	return err
 }
 
+// DeleteCourseNotify deletes the given course notify
 func (r *CoursePGSQL) DeleteCourseNotify(courseID entity.ID, cns []*entity.CourseNotify) error {
 	values := func(index int) []interface{} {
 		return []interface{}{
@@ -857,6 +896,7 @@ func (r *CoursePGSQL) DeleteCourseNotify(courseID entity.ID, cns []*entity.Cours
 	return err
 }
 
+// DeleteCourseNotifyByCourse deletes course notify using course id
 func (r *CoursePGSQL) DeleteCourseNotifyByCourse(courseID entity.ID) error {
 	res, err := r.db.Exec(`DELETE FROM course_notify WHERE course_id = $1;`, courseID)
 	if err != nil {

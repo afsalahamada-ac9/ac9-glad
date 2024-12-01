@@ -41,40 +41,40 @@ type CourseOrganizerReader interface {
 // CourseTeacherWriter course teacher writer
 type CourseTeacherWriter interface {
 	InsertCourseTeacher(entity.ID, []*entity.CourseTeacher) error
-	// UpdateCourseTeacher(entity.ID, []*entity.CourseTeacher) error
-	// DeleteCourseTeacher(entity.ID, []*entity.CourseTeacher) error
-	// DeleteCourseTeacherByCourse(entity.ID) error
+	UpdateCourseTeacher(entity.ID, []*entity.CourseTeacher) error
+	DeleteCourseTeacher(entity.ID, []*entity.CourseTeacher) error
+	DeleteCourseTeacherByCourse(entity.ID) error
 }
 
 // CourseTeacherReader course teacher reader
 type CourseTeacherReader interface {
-	// GetCourseTeacher(entity.ID) ([]*entity.CourseTeacher, error)
+	GetCourseTeacher(entity.ID) ([]*entity.CourseTeacher, error)
 }
 
 // CourseContactWriter course contact writer
 type CourseContactWriter interface {
 	InsertCourseContact(entity.ID, []*entity.CourseContact) error
-	// UpdateCourseContact(entity.ID, []*entity.CourseContact) error
-	// DeleteCourseContact(entity.ID, []*entity.CourseContact) error
-	// DeleteCourseContactByCourse(entity.ID) error
+	UpdateCourseContact(entity.ID, []*entity.CourseContact) error
+	DeleteCourseContact(entity.ID, []*entity.CourseContact) error
+	DeleteCourseContactByCourse(entity.ID) error
 }
 
 // CourseContactReader course contact reader
 type CourseContactReader interface {
-	// GetCourseContact(entity.ID) ([]*entity.CourseContact, error)
+	GetCourseContact(entity.ID) ([]*entity.CourseContact, error)
 }
 
 // CourseNotifyWriter course notify writer
 type CourseNotifyWriter interface {
 	InsertCourseNotify(entity.ID, []*entity.CourseNotify) error
-	// UpdateCourseNotify(entity.ID, []*entity.CourseNotify) error
-	// DeleteCourseNotify(entity.ID, []*entity.CourseNotify) error
-	// DeleteCourseNotifyByCourse(entity.ID) error
+	UpdateCourseNotify(entity.ID, []*entity.CourseNotify) error
+	DeleteCourseNotify(entity.ID, []*entity.CourseNotify) error
+	DeleteCourseNotifyByCourse(entity.ID) error
 }
 
 // CourseNotifyReader course notify reader
 type CourseNotifyReader interface {
-	// GetCourseNotify(entity.ID) ([]*entity.CourseNotify, error)
+	GetCourseNotify(entity.ID) ([]*entity.CourseNotify, error)
 }
 
 // Course repository interface

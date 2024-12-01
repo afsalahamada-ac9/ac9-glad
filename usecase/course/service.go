@@ -88,6 +88,7 @@ func (s *Service) CreateCourse(
 }
 
 // GetCourse retrieves a course
+// TODO: Retrieve organizer, teacher, contact, notify and timing and return it
 func (s *Service) GetCourse(id entity.ID) (*entity.Course, error) {
 	t, err := s.cRepo.Get(id)
 	if t == nil {
@@ -127,6 +128,7 @@ func (s *Service) ListCourses(tenantID entity.ID, page, limit int) ([]*entity.Co
 }
 
 // DeleteCourse deletes a course
+// Note: Since delete is cascaded to dependent tables, no need to call those functions explicitly
 func (s *Service) DeleteCourse(id entity.ID) error {
 	t, err := s.GetCourse(id)
 	if t == nil {
@@ -138,16 +140,6 @@ func (s *Service) DeleteCourse(id entity.ID) error {
 
 	return s.cRepo.Delete(id)
 }
-
-// UpdateCourse updates course
-// func (s *Service) UpdateCourse(c *entity.Course) error {
-// 	err := c.Validate()
-// 	if err != nil {
-// 		return err
-// 	}
-// 	c.UpdatedAt = time.Now()
-// 	return s.cRepo.Update(c)
-// }
 
 // GetCount gets total course count
 func (s *Service) GetCount(tenantID entity.ID) int {
@@ -193,21 +185,20 @@ func (s *Service) UpdateCourse(
 		return err
 	}
 
-	// TODO: Uncomment once implementation is complete for these functions
-	// err = s.cRepo.UpdateCourseTeacher(courseID, cts)
-	// if err != nil {
-	// 	return err
-	// }
+	err = s.cRepo.UpdateCourseTeacher(courseID, cts)
+	if err != nil {
+		return err
+	}
 
-	// err = s.cRepo.UpdateCourseContact(courseID, ccs)
-	// if err != nil {
-	// 	return err
-	// }
+	err = s.cRepo.UpdateCourseContact(courseID, ccs)
+	if err != nil {
+		return err
+	}
 
-	// err = s.cRepo.UpdateCourseNotify(courseID, cns)
-	// if err != nil {
-	// 	return err
-	// }
+	err = s.cRepo.UpdateCourseNotify(courseID, cns)
+	if err != nil {
+		return err
+	}
 
 	for _, ct := range courseTiming {
 		err := s.ctRepo.Update(ct)

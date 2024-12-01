@@ -150,6 +150,30 @@ func (r *inmemCourse) InsertCourseTeacher(courseID entity.ID, cts []*entity.Cour
 	return nil
 }
 
+// GetCourseTeacher gets course organizer for the given course id
+func (r *inmemCourse) GetCourseTeacher(courseID entity.ID) ([]*entity.CourseTeacher, error) {
+	// TODO
+	return nil, nil
+}
+
+// UpdateCourseTeacher updates course organizer for the given course id and the organizer
+func (r *inmemCourse) UpdateCourseTeacher(courseID entity.ID, cos []*entity.CourseTeacher) error {
+	// TODO
+	return nil
+}
+
+// DeleteCourseTeacher deletes the given course organizers
+func (r *inmemCourse) DeleteCourseTeacher(courseID entity.ID, cos []*entity.CourseTeacher) error {
+	// TODO
+	return nil
+}
+
+// DeleteCourseTeacherByCourse deletes course organizers using course id
+func (r *inmemCourse) DeleteCourseTeacherByCourse(courseID entity.ID) error {
+	// TODO
+	return nil
+}
+
 // --------------------------------------------------------------------------------
 // Course Contact
 // --------------------------------------------------------------------------------
@@ -159,11 +183,59 @@ func (r *inmemCourse) InsertCourseContact(courseID entity.ID, ccs []*entity.Cour
 	return nil
 }
 
+// GetCourseContact gets course organizer for the given course id
+func (r *inmemCourse) GetCourseContact(courseID entity.ID) ([]*entity.CourseContact, error) {
+	// TODO
+	return nil, nil
+}
+
+// UpdateCourseContact updates course organizer for the given course id and the organizer
+func (r *inmemCourse) UpdateCourseContact(courseID entity.ID, cos []*entity.CourseContact) error {
+	// TODO
+	return nil
+}
+
+// DeleteCourseContact deletes the given course organizers
+func (r *inmemCourse) DeleteCourseContact(courseID entity.ID, cos []*entity.CourseContact) error {
+	// TODO
+	return nil
+}
+
+// DeleteCourseContactByCourse deletes course organizers using course id
+func (r *inmemCourse) DeleteCourseContactByCourse(courseID entity.ID) error {
+	// TODO
+	return nil
+}
+
 // --------------------------------------------------------------------------------
 // Course Notify
 // --------------------------------------------------------------------------------
 // InsertCourseNotify creates course to notify mapping
 func (r *inmemCourse) InsertCourseNotify(courseID entity.ID, cns []*entity.CourseNotify) error {
+	// TODO
+	return nil
+}
+
+// GetCourseNotify gets course organizer for the given course id
+func (r *inmemCourse) GetCourseNotify(courseID entity.ID) ([]*entity.CourseNotify, error) {
+	// TODO
+	return nil, nil
+}
+
+// UpdateCourseNotify updates course organizer for the given course id and the organizer
+func (r *inmemCourse) UpdateCourseNotify(courseID entity.ID, cos []*entity.CourseNotify) error {
+	// TODO
+	return nil
+}
+
+// DeleteCourseNotify deletes the given course organizers
+func (r *inmemCourse) DeleteCourseNotify(courseID entity.ID, cos []*entity.CourseNotify) error {
+	// TODO
+	return nil
+}
+
+// DeleteCourseNotifyByCourse deletes course organizers using course id
+func (r *inmemCourse) DeleteCourseNotifyByCourse(courseID entity.ID) error {
 	// TODO
 	return nil
 }
