@@ -13,7 +13,8 @@ services:
       - ./ops/db/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres_data:/var/lib/postgresql/data
     container_name: glad-postgres
-    network_mode: "bridge"
+    networks:
+      - default
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U glad_user"]
       interval: 10s
@@ -31,25 +32,60 @@ services:
       DB_PORT: 5432
       DB_SSLMODE: disable # require
       API_PORT: 8080
+      # URL_HOST: url:8090
+      # ME: api
     expose:
       - 8080
     ports:
       - "8080:8080"
     container_name: glad-api
-    network_mode: "bridge"
+    networks:
+      - default
     depends_on:
       postgres:
         condition: service_healthy
+
+  # url:
+  #   image: api:dev
+  #   environment:
+  #     ME: url
+  #     API_HOST: api:8080
+  #     API_PORT: 8090
+  #     DB_USER: glad_user
+  #     DB_PASSWORD: glad1234
+  #     DB_DATABASE: glad
+  #     # TODO: localhost to be changed to DB hostname instead cluster
+  #     DB_HOST: postgres
+  #     DB_PORT: 5432
+  #     DB_SSLMODE: disable # require
+  #   expose:
+  #     - 8090
+  #   ports:
+  #     - "8090:8090"
+  #   container_name: url-api
+  #   networks:
+  #     - default
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+
+  # host:
+  #   image: alpine:latest
+  #   networks:
+  #     - default
+  #   command: sleep 3600
 
   grafana:
     image: grafana/grafana
     ports:
       - "3000:3000"
     container_name: glad-grafana
-    network_mode: "bridge"
+    networks:
+      - default
     depends_on:
       - prometheus
       - prometheus-pushgateway
+
   prometheus:
     image: prom/prometheus
     ports:
@@ -59,7 +95,9 @@ services:
     volumes:
       - ./ops/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     container_name: glad-prometheus
-    network_mode: "bridge"
+    networks:
+      - default
+
   prometheus-pushgateway:
     image: prom/pushgateway
     container_name: glad-pushgateway
@@ -70,3 +108,6 @@ services:
 
 volumes:
   postgres_data:
+
+networks:
+  default:
