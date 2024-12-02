@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"sudhagar/glad/entity"
+	"ac9/glad/entity"
 )
 
 // Service product usecase

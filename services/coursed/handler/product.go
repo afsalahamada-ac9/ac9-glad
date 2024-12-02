@@ -12,10 +12,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"sudhagar/glad/entity"
-	"sudhagar/glad/pkg/common"
-	"sudhagar/glad/services/coursed/presenter"
-	"sudhagar/glad/usecase/product"
+	"ac9/glad/entity"
+	"ac9/glad/pkg/common"
+	"ac9/glad/services/coursed/presenter"
+	"ac9/glad/usecase/product"
 
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"

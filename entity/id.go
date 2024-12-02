@@ -9,7 +9,7 @@ package entity
 import (
 	"math/rand"
 	"strconv"
-	"sudhagar/glad/pkg/uid"
+	"ac9/glad/pkg/uid"
 )
 
 const (

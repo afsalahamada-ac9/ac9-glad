@@ -12,11 +12,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"sudhagar/glad/entity"
-	"sudhagar/glad/pkg/common"
-	"sudhagar/glad/services/coursed/presenter"
+	"ac9/glad/entity"
+	"ac9/glad/pkg/common"
+	"ac9/glad/services/coursed/presenter"
 
-	mock "sudhagar/glad/usecase/account/mock"
+	mock "ac9/glad/usecase/account/mock"
 
 	"github.com/codegangsta/negroni"
 	"github.com/golang/mock/gomock"

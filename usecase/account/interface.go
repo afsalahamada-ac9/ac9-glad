@@ -7,7 +7,7 @@
 package account
 
 import (
-	"sudhagar/glad/entity"
+	"ac9/glad/entity"
 )
 
 // Reader interface

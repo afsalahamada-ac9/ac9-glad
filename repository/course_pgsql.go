@@ -11,8 +11,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"sudhagar/glad/entity"
-	"sudhagar/glad/pkg/util"
+	"ac9/glad/entity"
+	"ac9/glad/pkg/util"
 )
 
 // CoursePGSQL mysql repo

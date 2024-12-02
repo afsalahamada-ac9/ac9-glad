@@ -11,7 +11,7 @@ import (
 	"log"
 	"time"
 
-	"sudhagar/glad/entity"
+	"ac9/glad/entity"
 )
 
 // CourseTimingPGSQL pgsql repo

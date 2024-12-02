@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"sudhagar/glad/entity"
+	"ac9/glad/entity"
 )
 
 // ProductPGSQL postgres repo

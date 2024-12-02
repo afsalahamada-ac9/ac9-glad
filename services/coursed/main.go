@@ -15,24 +15,24 @@ import (
 	"strconv"
 	"time"
 
-	"sudhagar/glad/repository"
+	"ac9/glad/repository"
 
 	// Uber zap logging
-	"sudhagar/glad/pkg/logger"
+	"ac9/glad/pkg/logger"
 
-	"sudhagar/glad/usecase/account"
-	"sudhagar/glad/usecase/center"
-	"sudhagar/glad/usecase/course"
-	"sudhagar/glad/usecase/product"
-	"sudhagar/glad/usecase/tenant"
+	"ac9/glad/usecase/account"
+	"ac9/glad/usecase/center"
+	"ac9/glad/usecase/course"
+	"ac9/glad/usecase/product"
+	"ac9/glad/usecase/tenant"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"sudhagar/glad/config"
-	"sudhagar/glad/pkg/metric"
-	"sudhagar/glad/pkg/middleware"
-	"sudhagar/glad/pkg/util"
-	"sudhagar/glad/services/coursed/handler"
+	"ac9/glad/config"
+	"ac9/glad/pkg/metric"
+	"ac9/glad/pkg/middleware"
+	"ac9/glad/pkg/util"
+	"ac9/glad/services/coursed/handler"
 
 	"github.com/codegangsta/negroni"
 	_ "github.com/go-sql-driver/mysql"

@@ -7,7 +7,7 @@
 package course
 
 import (
-	"sudhagar/glad/entity"
+	"ac9/glad/entity"
 )
 
 // CourseReader course reader

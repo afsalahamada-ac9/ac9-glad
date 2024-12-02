@@ -8,9 +8,9 @@ package middleware
 
 import (
 	"net/http"
-	"sudhagar/glad/config"
-	"sudhagar/glad/pkg/common"
-	"sudhagar/glad/pkg/util"
+	"ac9/glad/config"
+	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/util"
 )
 
 // AddDefaultTenant Adds default tenant identifier

@@ -6,7 +6,7 @@
 
 package product
 
-import "sudhagar/glad/entity"
+import "ac9/glad/entity"
 
 // Reader defines read-only operations for products
 type Reader interface {

@@ -12,11 +12,11 @@ import (
 	"net/http"
 	"strconv"
 
-	"sudhagar/glad/usecase/tenant"
+	"ac9/glad/usecase/tenant"
 
-	"sudhagar/glad/services/coursed/presenter"
+	"ac9/glad/services/coursed/presenter"
 
-	"sudhagar/glad/entity"
+	"ac9/glad/entity"
 
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"

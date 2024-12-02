@@ -9,7 +9,7 @@ package tenant
 import (
 	"time"
 
-	"sudhagar/glad/entity"
+	"ac9/glad/entity"
 )
 
 // Service tenant usecase

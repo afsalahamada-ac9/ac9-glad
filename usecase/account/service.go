@@ -9,7 +9,7 @@ package account
 import (
 	"time"
 
-	"sudhagar/glad/entity"
+	"ac9/glad/entity"
 )
 
 // Service account usecase

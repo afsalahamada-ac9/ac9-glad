@@ -7,7 +7,7 @@
 package presenter
 
 import (
-	"sudhagar/glad/entity"
+	"ac9/glad/entity"
 )
 
 // Tenant data

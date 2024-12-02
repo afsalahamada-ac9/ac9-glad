@@ -1,4 +1,4 @@
-module sudhagar/glad
+module ac9/glad
 
 go 1.23
 

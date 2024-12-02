@@ -8,7 +8,7 @@ package course
 
 import (
 	"log"
-	"sudhagar/glad/entity"
+	"ac9/glad/entity"
 )
 
 // inmemCourseTiming in memory repo

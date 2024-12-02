@@ -9,7 +9,7 @@ package course
 import (
 	"strings"
 
-	"sudhagar/glad/entity"
+	"ac9/glad/entity"
 )
 
 // inmemCourse in memory repo

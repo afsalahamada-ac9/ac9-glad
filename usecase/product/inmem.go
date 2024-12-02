@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 
-	"sudhagar/glad/entity"
+	"ac9/glad/entity"
 )
 
 // inmem in memory repo

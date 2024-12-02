@@ -7,7 +7,7 @@
 package metric
 
 import (
-	"sudhagar/glad/config"
+	"ac9/glad/config"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/push"

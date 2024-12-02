@@ -8,7 +8,7 @@ package account
 
 import (
 	"strings"
-	"sudhagar/glad/entity"
+	"ac9/glad/entity"
 )
 
 // inmem in memory repo

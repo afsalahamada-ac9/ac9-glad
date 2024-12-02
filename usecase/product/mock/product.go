@@ -6,7 +6,7 @@ package mock_product
 
 import (
 	reflect "reflect"
-	entity "sudhagar/glad/entity"
+	entity "ac9/glad/entity"
 
 	gomock "github.com/golang/mock/gomock"
 )

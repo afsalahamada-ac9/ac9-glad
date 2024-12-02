@@ -7,7 +7,7 @@
 package tenant
 
 import (
-	"sudhagar/glad/entity"
+	"ac9/glad/entity"
 )
 
 // inmem in memory repo

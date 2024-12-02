@@ -10,7 +10,7 @@ import (
 	"database/sql"
 	"time"
 
-	"sudhagar/glad/entity"
+	"ac9/glad/entity"
 )
 
 // TenantPGSQL mysql repo
