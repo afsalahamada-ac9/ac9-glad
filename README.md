@@ -112,3 +112,7 @@ var record Record
 err := db.Get(&record, "SELECT data_jsonb FROM example WHERE id = $1", id)
 ```
 
+- **GitInfo**
+```
+go build -ldflags "-X main.gitTag=$(git describe --tags) -X main.gitHash=$(git rev-parse HEAD)"
+```
