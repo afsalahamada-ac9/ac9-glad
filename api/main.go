@@ -41,17 +41,20 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// Note: Not a best practice to use global variables in general
+var Log *logger.Logger
+
 func main() {
 
-	err := logger.InitLogger()
-	if err != nil {
-		log.Fatalf("failed to initialize the logger %v", err)
+	Log := logger.NewLoggerZap()
+	if Log == nil {
+		log.Fatalf("Failed to initialize logger")
 	}
 
 	// Defer the Sync to ensure logs are flushed out before program exits
 	defer func() {
-		if err := logger.Log.Sync(); err != nil {
-			logger.Log.Error("failed to sync logger: %v", err)
+		if err := Log.Sync(); err != nil {
+			log.Printf("Failed to sync logger: %v", err)
 		}
 	}()
 
@@ -64,7 +67,7 @@ func main() {
 		util.GetStrEnvOrConfig("DB_SSLMODE", config.DB_SSLMODE))
 	db, err := sql.Open("postgres", dataSourceName)
 	if err != nil {
-		log.Fatal(err.Error())
+		Log.Fatalf("Unable to initialize database: %v", err.Error())
 	}
 	defer db.Close()
 
@@ -111,9 +114,13 @@ func main() {
 	// product
 	handler.MakeProductHandlers(r, *n, productService)
 
+	// log handler
+	logger.MakeLogHandlers(r, *n, "api", Log)
+
 	http.Handle("/", r)
 	http.Handle("/metrics", promhttp.Handler())
 	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		Log.Debugf("Health check called")
 		w.WriteHeader(http.StatusOK)
 	})
 
@@ -129,9 +136,9 @@ func main() {
 		Handler:      context.ClearHandler(http.DefaultServeMux),
 		ErrorLog:     logger,
 	}
-	log.Println("Starting api server ...")
+	Log.Infof("Starting server at %v ...", srv.Addr)
 	err = srv.ListenAndServe()
 	if err != nil {
-		log.Fatal(err.Error())
+		Log.Fatalf(err.Error())
 	}
 }
