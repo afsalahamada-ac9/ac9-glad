@@ -29,9 +29,9 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"sudhagar/glad/api/handler"
-	"sudhagar/glad/api/middleware"
 	"sudhagar/glad/config"
 	"sudhagar/glad/pkg/metric"
+	"sudhagar/glad/pkg/middleware"
 	"sudhagar/glad/pkg/util"
 
 	"github.com/codegangsta/negroni"
