@@ -12,7 +12,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"sudhagar/glad/api/presenter"
+	"sudhagar/glad/coursed/presenter"
 	"sudhagar/glad/entity"
 	"sudhagar/glad/pkg/common"
 

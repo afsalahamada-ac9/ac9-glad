@@ -21,8 +21,8 @@ services:
       timeout: 5s
       retries: 5
 
-  api:
-    image: api:dev
+  coursed:
+    image: coursed:dev
     environment:
       DB_USER: glad_user
       DB_PASSWORD: glad1234
@@ -33,12 +33,12 @@ services:
       DB_SSLMODE: disable # require
       API_PORT: 8080
       # URL_HOST: url:8090
-      # ME: api
+      # ME: coursed
     expose:
       - 8080
     ports:
       - "8080:8080"
-    container_name: glad-api
+    container_name: glad-coursed
     networks:
       - default
     depends_on:
@@ -46,10 +46,10 @@ services:
         condition: service_healthy
 
   # url:
-  #   image: api:dev
+  #   image: coursed:dev
   #   environment:
   #     ME: url
-  #     API_HOST: api:8080
+  #     API_HOST: coursed:8080
   #     API_PORT: 8090
   #     DB_USER: glad_user
   #     DB_PASSWORD: glad1234

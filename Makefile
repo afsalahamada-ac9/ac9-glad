@@ -19,17 +19,21 @@ clean:
 dependencies:
 	go mod download
 
-build: dependencies build-api #build-cmd
+build: dependencies build-coursed build-sfsyncd
 
-build-api: 
-	go build -tags $(LIBRARY_ENV) -o ./bin/api api/main.go
+build-coursed: 
+	go build -tags $(LIBRARY_ENV) -o ./bin/coursed coursed/main.go
+
+build-sfsyncd: 
+	go build -tags $(LIBRARY_ENV) -o ./bin/sfsyncd sfsyncd/main.go
 
 #build-cmd:
 #	go build -tags $(LIBRARY_ENV) -o ./bin/search cmd/main.go
 
 # Adding more flags for complete static linking
 linux-binaries:
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(LIBRARY_ENV) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/api api/main.go
+	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(LIBRARY_ENV) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/coursed coursed/main.go
+	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(LIBRARY_ENV) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/sfsyncd sfsyncd/main.go
 #	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(LIBRARY_ENV) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/search cmd/main.go
 
 ci: dependencies test	
@@ -37,12 +41,17 @@ ci: dependencies test
 # builds one docker image
 # TODO: extend for multiple services
 docker:
-	docker build -t api:$(LIBRARY_ENV) .
+	docker build -f Dockerfile.coursed -t coursed:$(LIBRARY_ENV) .
+	docker build -f Dockerfile.sfsyncd -t sfsyncd:$(LIBRARY_ENV) .
 
 build-mocks:
 	@go get github.com/golang/mock/gomock
 	@go install github.com/golang/mock/mockgen
+	@~/go/bin/mockgen -source=usecase/account/interface.go -destination=usecase/account/mock/account.go
 	@~/go/bin/mockgen -source=usecase/center/interface.go -destination=usecase/center/mock/center.go
+	@~/go/bin/mockgen -source=usecase/course/interface.go -destination=usecase/course/mock/course.go
+	@~/go/bin/mockgen -source=usecase/product/interface.go -destination=usecase/product/mock/product.go
+	@~/go/bin/mockgen -source=usecase/tenant/interface.go -destination=usecase/tenant/mock/tenant.go
 
 test:
 	go test -tags testing ./...

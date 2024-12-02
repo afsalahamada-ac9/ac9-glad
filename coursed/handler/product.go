@@ -12,27 +12,19 @@ import (
 	"net/http"
 	"strconv"
 
-	"sudhagar/glad/pkg/common"
-	"sudhagar/glad/usecase/center"
-
-	"sudhagar/glad/api/presenter"
-
+	"sudhagar/glad/coursed/presenter"
 	"sudhagar/glad/entity"
+	"sudhagar/glad/pkg/common"
+	"sudhagar/glad/usecase/product"
 
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
 )
 
-// TODO:
-// 	- Implement pagination for center listing/search
-// 	- JSON based search and formatting requires some work
-// 	- ENUM can be optimized by storing integer value in the mapping
-// 	- Support for location and geolocation
-
-func listCenters(service center.UseCase) http.Handler {
+func listProducts(service product.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		errorMessage := "Error reading centers"
-		var data []*entity.Center
+		errorMessage := "Error reading products"
+		var data []*entity.Product
 		var err error
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
 		search := r.URL.Query().Get(httpParamQuery)
@@ -48,12 +40,9 @@ func listCenters(service center.UseCase) http.Handler {
 
 		switch {
 		case search == "":
-			data, err = service.ListCenters(tenantID, page, limit)
+			data, err = service.ListProducts(tenantID, page, limit)
 		default:
-			// TODO: search need to be reworked; need to add a count
-			// for search; also need to see how the caller generates
-			// the search query request
-			data, err = service.SearchCenters(tenantID, search, page, limit)
+			data, err = service.SearchProducts(tenantID, search, page, limit)
 		}
 		w.Header().Set("Content-Type", "application/json")
 		if err != nil && err != entity.ErrNotFound {
@@ -70,32 +59,43 @@ func listCenters(service center.UseCase) http.Handler {
 			_, _ = w.Write([]byte(errorMessage))
 			return
 		}
-		var toJ []*presenter.Center
+
+		var toJ []*presenter.Product
 		for _, d := range data {
-			toJ = append(toJ, &presenter.Center{
-				ID:      d.ID,
-				Name:    d.Name,
-				Mode:    d.Mode,
-				ExtName: d.ExtName,
+			toJ = append(toJ, &presenter.Product{
+				ID:               d.ID,
+				ExtName:          d.ExtName,
+				Title:            d.Title,
+				CType:            d.CType,
+				BaseProductExtID: d.BaseProductExtID,
+				DurationDays:     d.DurationDays,
+				Visibility:       d.Visibility,
+				MaxAttendees:     d.MaxAttendees,
+				Format:           d.Format,
+				IsAutoApprove:    d.IsAutoApprove,
 			})
 		}
 		if err := json.NewEncoder(w).Encode(toJ); err != nil {
-			w.Header().Set(common.HttpHeaderTenantID, tenant)
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte("Unable to encode center"))
+			_, _ = w.Write([]byte("Unable to encode product"))
 		}
 	})
 }
 
-func createCenter(service center.UseCase) http.Handler {
+func createProduct(service product.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		errorMessage := "Error adding center"
+		errorMessage := "Error adding product"
 		var input struct {
-			ExtID     string            `json:"extId"`
-			ExtName   string            `json:"extName"`
-			Name      string            `json:"name"`
-			Mode      entity.CenterMode `json:"mode"`
-			IsEnabled bool              `json:"isEnabled"`
+			ExtID            string                   `json:"extId"`
+			ExtName          string                   `json:"extName"`
+			Title            string                   `json:"title"`
+			CType            string                   `json:"ctype"`
+			BaseProductExtID string                   `json:"baseProductExtId"`
+			DurationDays     int32                    `json:"durationDays"`
+			Visibility       entity.ProductVisibility `json:"visibility"`
+			MaxAttendees     int32                    `json:"maxAttendees"`
+			Format           entity.ProductFormat     `json:"format"`
+			IsAutoApprove    bool                     `json:"isAutoApprove"`
 		}
 
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
@@ -114,28 +114,40 @@ func createCenter(service center.UseCase) http.Handler {
 			return
 		}
 
-		id, err := service.CreateCenter(
+		id, err := service.CreateProduct(
 			tenantID,
 			input.ExtID,
 			input.ExtName,
-			input.Name,
-			input.Mode,
-			input.IsEnabled)
+			input.Title,
+			input.CType,
+			input.BaseProductExtID,
+			input.DurationDays,
+			input.Visibility,
+			input.MaxAttendees,
+			input.Format,
+			input.IsAutoApprove,
+		)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
 		}
-		toJ := &presenter.Center{
-			ID:   id,
-			Name: input.Name,
-			Mode: input.Mode,
+
+		toJ := &presenter.Product{
+			ID:               id,
+			ExtName:          input.ExtName,
+			Title:            input.Title,
+			CType:            input.CType,
+			BaseProductExtID: input.BaseProductExtID,
+			DurationDays:     input.DurationDays,
+			Visibility:       input.Visibility,
+			MaxAttendees:     input.MaxAttendees,
+			Format:           input.Format,
 		}
 
 		w.Header().Set(common.HttpHeaderTenantID, tenant)
 		w.WriteHeader(http.StatusCreated)
 		if err := json.NewEncoder(w).Encode(toJ); err != nil {
-			log.Println(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage))
 			return
@@ -143,9 +155,9 @@ func createCenter(service center.UseCase) http.Handler {
 	})
 }
 
-func getCenter(service center.UseCase) http.Handler {
+func getProduct(service product.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		errorMessage := "Error reading center"
+		errorMessage := "Error reading product"
 		vars := mux.Vars(r)
 		id, err := entity.StringToID(vars["id"])
 		if err != nil {
@@ -153,7 +165,7 @@ func getCenter(service center.UseCase) http.Handler {
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
-		data, err := service.GetCenter(id)
+		data, err := service.GetProduct(id)
 		if err != nil && err != entity.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
@@ -166,24 +178,30 @@ func getCenter(service center.UseCase) http.Handler {
 			return
 		}
 
-		toJ := &presenter.Center{
-			ID:      data.ID,
-			Name:    data.Name,
-			Mode:    data.Mode,
-			ExtName: data.ExtName,
+		toJ := &presenter.Product{
+			ID:               data.ID,
+			ExtName:          data.ExtName,
+			Title:            data.Title,
+			CType:            data.CType,
+			BaseProductExtID: data.BaseProductExtID,
+			DurationDays:     data.DurationDays,
+			Visibility:       data.Visibility,
+			MaxAttendees:     data.MaxAttendees,
+			Format:           data.Format,
+			IsAutoApprove:    data.IsAutoApprove,
 		}
 
 		w.Header().Set(common.HttpHeaderTenantID, data.TenantID.String())
 		if err := json.NewEncoder(w).Encode(toJ); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte("Unable to encode center"))
+			_, _ = w.Write([]byte("Unable to encode product"))
 		}
 	})
 }
 
-func deleteCenter(service center.UseCase) http.Handler {
+func deleteProduct(service product.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		errorMessage := "Error removing center"
+		errorMessage := "Error removing product"
 		vars := mux.Vars(r)
 		id, err := entity.StringToID(vars["id"])
 		if err != nil {
@@ -191,14 +209,14 @@ func deleteCenter(service center.UseCase) http.Handler {
 			_, _ = w.Write([]byte(errorMessage))
 			return
 		}
-		err = service.DeleteCenter(id)
+		err = service.DeleteProduct(id)
 		switch err {
 		case nil:
 			w.WriteHeader(http.StatusOK)
 			return
 		case entity.ErrNotFound:
 			w.WriteHeader(http.StatusNotFound)
-			_, _ = w.Write([]byte("Center doesn't exist"))
+			_, _ = w.Write([]byte("Product doesn't exist"))
 			return
 		default:
 			w.WriteHeader(http.StatusInternalServerError)
@@ -208,9 +226,9 @@ func deleteCenter(service center.UseCase) http.Handler {
 	})
 }
 
-func updateCenter(service center.UseCase) http.Handler {
+func updateProduct(service product.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		errorMessage := "Error updating center"
+		errorMessage := "Error updating product"
 
 		vars := mux.Vars(r)
 		id, err := entity.StringToID(vars["id"])
@@ -220,7 +238,7 @@ func updateCenter(service center.UseCase) http.Handler {
 			return
 		}
 
-		var input entity.Center
+		var input entity.Product
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
 		tenantID, err := entity.StringToID(tenant)
 		if err != nil {
@@ -239,17 +257,23 @@ func updateCenter(service center.UseCase) http.Handler {
 
 		input.ID = id
 		input.TenantID = tenantID
-		err = service.UpdateCenter(&input)
+		err = service.UpdateProduct(&input)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
 		}
 
-		toJ := &presenter.Center{
-			ID:   input.ID,
-			Name: input.Name,
-			Mode: input.Mode,
+		toJ := &presenter.Product{
+			ID:               input.ID,
+			ExtName:          input.ExtName,
+			Title:            input.Title,
+			CType:            input.CType,
+			BaseProductExtID: input.BaseProductExtID,
+			DurationDays:     input.DurationDays,
+			Visibility:       input.Visibility,
+			MaxAttendees:     input.MaxAttendees,
+			Format:           input.Format,
 		}
 
 		w.Header().Set(common.HttpHeaderTenantID, tenant)
@@ -263,25 +287,25 @@ func updateCenter(service center.UseCase) http.Handler {
 	})
 }
 
-// MakeCenterHandlers make url handlers
-func MakeCenterHandlers(r *mux.Router, n negroni.Negroni, service center.UseCase) {
-	r.Handle("/v1/centers", n.With(
-		negroni.Wrap(listCenters(service)),
-	)).Methods("GET", "OPTIONS").Name("listCenters")
+// MakeProductHandlers make url handlers
+func MakeProductHandlers(r *mux.Router, n negroni.Negroni, service product.UseCase) {
+	r.Handle("/v1/products", n.With(
+		negroni.Wrap(listProducts(service)),
+	)).Methods("GET", "OPTIONS").Name("listProducts")
 
-	r.Handle("/v1/centers", n.With(
-		negroni.Wrap(createCenter(service)),
-	)).Methods("POST", "OPTIONS").Name("createCenter")
+	r.Handle("/v1/products", n.With(
+		negroni.Wrap(createProduct(service)),
+	)).Methods("POST", "OPTIONS").Name("createProduct")
 
-	r.Handle("/v1/centers/{id}", n.With(
-		negroni.Wrap(getCenter(service)),
-	)).Methods("GET", "OPTIONS").Name("getCenter")
+	r.Handle("/v1/products/{id}", n.With(
+		negroni.Wrap(getProduct(service)),
+	)).Methods("GET", "OPTIONS").Name("getProduct")
 
-	r.Handle("/v1/centers/{id}", n.With(
-		negroni.Wrap(deleteCenter(service)),
-	)).Methods("DELETE", "OPTIONS").Name("deleteCenter")
+	r.Handle("/v1/products/{id}", n.With(
+		negroni.Wrap(deleteProduct(service)),
+	)).Methods("DELETE", "OPTIONS").Name("deleteProduct")
 
-	r.Handle("/v1/centers/{id}", n.With(
-		negroni.Wrap(updateCenter(service)),
-	)).Methods("PUT", "OPTIONS").Name("updateCenter")
+	r.Handle("/v1/products/{id}", n.With(
+		negroni.Wrap(updateProduct(service)),
+	)).Methods("PUT", "OPTIONS").Name("updateProduct")
 }
