@@ -29,10 +29,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"sudhagar/glad/config"
-	"sudhagar/glad/coursed/handler"
 	"sudhagar/glad/pkg/metric"
 	"sudhagar/glad/pkg/middleware"
 	"sudhagar/glad/pkg/util"
+	"sudhagar/glad/services/coursed/handler"
 
 	"github.com/codegangsta/negroni"
 	_ "github.com/go-sql-driver/mysql"

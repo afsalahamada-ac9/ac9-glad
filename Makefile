@@ -6,8 +6,10 @@
 all: build
 FORCE: ;
 
-SHELL  := env LIBRARY_ENV=$(LIBRARY_ENV) $(SHELL)
-LIBRARY_ENV ?= dev
+SHELL  := env TAG=$(TAG) $(SHELL)
+TAG ?= dev
+DOCKERFILE_DIR = ops/docker
+SERVICES_DIR = services
 
 BIN_DIR = $(PWD)/bin
 
@@ -22,27 +24,27 @@ dependencies:
 build: dependencies build-coursed build-sfsyncd
 
 build-coursed: 
-	go build -tags $(LIBRARY_ENV) -o ./bin/coursed coursed/main.go
+	go build -tags $(TAG) -o ./bin/coursed $(SERVICES_DIR)/coursed/main.go
 
 build-sfsyncd: 
-	go build -tags $(LIBRARY_ENV) -o ./bin/sfsyncd sfsyncd/main.go
+	go build -tags $(TAG) -o ./bin/sfsyncd $(SERVICES_DIR)/sfsyncd/main.go
 
 #build-cmd:
-#	go build -tags $(LIBRARY_ENV) -o ./bin/search cmd/main.go
+#	go build -tags $(TAG) -o ./bin/search cmd/main.go
 
 # Adding more flags for complete static linking
 linux-binaries:
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(LIBRARY_ENV) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/coursed coursed/main.go
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(LIBRARY_ENV) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/sfsyncd sfsyncd/main.go
-#	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(LIBRARY_ENV) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/search cmd/main.go
+	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/coursed $(SERVICES_DIR)/coursed/main.go
+	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/sfsyncd $(SERVICES_DIR)/sfsyncd/main.go
+#	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/search cmd/main.go
 
 ci: dependencies test	
 
 # builds one docker image
-# TODO: extend for multiple services
+# TODO: support easy extension for multiple services
 docker:
-	docker build -f Dockerfile.coursed -t coursed:$(LIBRARY_ENV) .
-	docker build -f Dockerfile.sfsyncd -t sfsyncd:$(LIBRARY_ENV) .
+	docker build -f $(DOCKERFILE_DIR)/Dockerfile.coursed -t coursed:$(TAG) .
+	docker build -f $(DOCKERFILE_DIR)/Dockerfile.sfsyncd -t sfsyncd:$(TAG) .
 
 build-mocks:
 	@go get github.com/golang/mock/gomock

@@ -1,8 +1,8 @@
 package util
 
 var (
-    GitTag     = "v0.0.1-6-g33b2db7"
-    GitHash    = "33b2db7"
+    GitTag     = "v0.0.1-7-g33ea40b"
+    GitHash    = "33ea40b"
     BuildDate  = "2024-12-02"
-    BuildTime  = "18:11:14"
+    BuildTime  = "19:36:52"
 )

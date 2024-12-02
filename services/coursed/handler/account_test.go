@@ -12,9 +12,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"sudhagar/glad/coursed/presenter"
 	"sudhagar/glad/entity"
 	"sudhagar/glad/pkg/common"
+	"sudhagar/glad/services/coursed/presenter"
 
 	mock "sudhagar/glad/usecase/account/mock"
 

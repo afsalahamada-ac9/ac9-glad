@@ -15,7 +15,7 @@ import (
 	"sudhagar/glad/pkg/common"
 	"sudhagar/glad/usecase/account"
 
-	"sudhagar/glad/coursed/presenter"
+	"sudhagar/glad/services/coursed/presenter"
 
 	"sudhagar/glad/entity"
 

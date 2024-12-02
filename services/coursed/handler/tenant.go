@@ -14,7 +14,7 @@ import (
 
 	"sudhagar/glad/usecase/tenant"
 
-	"sudhagar/glad/coursed/presenter"
+	"sudhagar/glad/services/coursed/presenter"
 
 	"sudhagar/glad/entity"
 

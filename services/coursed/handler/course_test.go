@@ -13,11 +13,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"sudhagar/glad/coursed/presenter"
 	"sudhagar/glad/entity"
 	"sudhagar/glad/pkg/common"
+	"sudhagar/glad/services/coursed/presenter"
 
-	mock "sudhagar/glad/usecase/center/mock"
+	mock "sudhagar/glad/usecase/course/mock"
 
 	"github.com/codegangsta/negroni"
 	"github.com/golang/mock/gomock"
@@ -25,32 +25,26 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const (
-	tenantAlice       entity.ID = 7264348473653242881
-	tenantNonExistent entity.ID = 0
-	aliceExtID                  = "000aliceExtID"
-)
-
-func Test_listCenters(t *testing.T) {
+func Test_listCourses(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	service := mock.NewMockUseCase(controller)
 	r := mux.NewRouter()
 	n := negroni.New()
-	MakeCenterHandlers(r, *n, service)
-	path, err := r.GetRoute("listCenters").GetPathTemplate()
+	MakeCourseHandlers(r, *n, service)
+	path, err := r.GetRoute("listCourses").GetPathTemplate()
 	assert.Nil(t, err)
-	assert.Equal(t, "/v1/centers", path)
-	tmpl := &entity.Center{
+	assert.Equal(t, "/v1/courses", path)
+	tmpl := &entity.Course{
 		ID:       entity.NewID(),
 		TenantID: tenantAlice,
 		Name:     "default-0",
 	}
 	service.EXPECT().GetCount(tmpl.TenantID).Return(1)
 	service.EXPECT().
-		ListCenters(tmpl.TenantID, gomock.Any(), gomock.Any()).
-		Return([]*entity.Center{tmpl}, nil)
-	ts := httptest.NewServer(listCenters(service))
+		ListCourses(tmpl.TenantID, gomock.Any(), gomock.Any()).
+		Return([]*entity.Course{tmpl}, nil)
+	ts := httptest.NewServer(listCourses(service))
 	defer ts.Close()
 
 	client := &http.Client{}
@@ -61,16 +55,16 @@ func Test_listCenters(t *testing.T) {
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 }
 
-func Test_listCenters_NotFound(t *testing.T) {
+func Test_listCourses_NotFound(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	service := mock.NewMockUseCase(controller)
-	ts := httptest.NewServer(listCenters(service))
+	ts := httptest.NewServer(listCourses(service))
 	defer ts.Close()
 	tenantID := tenantAlice
 	service.EXPECT().GetCount(tenantID).Return(0)
 	service.EXPECT().
-		SearchCenters(tenantID, "non-existent", gomock.Any(), gomock.Any()).
+		SearchCourses(tenantID, "non-existent", 0, 0).
 		Return(nil, entity.ErrNotFound)
 
 	client := &http.Client{}
@@ -83,20 +77,20 @@ func Test_listCenters_NotFound(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 }
 
-func Test_listCenters_Search(t *testing.T) {
+func Test_listCourses_Search(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	service := mock.NewMockUseCase(controller)
-	tmpl := &entity.Center{
+	tmpl := &entity.Course{
 		ID:       entity.NewID(),
 		TenantID: tenantAlice,
 		Name:     "default-0",
 	}
 	service.EXPECT().GetCount(tmpl.TenantID).Return(1)
 	service.EXPECT().
-		SearchCenters(tmpl.TenantID, "default", gomock.Any(), gomock.Any()).
-		Return([]*entity.Center{tmpl}, nil)
-	ts := httptest.NewServer(listCenters(service))
+		SearchCourses(tmpl.TenantID, "default", gomock.Any(), gomock.Any()).
+		Return([]*entity.Course{tmpl}, nil)
+	ts := httptest.NewServer(listCourses(service))
 	defer ts.Close()
 
 	client := &http.Client{}
@@ -110,27 +104,29 @@ func Test_listCenters_Search(t *testing.T) {
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 }
 
-func Test_createCenter(t *testing.T) {
+func Test_createCourse(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	service := mock.NewMockUseCase(controller)
 	r := mux.NewRouter()
 	n := negroni.New()
-	MakeCenterHandlers(r, *n, service)
-	path, err := r.GetRoute("createCenter").GetPathTemplate()
+	MakeCourseHandlers(r, *n, service)
+	path, err := r.GetRoute("createCourse").GetPathTemplate()
 	assert.Nil(t, err)
-	assert.Equal(t, "/v1/centers", path)
+	assert.Equal(t, "/v1/courses", path)
 
 	id := entity.NewID()
+	// TODO: Check the length of the courseTimings and same number of
+	// courseTimingIDs to be returned
 	service.EXPECT().
-		CreateCenter(gomock.Any(),
+		CreateCourse(gomock.Any(),
 			gomock.Any(),
 			gomock.Any(),
 			gomock.Any(),
 			gomock.Any(),
 			gomock.Any()).
-		Return(id, nil)
-	h := createCenter(service)
+		Return(id, nil, nil)
+	h := createCourse(service)
 
 	ts := httptest.NewServer(h)
 	defer ts.Close()
@@ -139,18 +135,20 @@ func Test_createCenter(t *testing.T) {
 		TenantID entity.ID         `json:"tenant_id"`
 		ExtID    string            `json:"extId"`
 		Name     string            `json:"name"`
-		Mode     entity.CenterMode `json:"mode"`
-		Content  string            `json:"content"`
+		Mode     entity.CourseMode `json:"mode"`
+		// CenterID entity.ID         `json:"center_id"`
 	}{TenantID: tenantAlice,
 		ExtID: aliceExtID,
 		Name:  "default-0",
-		Mode:  (entity.CenterInPerson)}
+		Mode:  (entity.CourseInPerson),
+		// CenterID: aliceCenterID,
+	}
 	payloadBytes, err := json.Marshal(payload)
 	assert.Nil(t, err)
 
 	client := &http.Client{}
 	req, _ := http.NewRequest(http.MethodPost,
-		ts.URL+"/v1/centers",
+		ts.URL+"/v1/courses",
 		bytes.NewReader(payloadBytes))
 	req.Header.Set(common.HttpHeaderTenantID, tenantAlice.String())
 	req.Header.Set("Content-Type", "application/json")
@@ -159,93 +157,92 @@ func Test_createCenter(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusCreated, res.StatusCode)
 
-	var tmpl *presenter.Center
+	var tmpl *presenter.Course
 	json.NewDecoder(res.Body).Decode(&tmpl)
 	assert.Equal(t, id, tmpl.ID)
-	assert.Equal(t, payload.Name, tmpl.Name)
-	assert.Equal(t, payload.Mode, tmpl.Mode)
 	assert.Equal(t, tenantAlice.String(), res.Header.Get(common.HttpHeaderTenantID))
 }
 
-func Test_getCenter(t *testing.T) {
+func Test_getCourse(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	service := mock.NewMockUseCase(controller)
 	r := mux.NewRouter()
 	n := negroni.New()
-	MakeCenterHandlers(r, *n, service)
-	path, err := r.GetRoute("getCenter").GetPathTemplate()
+	MakeCourseHandlers(r, *n, service)
+	path, err := r.GetRoute("getCourse").GetPathTemplate()
 	assert.Nil(t, err)
-	assert.Equal(t, "/v1/centers/{id}", path)
-	tmpl := &entity.Center{
+	assert.Equal(t, "/v1/courses/{id}", path)
+	extID := aliceExtID
+	tmpl := &entity.Course{
 		ID:       entity.NewID(),
 		TenantID: tenantAlice,
-		ExtID:    aliceExtID,
+		ExtID:    &extID,
 		Name:     "default-0",
-		Mode:     entity.CenterInPerson,
+		Mode:     entity.CourseInPerson,
 	}
 	service.EXPECT().
-		GetCenter(tmpl.ID).
+		GetCourse(tmpl.ID).
 		Return(tmpl, nil)
-	handler := getCenter(service)
-	r.Handle("/v1/centers/{id}", handler)
+	handler := getCourse(service)
+	r.Handle("/v1/courses/{id}", handler)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
-	res, err := http.Get(ts.URL + "/v1/centers/" + tmpl.ID.String())
+	res, err := http.Get(ts.URL + "/v1/courses/" + tmpl.ID.String())
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
-	// presenter.Center is returned by the api (http) server
-	var d *presenter.Center
+	// presenter.Course is returned by the api (http) server
+	var d *presenter.Course
 	json.NewDecoder(res.Body).Decode(&d)
 	assert.NotNil(t, d)
 
 	assert.Equal(t, tmpl.ID, d.ID)
-	assert.Equal(t, tmpl.Name, d.Name)
-	assert.Equal(t, tmpl.Mode, d.Mode)
+	assert.Equal(t, tmpl.Name, *d.Name)
+	assert.Equal(t, tmpl.Mode, *d.Mode)
 	assert.Equal(t, tenantAlice.String(), res.Header.Get(common.HttpHeaderTenantID))
 }
 
-func Test_deleteCenter(t *testing.T) {
+func Test_deleteCourse(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	service := mock.NewMockUseCase(controller)
 	r := mux.NewRouter()
 	n := negroni.New()
-	MakeCenterHandlers(r, *n, service)
-	path, err := r.GetRoute("deleteCenter").GetPathTemplate()
+	MakeCourseHandlers(r, *n, service)
+	path, err := r.GetRoute("deleteCourse").GetPathTemplate()
 	assert.Nil(t, err)
-	assert.Equal(t, "/v1/centers/{id}", path)
+	assert.Equal(t, "/v1/courses/{id}", path)
 
 	id := entity.NewID()
-	service.EXPECT().DeleteCenter(id).Return(nil)
-	handler := deleteCenter(service)
-	req, _ := http.NewRequest("DELETE", "/v1/centers/"+id.String(), nil)
-	r.Handle("/v1/centers/{id}", handler).Methods("DELETE", "OPTIONS")
+	service.EXPECT().DeleteCourse(id).Return(nil)
+	handler := deleteCourse(service)
+	req, _ := http.NewRequest("DELETE", "/v1/courses/"+id.String(), nil)
+	r.Handle("/v1/courses/{id}", handler).Methods("DELETE", "OPTIONS")
 	rr := httptest.NewRecorder()
 	r.ServeHTTP(rr, req)
 	assert.Equal(t, http.StatusOK, rr.Code)
 }
 
-func Test_deleteCenterNonExistent(t *testing.T) {
+func Test_deleteCourseNonExistent(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	service := mock.NewMockUseCase(controller)
 	r := mux.NewRouter()
 	n := negroni.New()
-	MakeCenterHandlers(r, *n, service)
-	path, err := r.GetRoute("deleteCenter").GetPathTemplate()
+	MakeCourseHandlers(r, *n, service)
+	path, err := r.GetRoute("deleteCourse").GetPathTemplate()
 	assert.Nil(t, err)
-	assert.Equal(t, "/v1/centers/{id}", path)
+	assert.Equal(t, "/v1/courses/{id}", path)
 
 	id := entity.NewID()
-	service.EXPECT().DeleteCenter(id).Return(entity.ErrNotFound)
-	handler := deleteCenter(service)
-	req, _ := http.NewRequest("DELETE", "/v1/centers/"+id.String(), nil)
-	r.Handle("/v1/centers/{id}", handler).Methods("DELETE", "OPTIONS")
+	service.EXPECT().DeleteCourse(id).Return(entity.ErrNotFound)
+	handler := deleteCourse(service)
+	req, _ := http.NewRequest("DELETE", "/v1/courses/"+id.String(), nil)
+	r.Handle("/v1/courses/{id}", handler).Methods("DELETE", "OPTIONS")
 	rr := httptest.NewRecorder()
 	r.ServeHTTP(rr, req)
 	assert.Equal(t, http.StatusNotFound, rr.Code)
 }
 
-// TODO: Test case for updating center
+// TODO: Test case for updating course
