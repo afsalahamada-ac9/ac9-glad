@@ -58,15 +58,10 @@ func main() {
 		}
 	}()
 
-	for _, env := range os.Environ() {
-		Log.Infof(env)
-	}
-
 	dataSourceName := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s",
 		util.GetStrEnvOrConfig("DB_USER", config.DB_USER),
 		util.GetStrEnvOrConfig("DB_PASSWORD", config.DB_PASSWORD),
 		util.GetStrEnvOrConfig("DB_HOST", config.DB_HOST),
-		// util.GetIntEnvOrConfig("DB_PORT", config.DB_PORT),
 		util.GetStrEnvOrConfig("DB_DATABASE", config.DB_DATABASE),
 		util.GetStrEnvOrConfig("DB_SSLMODE", config.DB_SSLMODE))
 	db, err := sql.Open("postgres", dataSourceName)
@@ -93,7 +88,7 @@ func main() {
 
 	metricService, err := metric.NewPrometheusService()
 	if err != nil {
-		log.Fatal(err.Error())
+		Log.Fatalf("%v", err.Error())
 	}
 	r := mux.NewRouter()
 	// handlers
@@ -124,7 +119,6 @@ func main() {
 	http.Handle("/", r)
 	http.Handle("/metrics", promhttp.Handler())
 	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		Log.Debugf("Health check called")
 		w.WriteHeader(http.StatusOK)
 	})
 

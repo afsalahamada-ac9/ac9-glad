@@ -24,6 +24,7 @@ services:
   coursed:
     image: coursed:dev
     environment:
+      # ME: coursed
       DB_USER: glad_user
       DB_PASSWORD: glad1234
       DB_DATABASE: glad
@@ -33,7 +34,6 @@ services:
       DB_SSLMODE: disable # require
       API_PORT: 8080
       # URL_HOST: url:8090
-      # ME: coursed
     expose:
       - 8080
     ports:
@@ -44,6 +44,19 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  sfsyncd:
+    image: sfsyncd:dev
+    environment:
+      # ME: sfsyncd
+      API_PORT: 8090
+    expose:
+      - 8090
+    ports:
+      - "8090:8090"
+    container_name: glad-sfsyncd
+    networks:
+      - default
 
   # url:
   #   image: coursed:dev
