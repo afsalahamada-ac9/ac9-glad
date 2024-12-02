@@ -19,7 +19,7 @@ import (
 
 	mock "ac9/glad/usecase/product/mock"
 
-	"github.com/codegangsta/negroni"
+	"github.com/urfave/negroni"
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"

@@ -12,7 +12,7 @@ import (
 
 	"ac9/glad/pkg/metric"
 
-	"github.com/codegangsta/negroni"
+	"github.com/urfave/negroni"
 )
 
 // Metrics to prometheus

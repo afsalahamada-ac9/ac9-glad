@@ -23,7 +23,7 @@ import (
 	"ac9/glad/pkg/middleware"
 	"ac9/glad/pkg/util"
 
-	"github.com/codegangsta/negroni"
+	"github.com/urfave/negroni"
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"

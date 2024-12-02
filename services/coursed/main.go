@@ -34,11 +34,11 @@ import (
 	"ac9/glad/pkg/util"
 	"ac9/glad/services/coursed/handler"
 
-	"github.com/codegangsta/negroni"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
+	"github.com/urfave/negroni"
 )
 
 // Note: Not a best practice to use global variables in general
@@ -98,6 +98,8 @@ func main() {
 		negroni.HandlerFunc(middleware.AddDefaultTenant),
 		negroni.NewLogger(),
 	)
+	n.Use(&middleware.APILogging{Log: Log})
+
 	// center
 	handler.MakeCenterHandlers(r, *n, centerService)
 

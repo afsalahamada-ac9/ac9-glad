@@ -17,7 +17,7 @@ import (
 	"ac9/glad/services/coursed/presenter"
 	"ac9/glad/usecase/product"
 
-	"github.com/codegangsta/negroni"
+	"github.com/urfave/negroni"
 	"github.com/gorilla/mux"
 )
 

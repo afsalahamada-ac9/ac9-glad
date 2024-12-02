@@ -3,7 +3,6 @@ module ac9/glad
 go 1.23
 
 require (
-	github.com/codegangsta/negroni v0.3.0
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.6.0
@@ -13,6 +12,7 @@ require (
 	github.com/prometheus/client_golang v1.11.1
 	github.com/stretchr/testify v1.9.0
 	github.com/ulule/deepcopier v0.0.0-20200430083143-45decc6639b6
+	github.com/urfave/negroni v1.0.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.28.0
 )

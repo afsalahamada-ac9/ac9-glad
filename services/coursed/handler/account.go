@@ -19,7 +19,7 @@ import (
 
 	"ac9/glad/entity"
 
-	"github.com/codegangsta/negroni"
+	"github.com/urfave/negroni"
 	"github.com/gorilla/mux"
 )
 
