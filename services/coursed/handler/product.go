@@ -17,8 +17,8 @@ import (
 	"ac9/glad/services/coursed/presenter"
 	"ac9/glad/usecase/product"
 
-	"github.com/urfave/negroni"
 	"github.com/gorilla/mux"
+	"github.com/urfave/negroni"
 )
 
 func listProducts(service product.UseCase) http.Handler {
@@ -35,6 +35,18 @@ func listProducts(service product.UseCase) http.Handler {
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("Unable to parse tenant id"))
+			return
+		}
+
+		// Guard rails to limit the items queried from DB and sent
+		if page == 0 && limit == 0 {
+			page = defaultHttpPageNumber
+			limit = min(defaultHttpPageLimit, maxHttpPaginationLimit)
+		}
+
+		if limit > maxHttpPaginationLimit {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Page size requested is more than allowed limit"))
 			return
 		}
 

@@ -19,8 +19,8 @@ import (
 
 	"ac9/glad/entity"
 
-	"github.com/urfave/negroni"
 	"github.com/gorilla/mux"
+	"github.com/urfave/negroni"
 )
 
 func listAccounts(service account.UseCase) http.Handler {
@@ -42,13 +42,23 @@ func listAccounts(service account.UseCase) http.Handler {
 			return
 		}
 
+		// TODO: Common code: Need to make it reusable
+		// Guard rails to limit the items queried from DB and sent
+		if page == 0 && limit == 0 {
+			page = defaultHttpPageNumber
+			limit = min(defaultHttpPageLimit, maxHttpPaginationLimit)
+		}
+
+		if limit > maxHttpPaginationLimit {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Page size requested is more than allowed limit"))
+			return
+		}
+
 		switch {
 		case search == "":
-			// TODO: Implement page and limit in the query and that should be bound
-			// by the values supported by the server
 			data, err = service.ListAccounts(tenantID, page, limit, entity.AccountType(at))
 		default:
-			// TODO: Do we need to filter/search by type? I think so.
 			data, err = service.SearchAccounts(tenantID, search, page, limit, entity.AccountType(at))
 		}
 

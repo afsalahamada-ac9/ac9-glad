@@ -7,12 +7,14 @@
 package handler
 
 const (
-	coursedQueryParamKeyIndex string = "index"
-	coursedQueryParamKeyLimit string = "limit"
-	httpHeaderTotalCount             = "X-Total-Count"
-	httpParamQuery                   = "q"
-	httpParamPage                    = "page"
-	httpParamLimit                   = "limit"
-	httpParamType                    = "type"
-	maxHttpPaginationLimit           = 50
+	defaultHttpPageNumber = 1
+	defaultHttpPageLimit  = 20
+
+	httpHeaderTotalCount = "X-Total-Count"
+	httpParamLimit       = "limit"
+	httpParamPage        = "page"
+	httpParamQuery       = "q"
+	httpParamType        = "type"
+
+	maxHttpPaginationLimit = 50
 )
