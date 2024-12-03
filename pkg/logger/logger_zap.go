@@ -21,6 +21,8 @@ type ZapLoggerImpl struct {
 	sugar  *zap.SugaredLogger
 }
 
+var Log *ZapLoggerImpl
+
 func NewLoggerZap() *ZapLoggerImpl {
 
 	// Read log level from environment variable
@@ -58,6 +60,7 @@ func NewLoggerZap() *ZapLoggerImpl {
 		sugar:  zapLogger.Sugar(),
 	}
 
+	Log = logger
 	return logger
 }
 

@@ -13,6 +13,7 @@ import (
 	"strconv"
 
 	"ac9/glad/pkg/common"
+	l "ac9/glad/pkg/logger"
 	"ac9/glad/usecase/account"
 
 	"ac9/glad/services/coursed/presenter"
@@ -41,6 +42,8 @@ func listAccounts(service account.UseCase) http.Handler {
 			_, _ = w.Write([]byte("Unable to parse tenant id"))
 			return
 		}
+
+		l.Log.Debugf("Test")
 
 		// TODO: Common code: Need to make it reusable
 		// Guard rails to limit the items queried from DB and sent
