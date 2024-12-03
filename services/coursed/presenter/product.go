@@ -17,7 +17,7 @@ type Product struct {
 	ExtName          string                   `json:"extName"`
 	Title            string                   `json:"title"`
 	CType            string                   `json:"ctype"`
-	BaseProductExtID string                   `json:"baseProductExtId,omitempty"`
+	BaseProductExtID string                   `json:"baseProductExtID,omitempty"`
 	DurationDays     int32                    `json:"durationDays,omitempty"`
 	Visibility       entity.ProductVisibility `json:"visibility,omitempty"`
 	MaxAttendees     int32                    `json:"maxAttendees,omitempty"`

@@ -5,8 +5,8 @@
 package mock_course
 
 import (
-	reflect "reflect"
 	entity "ac9/glad/entity"
+	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
 )

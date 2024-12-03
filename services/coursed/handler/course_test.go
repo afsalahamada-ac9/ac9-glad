@@ -19,10 +19,10 @@ import (
 
 	mock "ac9/glad/usecase/course/mock"
 
-	"github.com/urfave/negroni"
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
+	"github.com/urfave/negroni"
 )
 
 func Test_listCourses(t *testing.T) {
@@ -64,7 +64,7 @@ func Test_listCourses_NotFound(t *testing.T) {
 	tenantID := tenantAlice
 	service.EXPECT().GetCount(tenantID).Return(0)
 	service.EXPECT().
-		SearchCourses(tenantID, "non-existent", 0, 0).
+		SearchCourses(tenantID, "non-existent", gomock.Any(), gomock.Any()).
 		Return(nil, entity.ErrNotFound)
 
 	client := &http.Client{}
@@ -132,12 +132,13 @@ func Test_createCourse(t *testing.T) {
 	defer ts.Close()
 
 	payload := struct {
-		TenantID entity.ID         `json:"tenant_id"`
-		ExtID    string            `json:"extId"`
-		Name     string            `json:"name"`
-		Mode     entity.CourseMode `json:"mode"`
+		// TenantID entity.ID         `json:"tenant_id"`
+		ExtID string            `json:"extID"`
+		Name  string            `json:"name"`
+		Mode  entity.CourseMode `json:"mode"`
 		// CenterID entity.ID         `json:"center_id"`
-	}{TenantID: tenantAlice,
+	}{
+		// TenantID: tenantAlice,
 		ExtID: aliceExtID,
 		Name:  "default-0",
 		Mode:  (entity.CourseInPerson),

@@ -98,11 +98,11 @@ func createProduct(service product.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error adding product"
 		var input struct {
-			ExtID            string                   `json:"extId"`
+			ExtID            string                   `json:"extID"`
 			ExtName          string                   `json:"extName"`
 			Title            string                   `json:"title"`
 			CType            string                   `json:"ctype"`
-			BaseProductExtID string                   `json:"baseProductExtId"`
+			BaseProductExtID string                   `json:"baseProductExtID"`
 			DurationDays     int32                    `json:"durationDays"`
 			Visibility       entity.ProductVisibility `json:"visibility"`
 			MaxAttendees     int32                    `json:"maxAttendees"`

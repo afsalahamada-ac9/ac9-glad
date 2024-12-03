@@ -19,10 +19,10 @@ import (
 
 	mock "ac9/glad/usecase/center/mock"
 
-	"github.com/urfave/negroni"
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
+	"github.com/urfave/negroni"
 )
 
 const (

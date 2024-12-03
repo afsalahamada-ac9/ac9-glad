@@ -8,20 +8,23 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"ac9/glad/entity"
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/logger"
 	"ac9/glad/services/coursed/presenter"
 
 	mock "ac9/glad/usecase/account/mock"
 
-	"github.com/urfave/negroni"
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
+	"github.com/urfave/negroni"
 )
 
 const (
@@ -31,6 +34,20 @@ const (
 	accountUsernamePrimary   string = "12345550001"
 	accountUsernameSecondary string = "12345550002"
 )
+
+func TestMain(m *testing.M) {
+	// Initialize logger
+	Log := logger.NewLoggerZap()
+	if Log == nil {
+		log.Fatalf("Failed to initialize logger")
+	}
+
+	// Run tests
+	code := m.Run()
+
+	// Exit with the result code
+	os.Exit(code)
+}
 
 func Test_listAccounts(t *testing.T) {
 	controller := gomock.NewController(t)

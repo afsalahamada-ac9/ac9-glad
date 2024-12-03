@@ -16,8 +16,8 @@ import (
 // X-GLAD-TenantID
 type Course struct {
 	ID           entity.ID            `json:"id"`
-	ExtID        *string              `json:"extId,omitempty"`
-	CenterID     *entity.ID           `json:"centerId,omitempty"`
+	ExtID        *string              `json:"extID,omitempty"`
+	CenterID     *entity.ID           `json:"centerID,omitempty"`
 	Name         *string              `json:"name,omitempty"`
 	Notes        *string              `json:"notes,omitempty"`
 	Timezone     *string              `json:"timezone,omitempty"`
@@ -38,8 +38,8 @@ type CourseTeacher struct {
 // TODO: Salesforce will send additional details: extID, URL (to be converted to shortURL), numAttendees
 type CourseReq struct {
 	Name         string               `json:"name"`
-	CenterID     entity.ID            `json:"centerId"`
-	ProductID    entity.ID            `json:"productId"`
+	CenterID     entity.ID            `json:"centerID"`
+	ProductID    entity.ID            `json:"productID"`
 	Mode         entity.CourseMode    `json:"mode"`
 	Timezone     string               `json:"timezone"`
 	Organizer    []entity.ID          `json:"organizer"`
@@ -56,7 +56,7 @@ type CourseReq struct {
 // CourseResponse struct used as response to the create course request (REST API)
 type CourseResponse struct {
 	ID         entity.ID   `json:"id"`
-	DateTimeID []entity.ID `json:"dateId"`
+	DateTimeID []entity.ID `json:"dateID"`
 	ShortURL   *string     `json:"shortURL,omitempty"`
 }
 

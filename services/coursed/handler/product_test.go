@@ -19,10 +19,10 @@ import (
 
 	mock "ac9/glad/usecase/product/mock"
 
-	"github.com/urfave/negroni"
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
+	"github.com/urfave/negroni"
 )
 
 // TODO: Add test cases to test page and limit functionality
@@ -153,11 +153,11 @@ func Test_createProduct(t *testing.T) {
 	defer ts.Close()
 
 	payload := struct {
-		ExtID            string                   `json:"extId"`
-		ExtName          string                   `json:"Extname"`
+		ExtID            string                   `json:"extID"`
+		ExtName          string                   `json:"extName"`
 		Title            string                   `json:"title"`
 		CType            string                   `json:"ctype"`
-		BaseProductExtID string                   `json:"baseProductExtId"`
+		BaseProductExtID string                   `json:"baseProductExtID"`
 		DurationDays     int32                    `json:"durationDays"`
 		Visibility       entity.ProductVisibility `json:"visibility"`
 		MaxAttendees     int32                    `json:"maxAttendees"`

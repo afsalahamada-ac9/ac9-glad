@@ -20,5 +20,5 @@ type Account struct {
 	Phone     string             `json:"phone,omitempty"`
 	Email     string             `json:"email,omitempty"`
 	Type      entity.AccountType `json:"type"`
-	CognitoID string             `json:"cognito_id,omitempty"`
+	CognitoID string             `json:"cognitoID,omitempty"`
 }

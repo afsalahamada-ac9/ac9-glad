@@ -24,9 +24,7 @@ import (
 )
 
 // TODO:
-// 	- Implement pagination for center listing/search
 // 	- JSON based search and formatting requires some work
-// 	- ENUM can be optimized by storing integer value in the mapping
 // 	- Support for location and geolocation
 
 func listCenters(service center.UseCase) http.Handler {
@@ -103,7 +101,7 @@ func createCenter(service center.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error adding center"
 		var input struct {
-			ExtID     string            `json:"extId"`
+			ExtID     string            `json:"extID"`
 			ExtName   string            `json:"extName"`
 			Name      string            `json:"name"`
 			Mode      entity.CenterMode `json:"mode"`
