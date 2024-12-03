@@ -100,6 +100,9 @@ func main() {
 	)
 	n.Use(&middleware.APILogging{Log: Log})
 
+	// log handler
+	logger.MakeLogHandlers(r, *n, "coursed", Log)
+
 	// center
 	handler.MakeCenterHandlers(r, *n, centerService)
 
@@ -114,9 +117,6 @@ func main() {
 
 	// product
 	handler.MakeProductHandlers(r, *n, productService)
-
-	// log handler
-	logger.MakeLogHandlers(r, *n, "coursed", Log)
 
 	http.Handle("/", r)
 	http.Handle("/metrics", promhttp.Handler())

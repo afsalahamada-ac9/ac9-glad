@@ -15,6 +15,7 @@ import (
 
 	// Uber zap logging
 	"ac9/glad/pkg/logger"
+	"ac9/glad/services/sfsyncd/handler"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
@@ -23,10 +24,10 @@ import (
 	"ac9/glad/pkg/middleware"
 	"ac9/glad/pkg/util"
 
-	"github.com/urfave/negroni"
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
+	"github.com/urfave/negroni"
 )
 
 // Note: Not a best practice to use global variables in general
@@ -58,6 +59,7 @@ func main() {
 		negroni.HandlerFunc(middleware.AddDefaultTenant),
 		negroni.NewLogger(),
 	)
+	n.Use(&middleware.APILogging{Log: Log})
 
 	// log handler
 	logger.MakeLogHandlers(r, *n, "sfsyncd", Log)
@@ -71,6 +73,12 @@ func main() {
 	r.HandleFunc("/readiness", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
+
+	// log handler
+	logger.MakeLogHandlers(r, *n, "sfsyncd", Log)
+
+	// test
+	handler.MakeTestHandlers(r, *n)
 
 	logger := log.New(os.Stderr, "logger: ", log.Lshortfile)
 	srv := &http.Server{

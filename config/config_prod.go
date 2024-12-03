@@ -25,4 +25,7 @@ const (
 
 	// Metrics
 	PROMETHEUS_PUSHGATEWAY = "http://localhost:9091/"
+
+	// SFSYNCD specific consts
+	COURSED_ADDR = "localhost:8080"
 )

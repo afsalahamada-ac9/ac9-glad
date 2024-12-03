@@ -50,6 +50,7 @@ services:
     environment:
       # ME: sfsyncd
       API_PORT: 8090
+      COURSED_ADDR: coursed:8080
     expose:
       - 8090
     ports:
