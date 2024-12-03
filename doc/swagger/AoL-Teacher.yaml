@@ -4,33 +4,155 @@ info:
   description: |-
     AoL Teacher API specification.
 
-    TODO:
-      1. Attendee object
-      2. Info query
-
   contact:
     email: sudhagar@abovecloud9.ai
-  version: 0.0.6
+  version: 0.0.7
 externalDocs:
   description: Find out more about AboveCloud9.AI
   url: https://abovecloud9.ai
 servers:
-  - url: https://stage.api.ac9ai.com/v1 # placeholder
+  - url: https://dev.api.ac9ai.com/v1   # development
+  - url: https://api.ac9ai.com/v1       # production
 tags:
   - name: account
     description: Operations about accounts
-  - name: config
-    description: System configuration such as timezones supported, etc
   - name: center
     description: Operations about centers
   - name: course
     description: Operations about courses
+  - name: glad
+    description: GLAD platform level operations such as configuration
+  - name: live-darshan
+    description: Operations about live darshan
+  - name: media
+    description: Operations about media
+  - name: participants
+    description: Operations about participants
   - name: product
     description: Operations about products
   - name: user
-    description: Operations about users, login, logout
+    description: Operations about users
 
 paths:
+  /accounts:
+    get:
+      tags:
+        - account
+      summary: Finds user account using search string
+      description: Retrives user accounts that match the given search string. This should be paginated.
+      operationId: searchAccounts
+      parameters:
+        - name: q
+          in: query
+          description: Account names that need to be considered for filter
+          required: false
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: Account type
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number (for pagination)
+          required: false
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: Number of items in the response
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearer: []
+
+  /centers:
+    get:
+      tags:
+        - center
+      summary: Finds centers
+      description: Returns all the centers. We may need to optimize by returning the centers that match the search string
+      operationId: findCenters
+      parameters:
+        - name: q
+          in: query
+          description: Search string
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number (for pagination)
+          required: false
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: Number of items in the response
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Center'
+        '404':
+          description: Center not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearer: []
+
+  # Note: This API is unauthenticated
+  /glad/config:
+    get:
+      tags:
+        - glad
+      summary: Retrieves GLAD configuration
+      description: Returns the GLAD configuration 
+      operationId: getGLADConfig
+      parameters:
+        - name: v   # Note: version ignored in v1
+          in: query
+          description: Current config version at the client
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GLADConfig'
+
   /courses:
     put:
       tags:
@@ -100,21 +222,13 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
         - bearer: []
-  /courses/findByUser:
+  /courses/me:
     get:
       tags:
         - course
-      summary: Finds courses by user identifier
-      description: Returns courses associated with given user IDs
-      operationId: findCoursesByUser
-      parameters:
-        - name: userID
-          in: query
-          description: Comma-separated list of user IDs
-          required: true
-          explode: false
-          schema:
-            type: string
+      summary: Finds courses for the logged in user
+      description: Returns courses associated with the logged in user
+      operationId: findMyCourses
       responses:
         '200':
           description: successful operation
@@ -136,7 +250,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /courses/{courseId}:
+      security:
+        - bearer: []
+  /courses/{courseID}:
     get:
       tags:
         - course
@@ -144,7 +260,7 @@ paths:
       description: Returns a single course
       operationId: getCourseById
       parameters:
-        - name: courseId
+        - name: courseID
           in: path
           description: ID of course to return
           required: true
@@ -178,7 +294,7 @@ paths:
       description: delete a course
       operationId: deleteCourse
       parameters:
-        - name: courseId
+        - name: courseID
           in: path
           description: Course id to delete
           required: true
@@ -194,115 +310,55 @@ paths:
       security:
         - bearer: []
 
-  /centers:
+  /live-darshan/token:
     get:
-      tags:
-        - center
-      summary: Finds centers
-      description: Returns all the centers. We may need to optimize by returning the centers that match the search string
-      operationId: findCenters
-      parameters:
-        - name: q
-          in: query
-          description: Search string
-          required: false
-          schema:
-            type: string
-        - name: page
-          in: query
-          description: Page number (for pagination)
-          required: false
-          schema:
-            type: integer
-        - name: limit
-          in: query
-          description: Number of items in the response
-          required: false
-          schema:
-            type: integer
+      summary: Get live-darshan token
+      description: Retrieve token for live darshan
       responses:
         '200':
-          description: successful operation
+          description: Metadata successfully retrieved
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Center'
-        '404':
-          description: Center not found
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/LiveDarshanToken'
+        '400':
+          description: Bad request. 
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
-  /config:
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearer: []
+  /live-darshan:
     get:
-      tags:
-        - config
-      summary: Retrieves configuration
-      description: Returns the configuration 
-      operationId: getConfig
-      parameters:
-        - name: v
-          in: query
-          description: Current config version at the client # timestamp could be used
-          required: true
-          schema:
-            type: string
+      summary: Get live-darshan details
+      description: Retrieve live darshan details
       responses:
         '200':
-          description: successful operation
+          description: Live Darshan details successfully retrieved
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Config'
-
-  /accounts:
-    get:
-      tags:
-        - account
-      summary: Finds user account using search string
-      description: Retrives user accounts that match the given search string. This should be paginated.
-      operationId: searchAccounts
-      parameters:
-        - name: q
-          in: query
-          description: Account names that need to be considered for filter
-          required: false
-          schema:
-            type: string
-        - name: type
-          in: query
-          description: Account type
-          required: false
-          schema:
-            type: string
-        - name: page
-          in: query
-          description: Page number (for pagination)
-          required: false
-          schema:
-            type: integer
-        - name: limit
-          in: query
-          description: Number of items in the response
-          required: false
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: successful operation
+                  $ref: '#/components/schemas/LiveDarshan'
+        '400':
+          description: Bad request. 
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Account'
-        '404':
-          description: Account not found
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
           content:
             application/json:
               schema:
@@ -310,67 +366,64 @@ paths:
       security:
         - bearer: []
 
-  /users/login:
+  /media/metadata/{type}:
     get:
-      tags:
-        - user
-      summary: Logs user into the system
-      description: ''
-      operationId: loginUser
+      summary: Get metadata
+      description: Retrieve metadata for quotes, images, or both if no type is specified.
       parameters:
-        - name: username
-          in: query
-          description: The user name for login typically email identifier
+        - name: type
+          in: path
           required: true
+          description: The type of media to fetch metadata for (e.g., "quote" or "image"). If not specified, returns metadata for both.
           schema:
             type: string
-        - name: password
-          in: query
-          description: The password for login in clear text
-          required: true
-          schema:
-            type: string
+            enum:
+              - quote
+              - image
       responses:
         '200':
-          description: successful operation
-          headers:
-            X-Expires-After:
-              description: date in UTC when token expires
-              schema:
-                type: string
-                format: date-time
+          description: Metadata successfully retrieved
           content:
             application/json:
               schema:
-                type: string
+                type: object
+                properties:
+                  quote:
+                    type: object
+                    properties:
+                      metadata:
+                        $ref: '#/components/schemas/MediaMetadata'
+                  image:
+                    type: object
+                    properties:
+                      metadata:
+                        $ref: '#/components/schemas/MediaMetadata'
         '400':
-          description: Invalid username/password supplied
+          description: Bad request. 
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /users/logout:
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearer: []
+
+  /participants/{courseID}:
     get:
       tags:
-        - user
-      summary: Logs out current logged in user session
-      description: ''
-      operationId: logoutUser
-      parameters: []
-      responses:
-        default:
-          description: successful operation
-  /users/{username}:
-    get:
-      tags:
-        - user
-      summary: Get user by user name
-      description: ''
-      operationId: getUserByName
+        - participants
+      summary: Finds participants by course ID
+      description: Returns a list of participants
+      operationId: getParticipantsByCourseID
       parameters:
-        - name: username
+        - name: courseID
           in: path
-          description: The name that needs to be fetched. Use user1 for testing.
+          description: ID of course to fetch participants
           required: true
           schema:
             type: string
@@ -380,19 +433,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Participant'
         '400':
-          description: Invalid username supplied
+          description: Invalid ID supplied
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: User not found
+          description: Participant(s) not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearer: []
 
   /products:
     get:
@@ -444,7 +499,7 @@ paths:
         - product
       summary: Get product by ID
       description: Returns a single product by its ID
-      operationId: getProductById
+      operationId: getProductByID
       parameters:
         - name: id
           in: path
@@ -474,18 +529,50 @@ paths:
       security:
         - bearer: []
 
+  /users/info:
+    post:
+      tags:
+        - user
+      summary: Posts user information to GLAD
+      description: ''
+      operationId: storeUserInfo
+      requestBody:
+        description: User information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInfo'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoResponse'
+        '500':
+          description: Server error occurred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearer: []
+
 components:
   schemas:
     DateArray:
       type: array
       items:
         type: string
-        format: date          # Only date in YYYY-MM-DD format
+        # Only date in YYYY-MM-DD format
+        format: date
     DateTimeArray:
       type: array
       items:
         type: string
-        format: date-time     # Full date-time in ISO 8601 format, YYYY-MM-DDTHH:MM:SSZ
+        # Full date-time in ISO 8601 format, YYYY-MM-DDTHH:MM:SSZ
+        format: date-time
     DateTime:
       type: object
       properties:
@@ -498,15 +585,7 @@ components:
         endTime:
           type: string
           format: time
-    CourseTeacher:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 10000000
-        is_primary:
-          type: boolean
+    # TODO: Timezone values will likely change
     Timezone:
       type: string
       description: Supported timezones
@@ -516,6 +595,17 @@ components:
         - CST
         - MST
         - PST
+
+    CourseTeacher:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10000000
+        is_primary:
+          type: boolean
+
     CourseRequest:
       type: object
       properties:
@@ -566,11 +656,11 @@ components:
           $ref: '#/components/schemas/Timezone'
         address:
           $ref: '#/components/schemas/Address'
-        centerId:
+        centerID:
           type: integer
           format: int64
           example: 10000000
-        productId:
+        productID:
           type: integer
           format: int64
           example: 20000000
@@ -587,6 +677,7 @@ components:
             type: integer
             format: int64
             example: 10000000
+
     CourseResponse:
       type: object
       properties:
@@ -596,19 +687,22 @@ components:
           example: 10000000
         shortURL:
           type: string
-        dateId:
+        dateID:
           type: array
           items:
             type: integer
             format: int64
             example: 10000000
+
     Course:
-      allOf: # Combines the CourseRequest and CourseResponse
+      # Combines the CourseRequest and CourseResponse
+      allOf:
         - $ref: "#/components/schemas/CourseRequest"
         - $ref: "#/components/schemas/CourseResponse"
         - type: object
           properties:
-            numAttendees: # Cannot be more than maxAttendees
+            # Cannot be more than maxAttendees
+            numAttendees:
               type: integer
               format: int32
               example: 10
@@ -618,6 +712,7 @@ components:
                 type: integer
                 format: int64
                 example: 10000000
+
     Center:
       type: object
       properties:
@@ -634,37 +729,23 @@ components:
           example: 'Happiness Center'
         address:
           $ref: '#/components/schemas/Address'
-        # Note: Cross checking whether this is required for v1.
-        # status:
-        #   type: string
-        #   description: Center Status
-        #   example: active
-        #   enum:
-        #     - active
-        #     - inactive
-        # Note: Do not see an usecase for v1
-        # type:
-        #   type: string
-        #   description: Center Type
-        #   example: ashram
-        #   enum:
-        #     - ashram
-        #     - temple-of-knowledge
-    Config:
+
+    GLADConfig:
       type: object
       properties:
-        version: # timestamp could be used. Version information to be stored at the client and sent in the config request to retrieve the changes from the backend.
+        # Note: timestamp could be used. Version information to be stored at the client and sent in the
+        # config request to retrieve the changes from the backend.
+        version:  # unused and not sent in v1. Client can set it to 0 if not received.
           type: integer
           format: int64
           example: 1
-        timezones:
+        timezone:
           type: array
           items:
             $ref: '#/components/schemas/Timezone'
-        endpoints:
-          type: array
-          items:
-            $ref: '#/components/schemas/Endpoints'
+        auth:
+            $ref: '#/components/schemas/GLADConfigAuth'
+
     Address:
       type: object
       properties:
@@ -683,19 +764,25 @@ components:
         country:
           type: string
           example: USA
-    Endpoints:
+
+    GLADConfigAuth:
       type: object
       properties:
-        type:
+        clientID:
           type: string
-          enum:
-            - auth
-            - media-images
-            - media-videos
-            - analytics
-            - logging
+          example: abcd567efghijkl
+        domain:
+          type: string
+          example: http://auth.ac9ai.com
+        region:
+          type: string
+          example: us-east-2
+        userPoolID:
+          type: string
+          example: JMzj123s
         url:
           type: string
+
     Account:
       type: object
       properties:
@@ -714,7 +801,7 @@ components:
           example: john@email.com
         phone:
           type: string
-          example: '********'
+          example: '123-456-7890'
         type:
           type: string
           description: User Type
@@ -726,16 +813,33 @@ components:
             - student
             - teacher
             - user
-    User:
+
+    UserInfo:
       type: object
       properties:
-        accountId:
+        pushToken:
+          type: string
+        appVersion:
+          type: string
+          example: 2024.12.1  # Note: Format to be finalized
+        deviceInfo:     # For analytics
+          type: object
+        platformInfo:   # For analytics
+          type: object
+
+    UserInfoResponse:
+      type: object
+      properties:
+        id:
           type: integer
           format: int64
           example: 10000000
-        username:
+        firstName:
           type: string
           example: theUser
+        lastName:
+          type: string
+          example: AI
 
     # HTTP status code indicates whether the request is a success or failure
     # In case of failre, error object will contain the details. In case of success
@@ -753,30 +857,22 @@ components:
               type: string
             details:
               type: string
-            traceId:
+            traceID:
               type: string
+
     BaseProduct:
       type: object
       required:
         - name
         - title
         - ctype
-        - baseProductId
       properties:
-        # Just title is enough. This is an internal field. Commented until integration testing.
-        # extName:
-        #   type: string
-        #   example: "Art of Living Course - Part 1"
         title:
           type: string
           example: "Art of Living Course Part 1 - In person"
         ctype:
           type: string
           example: "C-12345"
-        # Note: This is not required. Commented until integration testing.
-        # baseProductExtId:
-        #   type: string
-        #   example: "54321"
         durationDays:
           type: number
           format: int
@@ -784,7 +880,7 @@ components:
         visibility:
           type: string
           nullable: true
-          enum: [Public, Unlisted, null]
+          enum: [Public, Unlisted]
           example: "Public"
         maxAttendees:
           type: number
@@ -798,7 +894,8 @@ components:
           type: boolean
 
     Product:
-      allOf: # Combines the BaseProduct and the inline model
+      # Combines the BaseProduct and the inline model
+      allOf:
         - $ref: "#/components/schemas/BaseProduct"
         - type: object
           properties:
@@ -807,25 +904,76 @@ components:
               format: int64
               example: 10000000
 
-  requestBodies:
-    UserArray:
-      description: List of user object
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/User'
+    Participant:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 30000000
+        # Note: This could be different from the email on the account
+        email:
+          type: integer
+          format: int64
+          example: 10000000
+        account:
+          $ref: '#/components/schemas/Account'
+
+    LiveDarshanToken:
+      type: object
+      properties:
+        zoom:
+          type: object
+          properties:
+            signature:
+              type: string
+              description: Zoom meeting SDK JWT
+
+    LiveDarshan:
+      type: object
+      properties:
+        zoom:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+              example: 10000000
+            date:
+              type: string
+              format: date
+            startTime:
+              type: string
+              format: time
+            meetingID:
+              type: string
+              description: Zoom meeting identifier
+            password:
+              type: string
+              description: Zoom meeting password
+            meetingURL:
+              type: string
+              description: Zoom meeting url
+
+    MediaMetadata:
+      type: object
+      properties:
+        version:
+          type: string
+          description: Version of the metadata
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Last updated timestamp
+        total:
+          type: integer
+          description: Total number of items (quotes or images) in the system
+        url:
+          type: string
+          description: URL to fetch actual content or detailed metadata
+
   securitySchemes:
     bearer:
       type: apiKey
       name: Bearer
       in: header
-    sample_auth_unused:
-      type: oauth2
-      flows:
-        implicit:
-          authorizationUrl: https://auth.ac9ai.com/oauth/authorize
-          scopes:
-            write:courses: modify courses
-            read:courses: read courses
