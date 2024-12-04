@@ -38,6 +38,8 @@ build-ldsd:
 build-gcd:
 	go build -tags $(TAG) -o ./bin/gcd $(SERVICES_DIR)/gcd/main.go
 
+	go build -tags $(TAG) -o ./bin/pushd $(SERVICES_DIR)/pushd/main.go
+
 #build-cmd:
 #	go build -tags $(TAG) -o ./bin/search cmd/main.go
 
@@ -48,6 +50,7 @@ linux-binaries:
 	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/mediad $(SERVICES_DIR)/mediad/main.go
 	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/ldsd $(SERVICES_DIR)/ldsd/main.go
 	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/gcd $(SERVICES_DIR)/gcd/main.go
+	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/pushd $(SERVICES_DIR)/pushd/main.go
 #	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/search cmd/main.go
 
 ci: dependencies test	
@@ -60,6 +63,7 @@ docker:
 	docker build -f $(DOCKERFILE_DIR)/Dockerfile.mediad -t mediad:$(TAG) .
 	docker build -f $(DOCKERFILE_DIR)/Dockerfile.ldsd -t ldsd:$(TAG) .
 	docker build -f $(DOCKERFILE_DIR)/Dockerfile.gcd -t gcd:$(TAG) .
+	docker build -f $(DOCKERFILE_DIR)/Dockerfile.pushd -t pushd:$(TAG) .
 
 build-mocks:
 	@go get github.com/golang/mock/gomock
