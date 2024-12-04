@@ -296,3 +296,23 @@ CREATE TABLE IF NOT EXISTS course_notify (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX idx_course_notify_course_id ON course_notify(course_id);
+
+-- PARTICIPANT entity
+CREATE TABLE IF NOT EXISTS participant (
+    id BIGSERIAL PRIMARY KEY,
+    -- Note: ext_id is salesforce id
+    ext_id VARCHAR(32) NOT NULL UNIQUE,
+
+    -- Note: Do not want to delete course if participant exists
+    course_id BIGINT NOT NULL REFERENCES course(id),
+    -- Note: Do not want to delete account if participant exists
+    account_id BIGINT NOT NULL REFERENCES account(id),
+
+    email VARCHAR(80),
+
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX idx_participant_course_id ON participant(course_id);
+CREATE INDEX idx_participant_account_id ON participant(account_id);
+CREATE INDEX idx_participant_email ON participant(email);
