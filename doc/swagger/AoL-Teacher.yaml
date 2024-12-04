@@ -316,14 +316,11 @@ paths:
       description: Retrieve token for live darshan
       responses:
         '200':
-          description: Metadata successfully retrieved
+          description: Token successfully retrieved
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  metadata:
-                    $ref: '#/components/schemas/LiveDarshanToken'
+                $ref: '#/components/schemas/LiveDarshanToken'
         '400':
           description: Bad request. 
           content:
