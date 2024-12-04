@@ -1,0 +1,317 @@
+openapi: 3.0.0
+info:
+  title: Meetings API ### Meetings -> Live Darshan name change across the document.
+  description: CRUD operations for managing meetings. ### We generally do not call this as CRUD operations in the description.
+  version: 1.0.0
+
+servers:
+  - url: https://aol.com/api/lds ### Please refer to the Swagger spec I shared for the server name and prefix.
+
+paths:
+  /meetings:  ### live-darshan
+    get:
+      summary: List meetings with optional pagination, sorting, and filtering.
+      description: Retrieve a list of meetings.
+      operationId: listMeetings
+      tags:
+        - Meetings
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: The page number to retrieve.
+          schema:
+            type: integer
+            example: 2
+        - name: limit
+          in: query
+          required: false
+          description: The number of records per page.
+          schema:
+            type: integer
+            example: 25
+        - name: sort_by ### Can this be done on the browser?
+          in: query
+          required: false
+          description: The field to sort results by.
+          schema:
+            type: string
+            example: date
+        - name: order ### Can this be done on the browser?
+          in: query
+          required: false
+          description: The sort order (asc or desc).
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            example: asc
+      responses:
+        "200":
+          description: Meetings retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponseWithPagination" ### Naming should not be generic. It should specify the object/entity name.
+        "400":
+          $ref: "#/components/responses/ClientError" ### This should match with the AoL-Teacher spec. Generic comment.
+        "500":
+          $ref: "#/components/responses/ServerError" ### This should match with the AoL-Teacher spec. Generic comment.
+      security:
+        - bearerAuth: []
+
+    post:
+      summary: Create a new meeting.
+      description: Create a meeting with the provided details.
+      operationId: createMeeting
+      tags:
+        - Meetings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - date
+                - starttime   ### Consistent naming convention to be used. We use Lower CamelCase. This applies to all the fields.
+                - meeting_url
+                - created_by
+              properties:
+                date:
+                  type: string
+                  format: date
+                  description: Date of the meeting.
+                  example: "2024-12-01" ### please explicitly state whether this is YYYY-MM-DD or YYYY-DD-MM?
+                starttime:
+                  type: string
+                  format: time
+                  description: Start time of the meeting.
+                  example: "14:00:00"
+                meeting_url:
+                  type: string
+                  format: uri
+                  description: URL of the meeting.
+                  example: "https://us06web.zoom.us/j/123456789"
+                created_by:
+                  type: string  ### What is the rationale to pass this from the front end? What if user sends a random value?
+                  description: Creator of the meeting.
+                  example: "user123"
+      responses:
+        "201":
+          description: Meeting created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse" ### Please avoid generic names
+        "400":
+          $ref: "#/components/responses/ClientError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+      security:
+        - bearerAuth: []
+
+  /meetings/{id}:
+    put:
+      summary: Update a meeting.
+      description: Update meeting details by ID.
+      operationId: updateMeeting
+      tags:
+        - Meetings
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the meeting to update.
+          schema:
+            type: string
+            example: abc123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id  ### already passed in parameter above
+                - date
+                - starttime
+                - meeting_url
+                - last_updated_by ### What is the rationale to send this from the front end?
+              properties: ### Similar comments from the create meeting is applicable here
+                id:
+                  type: string
+                  description: Unique identifier for the meeting.
+                  example: abc123
+                date:
+                  type: string
+                  format: date
+                  description: Date of the meeting.
+                  example: "2024-12-01"
+                starttime:
+                  type: string
+                  format: time
+                  description: Start time of the meeting.
+                  example: "14:00:00"
+                meeting_url:
+                  type: string
+                  format: uri
+                  description: URL of the meeting.
+                  example: "https://us06web.zoom.us/j/123456789"
+                last_updated_by:
+                  type: string
+                  description: User who updated the meeting.
+                  example: user456
+      responses:
+        "200":
+          description: Meeting updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/ClientError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+      security:
+        - bearerAuth: []
+
+    delete:
+      summary: Delete a meeting.
+      description: Delete a meeting by ID.
+      operationId: deleteMeeting
+      tags:
+        - Meetings
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the meeting to delete.
+          schema:
+            type: string
+            example: abc123
+      responses:
+        "200":
+          description: Meeting deleted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse" ### Delete, Update and Create - all have same object?
+        "400":
+          $ref: "#/components/responses/ClientError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+      security:
+        - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        status: ### HTTP code is adequate. Do we need this?
+          type: string
+          example: success
+        message:
+          type: string
+          example: Operation was successful.
+        data:
+          type: object ### Object is not defined. Object is too generic.
+        meta: ### What is this used for?
+          type: string
+          nullable: true
+
+    SuccessResponseWithPagination:
+      allOf:
+        - $ref: "#/components/schemas/SuccessResponse"
+        - type: object
+          properties:
+            meta:
+              type: object
+              properties:
+                pagination:
+                  type: object
+                  properties:
+                    currentPage:  ### Is this a good information to include given that communication pattern is a request/reply?
+                      type: integer
+                      example: 2
+                    totalPages:   ### This is subject to the page size. So, this may not give proper info.
+                      type: integer
+                      example: 5
+                    totalRecords: ### This is recommended to be sent in the header.
+                      type: integer
+                      example: 125
+
+  responses:
+    ClientError:  ### We should match with the API Teacher spec.
+      description: Client Error - Validation failed or bad request.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: error
+              message:
+                type: string
+                example: Validation failed for one or more fields.
+              data:
+                type: string
+                nullable: true
+                example: null
+              errors:
+                type: array   ### Array seems like a good idea. We could include in API Teacher spec.
+                items:
+                  type: object
+                  properties:
+                    field:
+                      type: string
+                      example: date
+                    message:
+                      type: string
+                      example: Date is in invalid format.
+              meta:
+                type: string
+                nullable: true
+                example: null
+
+    ServerError:  ###  Format wise, this looks almost similar to the above one. Please help me understand the difference?
+      description: Server Error - Internal server issue.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: error
+              message:
+                type: string
+                example: Internal server error.
+              data:
+                type: string
+                nullable: true
+                example: null
+              errors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                      example: 500
+                    message:
+                      type: string
+                      example: Something went wrong on the server. Please try again later.
+              meta:
+                type: string
+                nullable: true
+                example: null

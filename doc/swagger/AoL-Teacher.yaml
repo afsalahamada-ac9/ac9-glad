@@ -142,7 +142,7 @@ paths:
           description: Current config version at the client
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '200':
           description: successful operation
@@ -370,7 +370,7 @@ paths:
       parameters:
         - name: type
           in: path
-          required: true
+          required: false
           description: The type of media to fetch metadata for (e.g., "quote" or "image"). If not specified, returns metadata for both.
           schema:
             type: string
@@ -951,8 +951,10 @@ components:
       type: object
       properties:
         version:
-          type: string
+          type: integer
           description: Version of the metadata
+          format: int64
+          example: 1
         lastUpdated:
           type: string
           format: date-time
