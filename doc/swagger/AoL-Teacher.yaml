@@ -6,7 +6,7 @@ info:
 
   contact:
     email: sudhagar@abovecloud9.ai
-  version: 0.0.7
+  version: 0.0.8
 externalDocs:
   description: Find out more about AboveCloud9.AI
   url: https://abovecloud9.ai
@@ -30,8 +30,8 @@ tags:
     description: Operations about participants
   - name: product
     description: Operations about products
-  - name: user
-    description: Operations about users
+  - name: push-notify
+    description: Operations about push notification
 
 paths:
   /accounts:
@@ -529,27 +529,23 @@ paths:
       security:
         - bearer: []
 
-  /users/info:
+  /push-notify/register:
     post:
       tags:
-        - user
-      summary: Posts user information to GLAD
+        - push-notify
+      summary: Register push notification information to GLAD
       description: ''
-      operationId: storeUserInfo
+      operationId: storePushNotifyInfo
       requestBody:
-        description: User information
+        description: Push notification information
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserInfo'
+              $ref: '#/components/schemas/PushNotifyInfo'
         required: true
       responses:
         '200':
           description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserInfoResponse'
         '500':
           description: Server error occurred
           content:
@@ -771,6 +767,9 @@ components:
         clientID:
           type: string
           example: abcd567efghijkl
+        clientSecret:
+          type: string
+          example: abcd567efghijklabcd567efghijkl
         domain:
           type: string
           example: http://auth.ac9ai.com
@@ -814,32 +813,22 @@ components:
             - teacher
             - user
 
-    UserInfo:
+    PushNotifyInfo:
       type: object
       properties:
         pushToken:
           type: string
+        # Note: Identifier that Apple/Google sends when token is invalidated
+        revokeID:
+          type: string
         appVersion:
           type: string
-          example: 2024.12.1  # Note: Format to be finalized
+          # Note: Format to be finalized
+          example: 2024.12.1
         deviceInfo:     # For analytics
           type: object
         platformInfo:   # For analytics
           type: object
-
-    UserInfoResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 10000000
-        firstName:
-          type: string
-          example: theUser
-        lastName:
-          type: string
-          example: AI
 
     # HTTP status code indicates whether the request is a success or failure
     # In case of failre, error object will contain the details. In case of success
@@ -928,6 +917,12 @@ components:
             signature:
               type: string
               description: Zoom meeting SDK JWT
+            firstName:
+              type: string
+              example: AboveCloud9
+            lastName:
+              type: string
+              example: AI
 
     LiveDarshan:
       type: object
