@@ -21,7 +21,7 @@ clean:
 dependencies:
 	go mod download
 
-build: dependencies build-coursed build-sfsyncd build-mediad
+build: dependencies build-coursed build-sfsyncd build-mediad build-ldsd
 
 build-coursed: 
 	go build -tags $(TAG) -o ./bin/coursed $(SERVICES_DIR)/coursed/main.go
@@ -32,6 +32,9 @@ build-sfsyncd:
 build-mediad:
 	go build -tags $(TAG) -o ./bin/mediad $(SERVICES_DIR)/mediad/main.go
 
+build-ldsd:
+	go build -tags $(TAG) -o ./bin/ldsd $(SERVICES_DIR)/ldsd/main.go
+
 #build-cmd:
 #	go build -tags $(TAG) -o ./bin/search cmd/main.go
 
@@ -40,6 +43,7 @@ linux-binaries:
 	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/coursed $(SERVICES_DIR)/coursed/main.go
 	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/sfsyncd $(SERVICES_DIR)/sfsyncd/main.go
 	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/mediad $(SERVICES_DIR)/mediad/main.go
+	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/ldsd $(SERVICES_DIR)/ldsd/main.go
 #	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/search cmd/main.go
 
 ci: dependencies test	
@@ -50,6 +54,7 @@ docker:
 	docker build -f $(DOCKERFILE_DIR)/Dockerfile.coursed -t coursed:$(TAG) .
 	docker build -f $(DOCKERFILE_DIR)/Dockerfile.sfsyncd -t sfsyncd:$(TAG) .
 	docker build -f $(DOCKERFILE_DIR)/Dockerfile.mediad -t mediad:$(TAG) .
+	docker build -f $(DOCKERFILE_DIR)/Dockerfile.ldsd -t ldsd:$(TAG) .
 
 build-mocks:
 	@go get github.com/golang/mock/gomock
