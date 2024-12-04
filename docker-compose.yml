@@ -83,7 +83,21 @@ services:
       - 8020
     ports:
       - "8020:8020"
-    container_name: glad-ldsd
+    container_name: glad-mediad
+    networks:
+      - default
+
+  gcd:
+    image: mediad:dev
+    environment:
+      # ME: mediad
+      API_PORT: 8030
+      COURSED_ADDR: coursed:8080
+    expose:
+      - 8030
+    ports:
+      - "8030:8030"
+    container_name: glad-mediad
     networks:
       - default
 
