@@ -31,21 +31,21 @@ LABEL org.opencontainers.image.authors="devops@abovecloud9.ai"
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 # Copy the binary
-COPY --from=builder /app/bin/mediad /mediad
+COPY --from=builder /app/bin/ldsd /ldsd
 
 # Copy any additional config files if needed
 # COPY --from=builder /app/config /config
 
 # Expose port (adjust as needed)
-EXPOSE 8010
+EXPOSE 8020
 
 # TODO: uncomment once healthcheck is supported
 # Add healthcheck
 # HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 #     # non-HTTP check:
-#     # CMD ["/mediad", "health"]
+#     # CMD ["/ldsd", "health"]
 #     # HTTP check: (use one of these)
-#     CMD ["/mediad", "-http-get=http://localhost:8090/health"]
+#     CMD ["/ldsd", "-http-get=http://localhost:8090/health"]
 
 # Command to run
-ENTRYPOINT ["/mediad"]
+ENTRYPOINT ["/ldsd"]

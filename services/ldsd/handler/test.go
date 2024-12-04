@@ -11,21 +11,20 @@ import (
 	"github.com/urfave/negroni"
 )
 
-func getLiveDarshanToken() http.Handler {
+func getLiveDarshanConfig() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		signature := presenter.ZoomSignature{
-			Signature: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZGtLZXkiOiJhYmMxMjMiLCJtbiI6IjEyMzQ1Njc4OSIsInJvbGUiOjAsImlhdCI6MTY0NjkzNzU1MywiZXhwIjoxNjQ2OTQ0NzUzLCJhcHBLZXkiOiJhYmMxMjMiLCJ0b2tlbkV4cCI6MTY0Njk0NDc1M30.UcWxbWY-y22wFarBBc9i3lGQuZAsuUpl8GRR8wUah2M",
-			FirstName: "AboveCloud9",
-			LastName:  "AI",
+		zoomInfo := presenter.ZoomInfo{
+			Signature:   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZGtLZXkiOiJhYmMxMjMiLCJtbiI6IjEyMzQ1Njc4OSIsInJvbGUiOjAsImlhdCI6MTY0NjkzNzU1MywiZXhwIjoxNjQ2OTQ0NzUzLCJhcHBLZXkiOiJhYmMxMjMiLCJ0b2tlbkV4cCI6MTY0Njk0NDc1M30.UcWxbWY-y22wFarBBc9i3lGQuZAsuUpl8GRR8wUah2M",
+			DisplayName: "AboveCloud9 AI",
 		}
 
-		metadataWrap := presenter.MetadataWrapper{
-			Metadata: presenter.Metadata{Zoom: signature},
+		config := presenter.LiveDarshanConfig{
+			Zoom: zoomInfo,
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(metadataWrap); err != nil {
-			http.Error(w, "Unable to encode metadata", http.StatusInternalServerError)
+		if err := json.NewEncoder(w).Encode(config); err != nil {
+			http.Error(w, "Unable to encode live darshan config", http.StatusInternalServerError)
 			return
 		}
 
@@ -33,22 +32,23 @@ func getLiveDarshanToken() http.Handler {
 	})
 }
 
-func getLiveDarshanDetails() http.Handler {
+func listLiveDarshan() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		zoomDetails := presenter.ZoomDetails{
+		ld := presenter.LiveDarshan{
 			ID:         10000000,
 			Date:       "2024-12-04",
-			StartTime:  "15:04:00", 
+			StartTime:  "15:04:00",
 			MeetingID:  "1234567890",
 			Password:   "test-password",
 			MeetingURL: "https://zoom.us/j/5551112222",
 		}
 
-		zoomWrap := []presenter.ZoomWrapper{{Zoom: zoomDetails}}
+		var ldList []presenter.LiveDarshan
+		ldList = append(ldList, ld)
 
 		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(zoomWrap); err != nil {
-			http.Error(w, "Unable to encode details", http.StatusInternalServerError)
+		if err := json.NewEncoder(w).Encode(ldList); err != nil {
+			http.Error(w, "Unable to encode live darshan details", http.StatusInternalServerError)
 			return
 		}
 
@@ -59,10 +59,10 @@ func getLiveDarshanDetails() http.Handler {
 // MakeTestHandlers sets up URL handlers
 func MakeTestHandlers(r *mux.Router, n negroni.Negroni) {
 	r.Handle("/v1/live-darshan", n.With(
-		negroni.Wrap(getLiveDarshanDetails()),
-	)).Methods(http.MethodGet).Name("live-darshan")
+		negroni.Wrap(listLiveDarshan()),
+	)).Methods(http.MethodGet).Name("listLiveDarshan")
 
-	r.Handle("/v1/live-darshan/token", n.With(
-		negroni.Wrap(getLiveDarshanToken()),
-	)).Methods(http.MethodGet).Name("live-darshan-token")
+	r.Handle("/v1/live-darshan/config", n.With(
+		negroni.Wrap(getLiveDarshanConfig()),
+	)).Methods(http.MethodGet).Name("getLiveDarshanConfig")
 }

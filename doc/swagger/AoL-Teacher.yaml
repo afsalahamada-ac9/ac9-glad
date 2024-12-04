@@ -1,3 +1,8 @@
+# Copyright 2024 AboveCloud9.AI Products and Services Private Limited
+# All rights reserved.
+# This code may not be used, copied, modified, or distributed without explicit permission.
+
+# TODO: This spec has grown large. This should be broken down into multiple files.
 openapi: 3.0.0
 info:
   title: AoL Teacher Interface
@@ -310,17 +315,19 @@ paths:
       security:
         - bearer: []
 
-  /live-darshan/token:
+  /live-darshan/config:
     get:
-      summary: Get live-darshan token
-      description: Retrieve token for live darshan
+      tags:
+        - live-darshan
+      summary: Get live-darshan config
+      description: Retrieve configuration for live darshan
       responses:
         '200':
-          description: Token successfully retrieved
+          description: Configuration successfully retrieved
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LiveDarshanToken'
+                $ref: '#/components/schemas/LiveDarshanConfig'
         '400':
           description: Bad request. 
           content:
@@ -337,6 +344,8 @@ paths:
         - bearer: []
   /live-darshan:
     get:
+      tags:
+        - live-darshan
       summary: Get live-darshan details
       description: Retrieve live darshan details
       responses:
@@ -363,15 +372,50 @@ paths:
       security:
         - bearer: []
 
+  /media/metadata:
+    get:
+      tags:
+        - media
+      summary: Get media metadata
+      description: Retrieves metadata for both quotes & images
+      responses:
+        '200':
+          description: Metadata successfully retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  quote:
+                    $ref: '#/components/schemas/MediaMetadata'
+                  image:
+                    $ref: '#/components/schemas/MediaMetadata'
+        '400':
+          description: Bad request. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearer: []
+
   /media/metadata/{type}:
     get:
+      tags:
+        - media
       summary: Get metadata
-      description: Retrieve metadata for quotes, images, or both if no type is specified.
+      description: Retrieve metadata for quotes or images
       parameters:
         - name: type
           in: path
-          required: false
-          description: The type of media to fetch metadata for (e.g., "quote" or "image"). If not specified, returns metadata for both.
+          required: true
+          description: The type of media to fetch metadata for (e.g., "quote" or "image")
           schema:
             type: string
             enum:
@@ -383,18 +427,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  quote:
-                    type: object
-                    properties:
-                      metadata:
-                        $ref: '#/components/schemas/MediaMetadata'
-                  image:
-                    type: object
-                    properties:
-                      metadata:
-                        $ref: '#/components/schemas/MediaMetadata'
+                $ref: '#/components/schemas/MediaMetadata'
         '400':
           description: Bad request. 
           content:
@@ -905,7 +938,7 @@ components:
         account:
           $ref: '#/components/schemas/Account'
 
-    LiveDarshanToken:
+    LiveDarshanConfig:
       type: object
       properties:
         zoom:
@@ -914,38 +947,33 @@ components:
             signature:
               type: string
               description: Zoom meeting SDK JWT
-            firstName:
+            # Zoom display name (first name + last name)
+            displayName:
               type: string
-              example: AboveCloud9
-            lastName:
-              type: string
-              example: AI
+              example: AboveCloud9 AI
 
     LiveDarshan:
       type: object
       properties:
-        zoom:
-          type: object
-          properties:
-            id:
-              type: integer
-              format: int64
-              example: 10000000
-            date:
-              type: string
-              format: date
-            startTime:
-              type: string
-              format: time
-            meetingID:
-              type: string
-              description: Zoom meeting identifier
-            password:
-              type: string
-              description: Zoom meeting password
-            meetingURL:
-              type: string
-              description: Zoom meeting url
+        id:
+          type: integer
+          format: int64
+          example: 10000000
+        date:
+          type: string
+          format: date
+        startTime:
+          type: string
+          format: time
+        meetingID:
+          type: string
+          description: Zoom meeting identifier
+        password:
+          type: string
+          description: Zoom meeting password
+        meetingURL:
+          type: string
+          description: Zoom meeting url
 
     MediaMetadata:
       type: object

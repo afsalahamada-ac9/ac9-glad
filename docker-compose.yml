@@ -74,16 +74,16 @@ services:
       - default
 
   ldsd:
-    image: mediad:dev
+    image: ldsd:dev
     environment:
-      # ME: mediad
+      # ME: ldsd
       API_PORT: 8020
       COURSED_ADDR: coursed:8080
     expose:
       - 8020
     ports:
       - "8020:8020"
-    container_name: glad-mediad
+    container_name: glad-ldsd
     networks:
       - default
 
