@@ -1,3 +1,9 @@
+/*
+ * Copyright 2024 AboveCloud9.AI Products and Services Private Limited
+ * All rights reserved.
+ * This code may not be used, copied, modified, or distributed without explicit permission.
+ */
+
 package presenter
 
 type Config struct {
@@ -7,10 +13,10 @@ type Config struct {
 }
 
 type Auth struct {
-	ClientId     string `json:"clientID"`
+	ClientID     string `json:"clientID"`
 	ClientSecret string `json:"clientSecret"`
 	Domain       string `json:"domain"`
 	Region       string `json:"region"`
-	UserPoolId   string `json:"userPoolID"`
-	Url          string `json:"url"`
+	UserPoolID   string `json:"userPoolID"`
+	URL          string `json:"url"`
 }

@@ -30,9 +30,6 @@ import (
 	"github.com/urfave/negroni"
 )
 
-// Note: Not a best practice to use global variables in general
-var Log *logger.Logger
-
 func main() {
 
 	Log := logger.NewLoggerZap()

@@ -21,7 +21,7 @@ clean:
 dependencies:
 	go mod download
 
-build: dependencies build-coursed build-sfsyncd build-mediad build-ldsd build-gcd
+build: dependencies build-coursed build-sfsyncd build-mediad build-ldsd build-gcd build-pushd
 
 build-coursed: 
 	go build -tags $(TAG) -o ./bin/coursed $(SERVICES_DIR)/coursed/main.go
@@ -38,6 +38,7 @@ build-ldsd:
 build-gcd:
 	go build -tags $(TAG) -o ./bin/gcd $(SERVICES_DIR)/gcd/main.go
 
+build-pushd:
 	go build -tags $(TAG) -o ./bin/pushd $(SERVICES_DIR)/pushd/main.go
 
 #build-cmd:

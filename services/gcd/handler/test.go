@@ -18,35 +18,13 @@ import (
 
 func getConfig() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// errorMessage := "Error retrieving metadata"
-		// // Prepare a client
-		// c := &fasthttp.Client{}
-
-		// fullPath := "http://" +
-		// 	util.GetStrEnvOrConfig("COURSED_ADDR", config.COURSED_ADDR) +
-		// 	"/v1/products"
-		// l.Log.Infof("fullPath=%v", fullPath)
-		// statusCode, body, err := c.Get(nil, fullPath)
-
-		// if err != nil {
-		// 	l.Log.Errorf("%v. err=%v", errorMessage, err)
-		// 	w.WriteHeader(http.StatusInternalServerError)
-		// 	_, _ = w.Write([]byte("Get() coursed products error"))
-		// 	return
-		// }
-
-		// if statusCode != fasthttp.StatusOK {
-		// 	w.WriteHeader(statusCode)
-		// 	return
-		// }
-
 		auth := presenter.Auth{
-			ClientId:     "abcd567efghijkl",
+			ClientID:     "abcd567efghijkl",
 			ClientSecret: "abcd567efghijklabcd567efghijkl",
 			Domain:       "http://auth.ac9ai.com",
 			Region:       "us-east-2",
-			UserPoolId:   "JMzj123s",
-			Url:          "http://ac9.ai.com/", // url not defined in spec
+			UserPoolID:   "JMzj123s",
+			URL:          "http://ac9.ai.com/", // url not defined in spec
 		}
 
 		config := presenter.Config{
@@ -55,20 +33,18 @@ func getConfig() http.Handler {
 			Auth:     auth,
 		}
 
-		configWrap := []presenter.Config{config}
-
-		if err := json.NewEncoder(w).Encode(configWrap); err != nil {
+		if err := json.NewEncoder(w).Encode(config); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte("Unable to encode metadata"))
+			_, _ = w.Write([]byte("Unable to encode glad configuration"))
 		}
 
 		w.WriteHeader(http.StatusOK)
 	})
 }
 
-// MakeTestHandlers make url handlers
+// MakeTestHandlers make glad handlers
 func MakeTestHandlers(r *mux.Router, n negroni.Negroni) {
 	r.Handle("/v1/glad/config", n.With(
 		negroni.Wrap(getConfig()),
-	)).Methods("GET").Name("glad-config")
+	)).Methods("GET").Name("getConfig")
 }

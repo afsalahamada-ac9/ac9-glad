@@ -86,7 +86,7 @@ func getMetadataByType() http.Handler {
 	})
 }
 
-// MakeTestHandlers make url handlers
+// MakeTestHandlers make media handlers
 func MakeTestHandlers(r *mux.Router, n negroni.Negroni) {
 	r.Handle("/v1/media/metadata", n.With(
 		negroni.Wrap(getMetadata()),

@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 AboveCloud9.AI Products and Services Private Limited
+ * All rights reserved.
+ * This code may not be used, copied, modified, or distributed without explicit permission.
+ */
 // Package handler implements HTTP handlers for live-darshan endpoints
 package handler
 
@@ -56,7 +61,7 @@ func listLiveDarshan() http.Handler {
 	})
 }
 
-// MakeTestHandlers sets up URL handlers
+// MakeTestHandlers sets up live darshan handlers
 func MakeTestHandlers(r *mux.Router, n negroni.Negroni) {
 	r.Handle("/v1/live-darshan", n.With(
 		negroni.Wrap(listLiveDarshan()),

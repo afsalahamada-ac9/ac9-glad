@@ -7,8 +7,12 @@
 package handler
 
 import (
+	"ac9/glad/entity"
+	"ac9/glad/pkg/common"
+	l "ac9/glad/pkg/logger"
 	"ac9/glad/services/pushd/presenter"
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -17,48 +21,34 @@ import (
 
 func registerPushNotify() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// errorMessage := "Error retrieving metadata"
-		// // Prepare a client
-		// c := &fasthttp.Client{}
+		var input presenter.PushNotifyInfo
 
-		// fullPath := "http://" +
-		// 	util.GetStrEnvOrConfig("COURSED_ADDR", config.COURSED_ADDR) +
-		// 	"/v1/products"
-		// l.Log.Infof("fullPath=%v", fullPath)
-		// statusCode, body, err := c.Get(nil, fullPath)
-
-		// if err != nil {
-		// 	l.Log.Errorf("%v. err=%v", errorMessage, err)
-		// 	w.WriteHeader(http.StatusInternalServerError)
-		// 	_, _ = w.Write([]byte("Get() coursed products error"))
-		// 	return
-		// }
-
-		// if statusCode != fasthttp.StatusOK {
-		// 	w.WriteHeader(statusCode)
-		// 	return
-		// }
-		pushNotification := presenter.PushNotification{
-			PushToken:   "asdbf8ay2",
-			RevokeID:    "je182e2",
-			AppVersion:  "2024.12.1",
-			DeviceInfo:  map[string]interface{}{},
-			PlatformInfo: map[string]interface{}{},
-		}
-		
-
-		if err := json.NewEncoder(w).Encode(pushNotification); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte("Unable to encode metadata"))
+		tenant := r.Header.Get(common.HttpHeaderTenantID)
+		_, err := entity.StringToID(tenant)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Missing tenant ID"))
+			return
 		}
 
+		err = json.NewDecoder(r.Body).Decode(&input)
+		if err != nil {
+			log.Println(err.Error())
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Unable to decode the data. " + err.Error()))
+			return
+		}
+
+		l.Log.Debugf("Push notify register received")
+
+		w.Header().Set(common.HttpHeaderTenantID, tenant)
 		w.WriteHeader(http.StatusOK)
 	})
 }
 
-// MakeTestHandlers make url handlers
+// MakeTestHandlers make push handlers
 func MakeTestHandlers(r *mux.Router, n negroni.Negroni) {
 	r.Handle("/v1/push-notify/register", n.With(
 		negroni.Wrap(registerPushNotify()),
-	)).Methods("GET").Name("register-push-notification")
+	)).Methods("POST").Name("registerPushNotify")
 }
