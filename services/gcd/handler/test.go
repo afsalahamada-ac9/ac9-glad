@@ -29,7 +29,7 @@ func getConfig() http.Handler {
 
 		config := presenter.Config{
 			Version:  1,
-			Timezone: []string{"EST"},
+			Timezone: []string{"EST", "Americas/New York", "CST", "MST", "PST", "Americas/Los Angeles", "HST", "AST"},
 			Auth:     auth,
 		}
 
@@ -44,6 +44,13 @@ func getConfig() http.Handler {
 
 // MakeTestHandlers make glad handlers
 func MakeTestHandlers(r *mux.Router, n negroni.Negroni) {
+	// Note: Deprecated. This path was mentioned in the MSC that's frozen.
+	// To avoid work at client, adding this duplicate path support that should be
+	// removed once client supports config.
+	r.Handle("/v1/glad/info", n.With(
+		negroni.Wrap(getConfig()),
+	)).Methods("GET").Name("getConfig")
+
 	r.Handle("/v1/glad/config", n.With(
 		negroni.Wrap(getConfig()),
 	)).Methods("GET").Name("getConfig")
