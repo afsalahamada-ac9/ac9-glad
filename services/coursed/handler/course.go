@@ -195,20 +195,40 @@ func getCourse(service course.UseCase) http.Handler {
 			return
 		}
 
-		toJ := &presenter.Course{
-			ID:           data.ID,
-			Name:         &data.Name,
-			Mode:         &data.Mode,
-			CenterID:     &data.CenterID,
-			Notes:        &data.Notes,
-			Timezone:     &data.Timezone,
-			Status:       &data.Status,
-			MaxAttendees: &data.MaxAttendees,
-			NumAttendees: &data.NumAttendees,
+		toJ := &presenter.Course{}
+		toJ.FromCourseEntity(data)
+
+		w.Header().Set(common.HttpHeaderTenantID, data.TenantID.String())
+		if err := json.NewEncoder(w).Encode(toJ); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte("Unable to encode course"))
+		}
+	})
+}
+
+// TODO: This is temporary until we implement the correct search
+func getCourseMe(service course.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		errorMessage := "Error reading course"
+
+		// hard-coded value
+		data, err := service.GetCourse(5312925492834409472)
+		if err != nil && err != entity.ErrNotFound {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
+			return
 		}
 
-		toJ.Address = &presenter.Address{}
-		toJ.Address.CopyFrom(data.Address)
+		if data == nil {
+			w.WriteHeader(http.StatusNotFound)
+			_, _ = w.Write([]byte("Empty data returned"))
+			return
+		}
+
+		c := &presenter.Course{}
+		c.FromCourseEntity(data)
+
+		toJ := []*presenter.Course{c}
 
 		w.Header().Set(common.HttpHeaderTenantID, data.TenantID.String())
 		if err := json.NewEncoder(w).Encode(toJ); err != nil {
@@ -340,6 +360,12 @@ func MakeCourseHandlers(r *mux.Router, n negroni.Negroni, service course.UseCase
 	r.Handle("/v1/courses", n.With(
 		negroni.Wrap(createCourse(service)),
 	)).Methods("POST", "OPTIONS").Name("createCourse")
+
+	// TODO: implement get courses by account-id
+
+	r.Handle("/v1/courses/me", n.With(
+		negroni.Wrap(getCourseMe(service)),
+	)).Methods("GET", "OPTIONS").Name("getCourseMe")
 
 	r.Handle("/v1/courses/{id}", n.With(
 		negroni.Wrap(getCourse(service)),

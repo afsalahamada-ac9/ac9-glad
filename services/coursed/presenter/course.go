@@ -148,3 +148,22 @@ func (cr CourseReq) ToCourseTiming() ([]*entity.CourseTiming, error) {
 
 	return cts, nil
 }
+
+// FromCourseEntity creates course response from course entity
+func (c *Course) FromCourseEntity(e *entity.Course) error {
+
+	c.ID = e.ID
+	c.Name = &e.Name
+	c.Mode = &e.Mode
+	c.CenterID = &e.CenterID
+	c.Notes = &e.Notes
+	c.Timezone = &e.Timezone
+	c.Status = &e.Status
+	c.MaxAttendees = &e.MaxAttendees
+	c.NumAttendees = &e.NumAttendees
+
+	c.Address = &Address{}
+	c.Address.CopyFrom(e.Address)
+
+	return nil
+}
