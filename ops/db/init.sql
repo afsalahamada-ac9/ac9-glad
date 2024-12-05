@@ -38,10 +38,13 @@ CREATE TYPE timezone_type AS ENUM ('EST'
     , 'PST'
     );
 CREATE TYPE account_type AS ENUM ('assistant-teacher'
+    , 'coordinator' -- Note: Unclear what this type is. TBD
     , 'member'
+    , 'other'       -- Note: Unclear what this type is. TBD
     , 'organizer'
     , 'student'
     , 'teacher'
+    , 'volunteer'
     , 'user'
     );
 CREATE TYPE account_status AS ENUM ('active'
