@@ -8,6 +8,8 @@ package presenter
 
 import (
 	"ac9/glad/entity"
+
+	"github.com/ulule/deepcopier"
 )
 
 // Account data - TenantID is returned in the HTTP header (may be not, as account is global?)
@@ -21,4 +23,11 @@ type Account struct {
 	Email     string             `json:"email,omitempty"`
 	Type      entity.AccountType `json:"type"`
 	CognitoID string             `json:"cognitoID,omitempty"`
+}
+
+// FromAccountEntity creates account response from account entity
+func (c *Account) FromAccountEntity(e *entity.Account) error {
+
+	deepcopier.Copy(e).To(c)
+	return nil
 }

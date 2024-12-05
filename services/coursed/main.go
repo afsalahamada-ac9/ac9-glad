@@ -67,21 +67,21 @@ func main() {
 	}
 	defer db.Close()
 
-	productRepo := repository.NewProductPGSQL(db)
-	productService := product.NewService(productRepo)
+	accountRepo := repository.NewAccountPGSQL(db)
+	accountService := account.NewService(accountRepo)
 
 	centerRepo := repository.NewCenterPGSQL(db)
 	centerService := center.NewService(centerRepo)
 
-	tenantRepo := repository.NewTenantPGSQL(db)
-	tenantService := tenant.NewService(tenantRepo)
-
-	accountRepo := repository.NewAccountPGSQL(db)
-	accountService := account.NewService(accountRepo)
-
 	courseRepo := repository.NewCoursePGSQL(db)
 	courseTimingRepo := repository.NewCourseTimingPGSQL(db)
 	courseService := course.NewService(courseRepo, courseTimingRepo)
+
+	productRepo := repository.NewProductPGSQL(db)
+	productService := product.NewService(productRepo)
+
+	tenantRepo := repository.NewTenantPGSQL(db)
+	tenantService := tenant.NewService(tenantRepo)
 
 	metricService, err := metric.NewPrometheusService()
 	if err != nil {
@@ -100,20 +100,23 @@ func main() {
 	// log handler
 	logger.MakeLogHandlers(r, *n, "coursed", Log)
 
-	// center
-	handler.MakeCenterHandlers(r, *n, centerService)
-
-	// tenant
-	handler.MakeTenantHandlers(r, *n, tenantService)
-
 	// account
 	handler.MakeAccountHandlers(r, *n, accountService)
+
+	// center
+	handler.MakeCenterHandlers(r, *n, centerService)
 
 	// course
 	handler.MakeCourseHandlers(r, *n, courseService)
 
+	// participant
+	handler.MakeParticipantHandlers(r, *n, accountService)
+
 	// product
 	handler.MakeProductHandlers(r, *n, productService)
+
+	// tenant
+	handler.MakeTenantHandlers(r, *n, tenantService)
 
 	http.Handle("/", r)
 	http.Handle("/metrics", promhttp.Handler())

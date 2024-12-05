@@ -184,15 +184,8 @@ func getAccount(service account.UseCase) http.Handler {
 			return
 		}
 
-		toJ := &presenter.Account{
-			ID:        data.ID,
-			Username:  data.Username,
-			FirstName: data.FirstName,
-			LastName:  data.LastName,
-			Phone:     data.Phone,
-			Email:     data.Email,
-			Type:      data.Type,
-		}
+		toJ := &presenter.Account{}
+		toJ.FromAccountEntity(data)
 
 		w.Header().Set(common.HttpHeaderTenantID, r.Header.Get(common.HttpHeaderTenantID))
 		if err := json.NewEncoder(w).Encode(toJ); err != nil {
