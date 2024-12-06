@@ -8,6 +8,7 @@ package common
 
 const (
 	HttpHeaderTenantID   = "X-GLAD-TenantID"
+	HttpHeaderAccountID  = "X-GLAD-AccountID"
 	DBFormatDateTimeMS   = "2006-01-02 15:04:05.000"
 	DBFormatDate         = "2006-01-02"
 	DBFormatTimeHH_MM    = "15:04:00"
