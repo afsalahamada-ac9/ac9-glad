@@ -47,7 +47,12 @@ COPY --from=builder /etc/group /etc/group
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 # Copy the binary
+COPY --from=builder /app/bin/gcd /gcd
 COPY --from=builder /app/bin/coursed /coursed
+COPY --from=builder /app/bin/ldsd /ldsd
+COPY --from=builder /app/bin/mediad /mediad
+COPY --from=builder /app/bin/pushd /pushd
+COPY --from=builder /app/bin/sfsyncd /sfsyncd
 
 # Copy any additional config files if needed
 # COPY --from=builder /app/config /config
@@ -62,9 +67,9 @@ EXPOSE 8080
 # Add healthcheck
 # HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 #     # non-HTTP check:
-#     # CMD ["/coursed", "health"]
+#     # CMD ["/gcd", "health"]
 #     # HTTP check: (use one of these)
-#     CMD ["/coursed", "-http-get=http://localhost:8080/health"]
+#     CMD ["/gcd", "-http-get=http://localhost:8090/health"]
 
 # Command to run
-ENTRYPOINT ["/coursed"]
+#ENTRYPOINT ["/gcd"] #commented as the command will be passed on container start in k8s

@@ -113,6 +113,14 @@ err := db.Get(&record, "SELECT data_jsonb FROM example WHERE id = $1", id)
 ```
 
 - **GitInfo**
-```
+```sh
 go build -ldflags "-X main.gitTag=$(git describe --tags) -X main.gitHash=$(git rev-parse HEAD)"
+```
+
+- **Pre-commit Setup**
+
+```sh
+cd glad
+cp .hooks/pre-commit .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
 ```

@@ -1,0 +1,189 @@
+# Copyright 2024 AboveCloud9.AI Products and Services Private Limited
+# All rights reserved.
+# This code may not be used, copied, modified, or distributed without explicit permission.
+
+version: 2.1
+
+orbs:
+  aws-cli: circleci/aws-cli@5.1.1
+  terraform: circleci/terraform@3.5.0
+  docker: circleci/docker@2.8.1
+
+executors:
+  python-executor:
+    docker:
+      - image: cimg/python:3.13-browsers  # Python base image with required tools
+    working_directory: ~/repo
+  go-executor:
+    docker:
+      - image: cimg/go:1.18-browsers  # Python base image with required tools
+    working_directory: ~/repo
+  aws-executor:
+    docker:
+      - image: cimg/aws:2024.03
+    working_directory: ~/repo
+
+jobs:
+  run-unit-tests:
+    executor: go-executor
+    steps:
+      - checkout
+      - run:
+          name: Run Unit Tests
+          command: |
+            go test -tags testing ./... -v -coverprofile=coverage.out
+      - run:
+          name: Display Coverage Report
+          command: |
+            go tool cover -func=coverage.out
+      - persist_to_workspace:
+          root: ~/repo/
+          paths:
+            - coverage.out
+  build-and-scan:
+    executor: aws-executor
+    steps:
+      - checkout
+      - setup_remote_docker
+      - aws-cli/setup:
+          role_arn: $OIDC_ROLE_ARN
+          region: us-east-1
+          # optional parameters
+          profile_name: OIDC-PROFILE  
+          session_duration: "1800"
+      - run:
+          name: Build Docker Image
+          command: |
+            docker build -t $ECR_REPO_NAME:latest . -f Dockerfile
+      - run:
+          name: Scan Docker Image with Trivy (Vulnerabilities)
+          command: |
+            curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -
+            ./bin/trivy image --severity HIGH,CRITICAL --exit-code 1 --no-progress $ECR_REPO_NAME:latest | tee TrivyImage.txt
+      - run:
+          name: Scan Dependencies (SCA)
+          command: |
+            ./bin/trivy fs --scanners vuln,config --exit-code 1 --severity HIGH,CRITICAL  . | tee TrivyFS.txt
+      - run:
+          name: Login to AWS ECR
+          command: |
+            aws ecr get-login-password --profile "OIDC-PROFILE" --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - run:
+          name: Push Image to ECR
+          command: |
+            VERSION=$(cat .version)
+
+            # Ensure .version file is not empty
+            if [ -z "$VERSION" ]; then
+              echo "Error: .version file is empty or missing."
+              exit 1
+            fi
+
+            # Docker tagging and pushing loop
+            for TAG in "latest" "$CIRCLE_SHA1" "$VERSION"; do
+                FULL_TAG="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:$TAG"
+                echo "Tagging Docker image as $FULL_TAG"
+                docker tag "$ECR_REPO_NAME:latest" "$FULL_TAG"
+
+                echo "Pushing Docker image with tag $TAG"
+                docker push "$FULL_TAG"
+            done
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - .
+
+  lint-and-static-analysis:
+    executor: go-executor
+    steps:
+      - checkout
+      - run:
+          name: Install Go Tools
+          command: |
+            curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.52.0
+            curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.21.4
+      - run:
+          name: Lint Go Code
+          command: |
+            golangci-lint run -v --timeout=5m -e 'go*'| tee ~/repo/golangci-lint.txt
+      - run:
+          name: Static Analysis with Gosec
+          command: |
+            gosec . | tee ~/repo/gosec.txt
+      - persist_to_workspace:
+          root: ~/repo/
+          paths:
+            - .
+
+  terraform-deploy:
+    executor: python-executor
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Configure AWS Credentials
+          command: |
+            aws sts assume-role --role-arn $ASSUME_ROLE_ARN --role-session-name terraform-session > creds.json
+            export AWS_ACCESS_KEY_ID=$(cat creds.json | jq -r '.Credentials.AccessKeyId')
+            export AWS_SECRET_ACCESS_KEY=$(cat creds.json | jq -r '.Credentials.SecretAccessKey')
+            export AWS_SESSION_TOKEN=$(cat creds.json | jq -r '.Credentials.SessionToken')
+      - terraform/init:
+          path: ~/repo/terraform
+      - terraform/plan:
+          path: ~/repo/terraform
+          workspace: $TERRAFORM_WORKSPACE
+      - terraform/apply:
+          path: ~/repo/terraform
+          workspace: $TERRAFORM_WORKSPACE
+
+  deploy-to-kubernetes:
+    executor: python-executor
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Configure kubectl
+          command: |
+            aws eks update-kubeconfig --region $AWS_REGION --name CLUSTER_NAME
+      - run:
+          name: Deploy Kubernetes Configs
+          command: |
+            kubectl apply -f  manual/k8s/
+
+  save-artifacts:
+    executor: python-executor
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Save Logs and Outputs
+          command: |
+            mkdir -p ~/repo/artifacts
+            cp ~/repo/golangci-lint.txt ~/repo/artifacts
+            cp ~/repo/golangci-lint.txt ~/repo/artifacts
+            cp ~/repo/Trivy* ~/repo/artifacts
+            #cp -r ~/repo/terraform/plan.out ~/repo/artifacts/
+            #kubectl get all -A > ~/repo/artifacts/k8s-resources.log
+      - store_artifacts:
+          path: ~/repo/artifacts
+
+workflows:
+  version: 2
+  deploy:
+    jobs:
+      - lint-and-static-analysis
+      - run-unit-tests #:
+          # requires:
+          #   - lint-and-static-analysis
+      - build-and-scan #:
+          # requires:
+          #   - run-unit-tests
+      # - terraform-deploy :
+      #     requires:
+      #       - build-and-scan
+      # - deploy-to-kubernetes:
+      #     requires:
+      #       - build-and-scan
+      # - save-artifacts:
+      #     requires:
+      #       - build-and-scan

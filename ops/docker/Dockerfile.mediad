@@ -8,6 +8,18 @@ FROM golang:1.23-alpine AS builder
 # Install git and build dependencies
 RUN apk add --no-cache git build-base
 
+ENV USER=appuser
+ENV UID=10001 
+# See https://stackoverflow.com/a/55757473/12429735RUN 
+RUN adduser \    
+    --disabled-password \    
+    --gecos "" \    
+    --home "/nonexistent" \    
+    --shell "/sbin/nologin" \    
+    --no-create-home \    
+    --uid "${UID}" \    
+    "${USER}"
+
 # Set working directory
 WORKDIR /app
 
@@ -27,6 +39,10 @@ RUN make linux-binaries
 FROM scratch
 LABEL org.opencontainers.image.authors="devops@abovecloud9.ai"
 
+# Import the user and group files from the builder.
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/group /etc/group
+
 # Copy ca-certificates for HTTPS requests
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
@@ -36,8 +52,11 @@ COPY --from=builder /app/bin/mediad /mediad
 # Copy any additional config files if needed
 # COPY --from=builder /app/config /config
 
+# Use an unprivileged user.
+USER appuser:appuser
+
 # Expose port (adjust as needed)
-EXPOSE 8010
+EXPOSE 8080
 
 # TODO: uncomment once healthcheck is supported
 # Add healthcheck
@@ -45,7 +64,7 @@ EXPOSE 8010
 #     # non-HTTP check:
 #     # CMD ["/mediad", "health"]
 #     # HTTP check: (use one of these)
-#     CMD ["/mediad", "-http-get=http://localhost:8090/health"]
+#     CMD ["/mediad", "-http-get=http://localhost:8080/health"]
 
 # Command to run
 ENTRYPOINT ["/mediad"]

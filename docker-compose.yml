@@ -49,12 +49,12 @@ services:
     image: sfsyncd:dev
     environment:
       # ME: sfsyncd
-      API_PORT: 8090
+      API_PORT: 8080
       COURSED_ADDR: coursed:8080
     expose:
-      - 8090
+      - 8080
     ports:
-      - "8090:8090"
+      - "8090:8080"
     container_name: glad-sfsyncd
     networks:
       - default
@@ -63,12 +63,12 @@ services:
     image: mediad:dev
     environment:
       # ME: mediad
-      API_PORT: 8010
+      API_PORT: 8080
       COURSED_ADDR: coursed:8080
     expose:
-      - 8010
+      - 8080
     ports:
-      - "8010:8010"
+      - "8010:8080"
     container_name: glad-mediad
     networks:
       - default
@@ -77,12 +77,12 @@ services:
     image: ldsd:dev
     environment:
       # ME: ldsd
-      API_PORT: 8020
+      API_PORT: 8080
       COURSED_ADDR: coursed:8080
     expose:
-      - 8020
+      - 8080
     ports:
-      - "8020:8020"
+      - "8020:8080"
     container_name: glad-ldsd
     networks:
       - default
@@ -91,12 +91,12 @@ services:
     image: gcd:dev
     environment:
       # ME: gcd
-      API_PORT: 8030
+      API_PORT: 8080
       COURSED_ADDR: coursed:8080
     expose:
-      - 8030
+      - 8080
     ports:
-      - "8030:8030"
+      - "8030:8080"
     container_name: glad-gcd
     networks:
       - default
@@ -105,12 +105,12 @@ services:
     image: pushd:dev
     environment:
       # ME: pushd
-      API_PORT: 8040
+      API_PORT: 8080
       COURSED_ADDR: coursed:8080
     expose:
-      - 8040
+      - 8080
     ports:
-      - "8040:8040"
+      - "8040:8080"
     container_name: glad-pushd
     networks:
       - default
@@ -120,7 +120,7 @@ services:
   #   environment:
   #     ME: url
   #     API_HOST: coursed:8080
-  #     API_PORT: 8090
+  #     API_PORT: 8080
   #     DB_USER: glad_user
   #     DB_PASSWORD: glad1234
   #     DB_DATABASE: glad
@@ -129,9 +129,9 @@ services:
   #     DB_PORT: 5432
   #     DB_SSLMODE: disable # require
   #   expose:
-  #     - 8090
+  #     - 8080
   #   ports:
-  #     - "8090:8090"
+  #     - "8090:8080"
   #   container_name: url-api
   #   networks:
   #     - default

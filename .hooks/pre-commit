@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Copyright 2024 AboveCloud9.AI Products and Services Private Limited
+# All rights reserved.
+# This code may not be used, copied, modified, or distributed without explicit permission.
+
+
+# Define the file to update
+VERSION_FILE=".version"
+
+# Get the current date in YEAR-MM-DATE format
+CURRENT_DATE=$(date +"%Y.%m.%d.%H%M%S")
+
+# Write the current date into the .version file
+echo "v$CURRENT_DATE" > "$VERSION_FILE"
+echo "Updated $VERSION_FILE with date: $CURRENT_DATE"
+
+# Add .version to the staging area if it's not already staged
+if ! git diff --cached --name-only | grep -q "$VERSION_FILE"; then
+    git add "$VERSION_FILE"
+    echo "Staged $VERSION_FILE for commit."
+fi
+
+# Exit with success
+exit 0
+
+
+# TO set up as pre-sommit run the below commands
+
+# cp .hooks/pre-commit .git/hooks/pre-commit
+# chmod +x .git/hooks/pre-commit
