@@ -16,7 +16,7 @@ executors:
     working_directory: ~/repo
   go-executor:
     docker:
-      - image: cimg/go:1.18-browsers  # Python base image with required tools
+      - image: cimg/go:1.23-browsers  # Python base image with required tools
     working_directory: ~/repo
   aws-executor:
     docker:
