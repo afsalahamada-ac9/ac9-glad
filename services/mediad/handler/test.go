@@ -61,14 +61,14 @@ func getMetadataByType() http.Handler {
 			toJ = presenter.Metadata{
 				Version:     1,
 				LastUpdated: "2024-12-03T15:38:43+05:30",
-				Total:       rand.IntN(2500),
+				Total:       rand.IntN(2000),
 				URL:         "https://dummy-s3-url.abovecloud9.ai/bucket/quote/quote.json",
 			}
 		case "media":
 			toJ = presenter.Metadata{
 				Version:     2,
 				LastUpdated: "2024-12-04T15:38:43+05:30",
-				Total:       rand.IntN(400),
+				Total:       rand.IntN(200),
 				URL:         "https://dummy-s3-url.abovecloud9.ai/bucket/media/mediaMeta.json",
 			}
 		default:
