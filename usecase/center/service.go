@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 )
 
 // Service center usecase
@@ -26,23 +27,23 @@ func NewService(r Repository) *Service {
 }
 
 // CreateCenter creates a center
-func (s *Service) CreateCenter(tenantID entity.ID,
+func (s *Service) CreateCenter(tenantID id.ID,
 	extID,
 	extName,
 	name string,
 	mode entity.CenterMode,
 	isEnabled bool,
-) (entity.ID, error) {
+) (id.ID, error) {
 	c, err := entity.NewCenter(tenantID, extID, extName, name, entity.CenterAddress{},
 		entity.CenterGeoLocation{}, 0, mode, "", false, isEnabled)
 	if err != nil {
-		return entity.IDInvalid, err
+		return id.IDInvalid, err
 	}
 	return s.repo.Create(c)
 }
 
 // GetCenter retrieves a center
-func (s *Service) GetCenter(id entity.ID) (*entity.Center, error) {
+func (s *Service) GetCenter(id id.ID) (*entity.Center, error) {
 	t, err := s.repo.Get(id)
 	if t == nil {
 		return nil, entity.ErrNotFound
@@ -55,7 +56,7 @@ func (s *Service) GetCenter(id entity.ID) (*entity.Center, error) {
 }
 
 // SearchCenters search center
-func (s *Service) SearchCenters(tenantID entity.ID,
+func (s *Service) SearchCenters(tenantID id.ID,
 	query string, page, limit int,
 ) ([]*entity.Center, error) {
 	centers, err := s.repo.Search(tenantID, strings.ToLower(query), page, limit)
@@ -69,7 +70,7 @@ func (s *Service) SearchCenters(tenantID entity.ID,
 }
 
 // ListCenters list center
-func (s *Service) ListCenters(tenantID entity.ID, page, limit int) ([]*entity.Center, error) {
+func (s *Service) ListCenters(tenantID id.ID, page, limit int) ([]*entity.Center, error) {
 	centers, err := s.repo.List(tenantID, page, limit)
 	if err != nil {
 		return nil, err
@@ -81,7 +82,7 @@ func (s *Service) ListCenters(tenantID entity.ID, page, limit int) ([]*entity.Ce
 }
 
 // DeleteCenter Delete a center
-func (s *Service) DeleteCenter(id entity.ID) error {
+func (s *Service) DeleteCenter(id id.ID) error {
 	t, err := s.GetCenter(id)
 	if t == nil {
 		return entity.ErrNotFound
@@ -104,7 +105,7 @@ func (s *Service) UpdateCenter(c *entity.Center) error {
 }
 
 // GetCount gets total center count
-func (s *Service) GetCount(tenantID entity.ID) int {
+func (s *Service) GetCount(tenantID id.ID) int {
 	count, err := s.repo.GetCount(tenantID)
 	if err != nil {
 		return 0

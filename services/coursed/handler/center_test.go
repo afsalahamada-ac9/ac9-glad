@@ -15,6 +15,7 @@ import (
 
 	"ac9/glad/entity"
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/id"
 	"ac9/glad/services/coursed/presenter"
 
 	mock "ac9/glad/usecase/center/mock"
@@ -26,9 +27,9 @@ import (
 )
 
 const (
-	tenantAlice       entity.ID = 7264348473653242881
-	tenantNonExistent entity.ID = 0
-	aliceExtID                  = "000aliceExtID"
+	tenantAlice       id.ID = 7264348473653242881
+	tenantNonExistent id.ID = 0
+	aliceExtID              = "000aliceExtID"
 )
 
 func Test_listCenters(t *testing.T) {
@@ -41,15 +42,15 @@ func Test_listCenters(t *testing.T) {
 	path, err := r.GetRoute("listCenters").GetPathTemplate()
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/centers", path)
-	tmpl := &entity.Center{
-		ID:       entity.NewID(),
+	center := &entity.Center{
+		ID:       id.New(),
 		TenantID: tenantAlice,
 		Name:     "default-0",
 	}
-	service.EXPECT().GetCount(tmpl.TenantID).Return(1)
+	service.EXPECT().GetCount(center.TenantID).Return(1)
 	service.EXPECT().
-		ListCenters(tmpl.TenantID, gomock.Any(), gomock.Any()).
-		Return([]*entity.Center{tmpl}, nil)
+		ListCenters(center.TenantID, gomock.Any(), gomock.Any()).
+		Return([]*entity.Center{center}, nil)
 	ts := httptest.NewServer(listCenters(service))
 	defer ts.Close()
 
@@ -87,15 +88,15 @@ func Test_listCenters_Search(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	service := mock.NewMockUseCase(controller)
-	tmpl := &entity.Center{
-		ID:       entity.NewID(),
+	center := &entity.Center{
+		ID:       id.New(),
 		TenantID: tenantAlice,
 		Name:     "default-0",
 	}
-	service.EXPECT().GetCount(tmpl.TenantID).Return(1)
+	service.EXPECT().GetCount(center.TenantID).Return(1)
 	service.EXPECT().
-		SearchCenters(tmpl.TenantID, "default", gomock.Any(), gomock.Any()).
-		Return([]*entity.Center{tmpl}, nil)
+		SearchCenters(center.TenantID, "default", gomock.Any(), gomock.Any()).
+		Return([]*entity.Center{center}, nil)
 	ts := httptest.NewServer(listCenters(service))
 	defer ts.Close()
 
@@ -121,7 +122,7 @@ func Test_createCenter(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/centers", path)
 
-	id := entity.NewID()
+	centerID := id.New()
 	service.EXPECT().
 		CreateCenter(gomock.Any(),
 			gomock.Any(),
@@ -129,14 +130,14 @@ func Test_createCenter(t *testing.T) {
 			gomock.Any(),
 			gomock.Any(),
 			gomock.Any()).
-		Return(id, nil)
+		Return(centerID, nil)
 	h := createCenter(service)
 
 	ts := httptest.NewServer(h)
 	defer ts.Close()
 
 	payload := struct {
-		TenantID entity.ID         `json:"tenant_id"`
+		TenantID id.ID             `json:"tenant_id"`
 		ExtID    string            `json:"extId"`
 		Name     string            `json:"name"`
 		Mode     entity.CenterMode `json:"mode"`
@@ -159,11 +160,11 @@ func Test_createCenter(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusCreated, res.StatusCode)
 
-	var tmpl *presenter.Center
-	json.NewDecoder(res.Body).Decode(&tmpl)
-	assert.Equal(t, id, tmpl.ID)
-	assert.Equal(t, payload.Name, tmpl.Name)
-	assert.Equal(t, payload.Mode, tmpl.Mode)
+	var center *presenter.Center
+	json.NewDecoder(res.Body).Decode(&center)
+	assert.Equal(t, centerID, center.ID)
+	assert.Equal(t, payload.Name, center.Name)
+	assert.Equal(t, payload.Mode, center.Mode)
 	assert.Equal(t, tenantAlice.String(), res.Header.Get(common.HttpHeaderTenantID))
 }
 
@@ -177,21 +178,21 @@ func Test_getCenter(t *testing.T) {
 	path, err := r.GetRoute("getCenter").GetPathTemplate()
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/centers/{id}", path)
-	tmpl := &entity.Center{
-		ID:       entity.NewID(),
+	center := &entity.Center{
+		ID:       id.New(),
 		TenantID: tenantAlice,
 		ExtID:    aliceExtID,
 		Name:     "default-0",
 		Mode:     entity.CenterInPerson,
 	}
 	service.EXPECT().
-		GetCenter(tmpl.ID).
-		Return(tmpl, nil)
+		GetCenter(center.ID).
+		Return(center, nil)
 	handler := getCenter(service)
 	r.Handle("/v1/centers/{id}", handler)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
-	res, err := http.Get(ts.URL + "/v1/centers/" + tmpl.ID.String())
+	res, err := http.Get(ts.URL + "/v1/centers/" + center.ID.String())
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
@@ -200,9 +201,9 @@ func Test_getCenter(t *testing.T) {
 	json.NewDecoder(res.Body).Decode(&d)
 	assert.NotNil(t, d)
 
-	assert.Equal(t, tmpl.ID, d.ID)
-	assert.Equal(t, tmpl.Name, d.Name)
-	assert.Equal(t, tmpl.Mode, d.Mode)
+	assert.Equal(t, center.ID, d.ID)
+	assert.Equal(t, center.Name, d.Name)
+	assert.Equal(t, center.Mode, d.Mode)
 	assert.Equal(t, tenantAlice.String(), res.Header.Get(common.HttpHeaderTenantID))
 }
 
@@ -217,7 +218,7 @@ func Test_deleteCenter(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/centers/{id}", path)
 
-	id := entity.NewID()
+	id := id.New()
 	service.EXPECT().DeleteCenter(id).Return(nil)
 	handler := deleteCenter(service)
 	req, _ := http.NewRequest("DELETE", "/v1/centers/"+id.String(), nil)
@@ -238,7 +239,7 @@ func Test_deleteCenterNonExistent(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/centers/{id}", path)
 
-	id := entity.NewID()
+	id := id.New()
 	service.EXPECT().DeleteCenter(id).Return(entity.ErrNotFound)
 	handler := deleteCenter(service)
 	req, _ := http.NewRequest("DELETE", "/v1/centers/"+id.String(), nil)

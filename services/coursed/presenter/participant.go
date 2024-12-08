@@ -6,14 +6,12 @@
 
 package presenter
 
-import (
-	"ac9/glad/entity"
-)
+import "ac9/glad/pkg/id"
 
 // Participant data - TenantID is returned in the HTTP header (may be not, as account is global?)
 // X-GLAD-TenantID
 type Participant struct {
-	ID      entity.ID `json:"id"`
-	Email   string    `json:"email,omitempty"`
-	Account *Account  `json:"account,omitempty"`
+	ID      id.ID    `json:"id"`
+	Email   string   `json:"email,omitempty"`
+	Account *Account `json:"account,omitempty"`
 }

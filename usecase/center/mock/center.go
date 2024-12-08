@@ -5,8 +5,9 @@
 package mock_center
 
 import (
-	reflect "reflect"
 	entity "ac9/glad/entity"
+	id "ac9/glad/pkg/id"
+	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
 )
@@ -35,7 +36,7 @@ func (m *MockReader) EXPECT() *MockReaderMockRecorder {
 }
 
 // Get mocks base method.
-func (m *MockReader) Get(id entity.ID) (*entity.Center, error) {
+func (m *MockReader) Get(id id.ID) (*entity.Center, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", id)
 	ret0, _ := ret[0].(*entity.Center)
@@ -50,7 +51,7 @@ func (mr *MockReaderMockRecorder) Get(id interface{}) *gomock.Call {
 }
 
 // GetCount mocks base method.
-func (m *MockReader) GetCount(id entity.ID) (int, error) {
+func (m *MockReader) GetCount(id id.ID) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCount", id)
 	ret0, _ := ret[0].(int)
@@ -65,7 +66,7 @@ func (mr *MockReaderMockRecorder) GetCount(id interface{}) *gomock.Call {
 }
 
 // List mocks base method.
-func (m *MockReader) List(tenantID entity.ID, page, limit int) ([]*entity.Center, error) {
+func (m *MockReader) List(tenantID id.ID, page, limit int) ([]*entity.Center, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", tenantID, page, limit)
 	ret0, _ := ret[0].([]*entity.Center)
@@ -80,7 +81,7 @@ func (mr *MockReaderMockRecorder) List(tenantID, page, limit interface{}) *gomoc
 }
 
 // Search mocks base method.
-func (m *MockReader) Search(tenantID entity.ID, query string, page, limit int) ([]*entity.Center, error) {
+func (m *MockReader) Search(tenantID id.ID, query string, page, limit int) ([]*entity.Center, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Search", tenantID, query, page, limit)
 	ret0, _ := ret[0].([]*entity.Center)
@@ -118,10 +119,10 @@ func (m *MockWriter) EXPECT() *MockWriterMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockWriter) Create(e *entity.Center) (entity.ID, error) {
+func (m *MockWriter) Create(e *entity.Center) (id.ID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", e)
-	ret0, _ := ret[0].(entity.ID)
+	ret0, _ := ret[0].(id.ID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -133,7 +134,7 @@ func (mr *MockWriterMockRecorder) Create(e interface{}) *gomock.Call {
 }
 
 // Delete mocks base method.
-func (m *MockWriter) Delete(id entity.ID) error {
+func (m *MockWriter) Delete(id id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", id)
 	ret0, _ := ret[0].(error)
@@ -184,10 +185,10 @@ func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockRepository) Create(e *entity.Center) (entity.ID, error) {
+func (m *MockRepository) Create(e *entity.Center) (id.ID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", e)
-	ret0, _ := ret[0].(entity.ID)
+	ret0, _ := ret[0].(id.ID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -199,7 +200,7 @@ func (mr *MockRepositoryMockRecorder) Create(e interface{}) *gomock.Call {
 }
 
 // Delete mocks base method.
-func (m *MockRepository) Delete(id entity.ID) error {
+func (m *MockRepository) Delete(id id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", id)
 	ret0, _ := ret[0].(error)
@@ -213,7 +214,7 @@ func (mr *MockRepositoryMockRecorder) Delete(id interface{}) *gomock.Call {
 }
 
 // Get mocks base method.
-func (m *MockRepository) Get(id entity.ID) (*entity.Center, error) {
+func (m *MockRepository) Get(id id.ID) (*entity.Center, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", id)
 	ret0, _ := ret[0].(*entity.Center)
@@ -228,7 +229,7 @@ func (mr *MockRepositoryMockRecorder) Get(id interface{}) *gomock.Call {
 }
 
 // GetCount mocks base method.
-func (m *MockRepository) GetCount(id entity.ID) (int, error) {
+func (m *MockRepository) GetCount(id id.ID) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCount", id)
 	ret0, _ := ret[0].(int)
@@ -243,7 +244,7 @@ func (mr *MockRepositoryMockRecorder) GetCount(id interface{}) *gomock.Call {
 }
 
 // List mocks base method.
-func (m *MockRepository) List(tenantID entity.ID, page, limit int) ([]*entity.Center, error) {
+func (m *MockRepository) List(tenantID id.ID, page, limit int) ([]*entity.Center, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", tenantID, page, limit)
 	ret0, _ := ret[0].([]*entity.Center)
@@ -258,7 +259,7 @@ func (mr *MockRepositoryMockRecorder) List(tenantID, page, limit interface{}) *g
 }
 
 // Search mocks base method.
-func (m *MockRepository) Search(tenantID entity.ID, query string, page, limit int) ([]*entity.Center, error) {
+func (m *MockRepository) Search(tenantID id.ID, query string, page, limit int) ([]*entity.Center, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Search", tenantID, query, page, limit)
 	ret0, _ := ret[0].([]*entity.Center)
@@ -310,10 +311,10 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 }
 
 // CreateCenter mocks base method.
-func (m *MockUseCase) CreateCenter(tenantID entity.ID, extID, extName, name string, mode entity.CenterMode, isEnabled bool) (entity.ID, error) {
+func (m *MockUseCase) CreateCenter(tenantID id.ID, extID, extName, name string, mode entity.CenterMode, isEnabled bool) (id.ID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateCenter", tenantID, extID, extName, name, mode, isEnabled)
-	ret0, _ := ret[0].(entity.ID)
+	ret0, _ := ret[0].(id.ID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -325,7 +326,7 @@ func (mr *MockUseCaseMockRecorder) CreateCenter(tenantID, extID, extName, name, 
 }
 
 // DeleteCenter mocks base method.
-func (m *MockUseCase) DeleteCenter(id entity.ID) error {
+func (m *MockUseCase) DeleteCenter(id id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCenter", id)
 	ret0, _ := ret[0].(error)
@@ -339,7 +340,7 @@ func (mr *MockUseCaseMockRecorder) DeleteCenter(id interface{}) *gomock.Call {
 }
 
 // GetCenter mocks base method.
-func (m *MockUseCase) GetCenter(id entity.ID) (*entity.Center, error) {
+func (m *MockUseCase) GetCenter(id id.ID) (*entity.Center, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCenter", id)
 	ret0, _ := ret[0].(*entity.Center)
@@ -354,7 +355,7 @@ func (mr *MockUseCaseMockRecorder) GetCenter(id interface{}) *gomock.Call {
 }
 
 // GetCount mocks base method.
-func (m *MockUseCase) GetCount(id entity.ID) int {
+func (m *MockUseCase) GetCount(id id.ID) int {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCount", id)
 	ret0, _ := ret[0].(int)
@@ -368,7 +369,7 @@ func (mr *MockUseCaseMockRecorder) GetCount(id interface{}) *gomock.Call {
 }
 
 // ListCenters mocks base method.
-func (m *MockUseCase) ListCenters(tenantID entity.ID, page, limit int) ([]*entity.Center, error) {
+func (m *MockUseCase) ListCenters(tenantID id.ID, page, limit int) ([]*entity.Center, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListCenters", tenantID, page, limit)
 	ret0, _ := ret[0].([]*entity.Center)
@@ -383,7 +384,7 @@ func (mr *MockUseCaseMockRecorder) ListCenters(tenantID, page, limit interface{}
 }
 
 // SearchCenters mocks base method.
-func (m *MockUseCase) SearchCenters(tenantID entity.ID, query string, page, limit int) ([]*entity.Center, error) {
+func (m *MockUseCase) SearchCenters(tenantID id.ID, query string, page, limit int) ([]*entity.Center, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SearchCenters", tenantID, query, page, limit)
 	ret0, _ := ret[0].([]*entity.Center)

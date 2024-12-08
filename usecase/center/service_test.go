@@ -11,17 +11,18 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 
 	"github.com/stretchr/testify/assert"
 )
 
 const (
-	centerDefault entity.ID = 13790493495087071234
-	tenantAlice   entity.ID = 13790492210917015554
-	aliceExtID              = "000aliceExtID"
+	centerDefault id.ID = 13790493495087071234
+	tenantAlice   id.ID = 13790492210917015554
+	aliceExtID          = "000aliceExtID"
 
 	// todo: add multi-tenant support
-	// tenantBob    entity.ID = 13790492210917015555
+	// tenantBob    id.ID = 13790492210917015555
 	bobExtID = "000bobExtID"
 )
 

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 )
 
 // CenterPGSQL mysql repo
@@ -26,7 +27,7 @@ func NewCenterPGSQL(db *sql.DB) *CenterPGSQL {
 }
 
 // Create creates a center
-func (r *CenterPGSQL) Create(e *entity.Center) (entity.ID, error) {
+func (r *CenterPGSQL) Create(e *entity.Center) (id.ID, error) {
 	stmt, err := r.db.Prepare(`
 		INSERT INTO center (id, tenant_id, ext_id, ext_name, name, address, geo_location,
 		 capacity, mode, webpage, is_national_center, is_enabled, created_at)
@@ -61,7 +62,7 @@ func (r *CenterPGSQL) Create(e *entity.Center) (entity.ID, error) {
 
 // Get retrieves a center
 // Not all fields are required for v1
-func (r *CenterPGSQL) Get(id entity.ID) (*entity.Center, error) {
+func (r *CenterPGSQL) Get(id id.ID) (*entity.Center, error) {
 	stmt, err := r.db.Prepare(`
 		SELECT id, tenant_id, ext_id, ext_name, name, mode, created_at FROM center WHERE id = $1;`)
 	if err != nil {
@@ -100,7 +101,7 @@ func (r *CenterPGSQL) Update(e *entity.Center) error {
 }
 
 // Search searches centers
-func (r *CenterPGSQL) Search(tenantID entity.ID,
+func (r *CenterPGSQL) Search(tenantID id.ID,
 	q string, page, limit int,
 ) ([]*entity.Center, error) {
 	query := `
@@ -144,7 +145,7 @@ func (r *CenterPGSQL) Search(tenantID entity.ID,
 }
 
 // List lists centers
-func (r *CenterPGSQL) List(tenantID entity.ID, page, limit int) ([]*entity.Center, error) {
+func (r *CenterPGSQL) List(tenantID id.ID, page, limit int) ([]*entity.Center, error) {
 	query := `
 		SELECT id, tenant_id, ext_id, ext_name, name, capacity, mode, created_at
 		FROM center
@@ -181,7 +182,7 @@ func (r *CenterPGSQL) List(tenantID entity.ID, page, limit int) ([]*entity.Cente
 }
 
 // Delete deletes a center
-func (r *CenterPGSQL) Delete(id entity.ID) error {
+func (r *CenterPGSQL) Delete(id id.ID) error {
 	res, err := r.db.Exec(`DELETE FROM center WHERE id = $1;`, id)
 	if err != nil {
 		return err
@@ -195,7 +196,7 @@ func (r *CenterPGSQL) Delete(id entity.ID) error {
 }
 
 // Get total centers
-func (r *CenterPGSQL) GetCount(tenantID entity.ID) (int, error) {
+func (r *CenterPGSQL) GetCount(tenantID id.ID) (int, error) {
 	stmt, err := r.db.Prepare(`SELECT count(*) FROM center WHERE tenant_id = $1;`)
 	if err != nil {
 		return 0, err

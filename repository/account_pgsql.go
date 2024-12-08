@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 )
 
 // AccountPGSQL mysql repo
@@ -58,7 +59,7 @@ func (r *AccountPGSQL) Create(e *entity.Account) error {
 
 // Note: Accounts are global in nature, but for storage purposes they will be assigned to some tenants.
 // GetByName retrieves an account using username
-func (r *AccountPGSQL) GetByName(tenantID entity.ID, username string) (*entity.Account, error) {
+func (r *AccountPGSQL) GetByName(tenantID id.ID, username string) (*entity.Account, error) {
 	stmt, err := r.db.Prepare(`
 		SELECT id, ext_id, cognito_id, type, created_at FROM account WHERE tenant_id = $1 AND username = $2;`)
 	if err != nil {
@@ -91,7 +92,7 @@ func (r *AccountPGSQL) Update(e *entity.Account) error {
 }
 
 // List accounts
-func (r *AccountPGSQL) List(tenantID entity.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
+func (r *AccountPGSQL) List(tenantID id.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
 
 	// if account type is not passed, then match any account types
 	if at == "" {
@@ -135,7 +136,7 @@ func (r *AccountPGSQL) List(tenantID entity.ID, page, limit int, at entity.Accou
 }
 
 // Delete deletes an account
-func (r *AccountPGSQL) Delete(id entity.ID) error {
+func (r *AccountPGSQL) Delete(id id.ID) error {
 	res, err := r.db.Exec(`DELETE FROM account WHERE id = $1;`, id)
 	if err != nil {
 		return err
@@ -149,7 +150,7 @@ func (r *AccountPGSQL) Delete(id entity.ID) error {
 }
 
 // DeleteByName deletes an account using username
-func (r *AccountPGSQL) DeleteByName(tenantID entity.ID, username string) error {
+func (r *AccountPGSQL) DeleteByName(tenantID id.ID, username string) error {
 	res, err := r.db.Exec(`DELETE FROM account WHERE tenant_id = $1 AND username = $2;`, tenantID, username)
 	if err != nil {
 		return err
@@ -163,7 +164,7 @@ func (r *AccountPGSQL) DeleteByName(tenantID entity.ID, username string) error {
 }
 
 // Get total accounts
-func (r *AccountPGSQL) GetCount(tenantID entity.ID) (int, error) {
+func (r *AccountPGSQL) GetCount(tenantID id.ID) (int, error) {
 	stmt, err := r.db.Prepare(`SELECT count(*) FROM account WHERE tenant_id = $1;`)
 	if err != nil {
 		return 0, err
@@ -178,7 +179,7 @@ func (r *AccountPGSQL) GetCount(tenantID entity.ID) (int, error) {
 }
 
 // Get retrieves an account
-func (r *AccountPGSQL) Get(id entity.ID) (*entity.Account, error) {
+func (r *AccountPGSQL) Get(id id.ID) (*entity.Account, error) {
 	stmt, err := r.db.Prepare(`
 		SELECT id, tenant_id, ext_id, username, first_name, last_name,
 			phone, email, type, created_at
@@ -220,7 +221,7 @@ func (r *AccountPGSQL) Get(id entity.ID) (*entity.Account, error) {
 }
 
 // Search searches accounts
-func (r *AccountPGSQL) Search(tenantID entity.ID, q string, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
+func (r *AccountPGSQL) Search(tenantID id.ID, q string, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
 	// OR LOWER(first_name) LIKE LOWER($2)
 	// OR LOWER(last_name) LIKE LOWER($2)
 	// OR LOWER(email) LIKE LOWER($2)

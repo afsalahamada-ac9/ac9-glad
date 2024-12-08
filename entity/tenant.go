@@ -7,6 +7,7 @@
 package entity
 
 import (
+	"ac9/glad/pkg/id"
 	"crypto/sha256"
 	"encoding/base64"
 	"log"
@@ -17,7 +18,7 @@ import (
 
 // Tenant data
 type Tenant struct {
-	ID      ID
+	ID      id.ID
 	Name    string
 	Country string
 
@@ -31,7 +32,7 @@ type Tenant struct {
 // NewTenant create a new tenant
 func NewTenant(name, country string) (*Tenant, error) {
 	t := &Tenant{
-		ID:        NewID(),
+		ID:        id.New(),
 		Name:      name,
 		Country:   country,
 		CreatedAt: time.Now(),

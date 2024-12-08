@@ -15,14 +15,15 @@ import (
 
 	"ac9/glad/entity"
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/id"
 	"ac9/glad/services/coursed/presenter"
 
 	mock "ac9/glad/usecase/tenant/mock"
 
-	"github.com/urfave/negroni"
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
+	"github.com/urfave/negroni"
 )
 
 const (
@@ -41,7 +42,7 @@ func Test_listTenants(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/tenants", path)
 	tenant := &entity.Tenant{
-		ID: entity.NewID(),
+		ID: id.New(),
 	}
 	service.EXPECT().GetCount().Return(1)
 	service.EXPECT().
@@ -69,7 +70,7 @@ func Test_createTenant(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/tenants", path)
 
-	id := entity.NewID()
+	id := id.New()
 	service.EXPECT().
 		CreateTenant(gomock.Any(),
 			gomock.Any()).
@@ -114,7 +115,7 @@ func Test_getTenant(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/tenants/{id}", path)
 	tenant := &entity.Tenant{
-		ID:        entity.NewID(),
+		ID:        id.New(),
 		Name:      nameAlice,
 		Country:   countryAlice,
 		AuthToken: "token123",
@@ -152,7 +153,7 @@ func Test_deleteTenant(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/tenants/{id}", path)
 
-	id := entity.NewID()
+	id := id.New()
 	service.EXPECT().DeleteTenant(id).Return(nil)
 	handler := deleteTenant(service)
 	req, _ := http.NewRequest("DELETE", "/v1/tenants/"+id.String(), nil)
@@ -173,7 +174,7 @@ func Test_deleteTenantNonExistent(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/tenants/{id}", path)
 
-	id := entity.NewID()
+	id := id.New()
 	service.EXPECT().DeleteTenant(id).Return(entity.ErrNotFound)
 	handler := deleteTenant(service)
 	req, _ := http.NewRequest("DELETE", "/v1/tenants/"+id.String(), nil)
@@ -195,7 +196,7 @@ func Test_login(t *testing.T) {
 	assert.Equal(t, "/v1/login", path)
 
 	tenant := &entity.Tenant{
-		ID:        entity.NewID(),
+		ID:        id.New(),
 		Name:      nameAlice,
 		Country:   countryAlice,
 		AuthToken: "token123",

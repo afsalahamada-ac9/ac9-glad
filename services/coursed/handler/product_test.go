@@ -15,6 +15,7 @@ import (
 
 	"ac9/glad/entity"
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/id"
 	"ac9/glad/services/coursed/presenter"
 
 	mock "ac9/glad/usecase/product/mock"
@@ -37,8 +38,8 @@ func Test_listProducts(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/products", path)
 
-	tmpl := &entity.Product{
-		ID:           entity.NewID(),
+	product := &entity.Product{
+		ID:           id.New(),
 		TenantID:     tenantAlice,
 		ExtID:        aliceExtID,
 		ExtName:      "product-1",
@@ -49,10 +50,10 @@ func Test_listProducts(t *testing.T) {
 		MaxAttendees: 100,
 		Format:       entity.ProductFormatInPerson,
 	}
-	service.EXPECT().GetCount(tmpl.TenantID).Return(1)
+	service.EXPECT().GetCount(product.TenantID).Return(1)
 	service.EXPECT().
-		ListProducts(tmpl.TenantID, gomock.Any(), gomock.Any()).
-		Return([]*entity.Product{tmpl}, nil)
+		ListProducts(product.TenantID, gomock.Any(), gomock.Any()).
+		Return([]*entity.Product{product}, nil)
 
 	ts := httptest.NewServer(listProducts(service))
 	defer ts.Close()
@@ -91,8 +92,8 @@ func Test_listProducts_Search(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	service := mock.NewMockUseCase(controller)
-	tmpl := &entity.Product{
-		ID:           entity.NewID(),
+	product := &entity.Product{
+		ID:           id.New(),
 		TenantID:     tenantAlice,
 		ExtName:      "product-1",
 		Title:        "Product One",
@@ -102,10 +103,10 @@ func Test_listProducts_Search(t *testing.T) {
 		MaxAttendees: 100,
 		Format:       entity.ProductFormatInPerson,
 	}
-	service.EXPECT().GetCount(tmpl.TenantID).Return(1)
+	service.EXPECT().GetCount(product.TenantID).Return(1)
 	service.EXPECT().
-		SearchProducts(tmpl.TenantID, "product", gomock.Any(), gomock.Any()).
-		Return([]*entity.Product{tmpl}, nil)
+		SearchProducts(product.TenantID, "product", gomock.Any(), gomock.Any()).
+		Return([]*entity.Product{product}, nil)
 	ts := httptest.NewServer(listProducts(service))
 	defer ts.Close()
 
@@ -131,7 +132,7 @@ func Test_createProduct(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/products", path)
 
-	id := entity.NewID()
+	productID := id.New()
 	service.EXPECT().
 		CreateProduct(
 			gomock.Any(),
@@ -146,7 +147,7 @@ func Test_createProduct(t *testing.T) {
 			gomock.Any(),
 			gomock.Any(),
 		).
-		Return(id, nil)
+		Return(productID, nil)
 	h := createProduct(service)
 
 	ts := httptest.NewServer(h)
@@ -187,17 +188,17 @@ func Test_createProduct(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusCreated, res.StatusCode)
 
-	var tmpl *presenter.Product
-	json.NewDecoder(res.Body).Decode(&tmpl)
-	assert.Equal(t, id, tmpl.ID)
-	assert.Equal(t, payload.ExtName, tmpl.ExtName)
-	assert.Equal(t, payload.Title, tmpl.Title)
-	assert.Equal(t, payload.CType, tmpl.CType)
-	assert.Equal(t, payload.BaseProductExtID, tmpl.BaseProductExtID)
-	assert.Equal(t, payload.DurationDays, tmpl.DurationDays)
-	assert.Equal(t, payload.Visibility, tmpl.Visibility)
-	assert.Equal(t, payload.MaxAttendees, tmpl.MaxAttendees)
-	assert.Equal(t, payload.Format, tmpl.Format)
+	var product *presenter.Product
+	json.NewDecoder(res.Body).Decode(&product)
+	assert.Equal(t, productID, product.ID)
+	assert.Equal(t, payload.ExtName, product.ExtName)
+	assert.Equal(t, payload.Title, product.Title)
+	assert.Equal(t, payload.CType, product.CType)
+	assert.Equal(t, payload.BaseProductExtID, product.BaseProductExtID)
+	assert.Equal(t, payload.DurationDays, product.DurationDays)
+	assert.Equal(t, payload.Visibility, product.Visibility)
+	assert.Equal(t, payload.MaxAttendees, product.MaxAttendees)
+	assert.Equal(t, payload.Format, product.Format)
 	assert.Equal(t, tenantAlice.String(), res.Header.Get(common.HttpHeaderTenantID))
 }
 
@@ -212,8 +213,8 @@ func Test_getProduct(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/products/{id}", path)
 
-	tmpl := &entity.Product{
-		ID:           entity.NewID(),
+	product := &entity.Product{
+		ID:           id.New(),
 		TenantID:     tenantAlice,
 		ExtID:        aliceExtID,
 		ExtName:      "product-1",
@@ -225,27 +226,27 @@ func Test_getProduct(t *testing.T) {
 		Format:       entity.ProductFormatInPerson,
 	}
 	service.EXPECT().
-		GetProduct(tmpl.ID).
-		Return(tmpl, nil)
+		GetProduct(product.ID).
+		Return(product, nil)
 	handler := getProduct(service)
 	r.Handle("/v1/products/{id}", handler)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
-	res, err := http.Get(ts.URL + "/v1/products/" + tmpl.ID.String())
+	res, err := http.Get(ts.URL + "/v1/products/" + product.ID.String())
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
 	var d *presenter.Product
 	json.NewDecoder(res.Body).Decode(&d)
 	assert.NotNil(t, d)
-	assert.Equal(t, tmpl.ID, d.ID)
-	assert.Equal(t, tmpl.ExtName, d.ExtName)
-	assert.Equal(t, tmpl.Title, d.Title)
-	assert.Equal(t, tmpl.CType, d.CType)
-	assert.Equal(t, tmpl.DurationDays, d.DurationDays)
-	assert.Equal(t, tmpl.Visibility, d.Visibility)
-	assert.Equal(t, tmpl.MaxAttendees, d.MaxAttendees)
-	assert.Equal(t, tmpl.Format, d.Format)
+	assert.Equal(t, product.ID, d.ID)
+	assert.Equal(t, product.ExtName, d.ExtName)
+	assert.Equal(t, product.Title, d.Title)
+	assert.Equal(t, product.CType, d.CType)
+	assert.Equal(t, product.DurationDays, d.DurationDays)
+	assert.Equal(t, product.Visibility, d.Visibility)
+	assert.Equal(t, product.MaxAttendees, d.MaxAttendees)
+	assert.Equal(t, product.Format, d.Format)
 	assert.Equal(t, tenantAlice.String(), res.Header.Get(common.HttpHeaderTenantID))
 }
 
@@ -260,7 +261,7 @@ func Test_deleteProduct(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/products/{id}", path)
 
-	id := entity.NewID()
+	id := id.New()
 	service.EXPECT().DeleteProduct(id).Return(nil)
 	handler := deleteProduct(service)
 	req, _ := http.NewRequest("DELETE", "/v1/products/"+id.String(), nil)
@@ -281,7 +282,7 @@ func Test_deleteProductNonExistent(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/products/{id}", path)
 
-	id := entity.NewID()
+	id := id.New()
 	service.EXPECT().DeleteProduct(id).Return(entity.ErrNotFound)
 	handler := deleteProduct(service)
 	req, _ := http.NewRequest("DELETE", "/v1/products/"+id.String(), nil)
@@ -302,7 +303,7 @@ func Test_updateProduct(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/products/{id}", path)
 
-	id := entity.NewID()
+	id := id.New()
 	updatePayload := &entity.Product{
 		ID:           id,
 		TenantID:     tenantAlice,
@@ -360,7 +361,7 @@ func Test_updateProduct_BadRequest(t *testing.T) {
 	n := negroni.New()
 	MakeProductHandlers(r, *n, service)
 
-	id := entity.NewID()
+	id := id.New()
 	handler := updateProduct(service)
 
 	// Test with invalid JSON payload
@@ -385,7 +386,7 @@ func Test_updateProduct_MissingTenant(t *testing.T) {
 	n := negroni.New()
 	MakeProductHandlers(r, *n, service)
 
-	id := entity.NewID()
+	id := id.New()
 	updatePayload := &entity.Product{
 		ID:      id,
 		ExtName: "updated-product",

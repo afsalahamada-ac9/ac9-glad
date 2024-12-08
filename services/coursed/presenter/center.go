@@ -8,12 +8,13 @@ package presenter
 
 import (
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 )
 
 // Center data - TenantID is returned in the HTTP header
 // X-GLAD-TenantID
 type Center struct {
-	ID      entity.ID         `json:"id"`
+	ID      id.ID             `json:"id"`
 	Name    string            `json:"name"`
 	ExtName string            `json:"extName"`
 	Mode    entity.CenterMode `json:"mode"`

@@ -6,21 +6,24 @@
 
 package product
 
-import "ac9/glad/entity"
+import (
+	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
+)
 
 // Reader defines read-only operations for products
 type Reader interface {
-	Get(id entity.ID) (*entity.Product, error)
-	List(tenantID entity.ID, page, limit int) ([]*entity.Product, error)
-	Search(tenantID entity.ID, q string, page, limit int) ([]*entity.Product, error)
-	GetCount(tenantID entity.ID) (int, error)
+	Get(id id.ID) (*entity.Product, error)
+	List(tenantID id.ID, page, limit int) ([]*entity.Product, error)
+	Search(tenantID id.ID, q string, page, limit int) ([]*entity.Product, error)
+	GetCount(tenantID id.ID) (int, error)
 }
 
 // Writer defines write-only operations for products
 type Writer interface {
-	Create(product *entity.Product) (entity.ID, error)
+	Create(product *entity.Product) (id.ID, error)
 	Update(product *entity.Product) error
-	Delete(id entity.ID) error
+	Delete(id id.ID) error
 }
 
 // Repository interface
@@ -31,10 +34,10 @@ type Repository interface {
 
 // UseCase defines the interface for product business logic
 type UseCase interface {
-	GetProduct(id entity.ID) (*entity.Product, error)
-	SearchProducts(tenantID entity.ID, q string, page, limit int) ([]*entity.Product, error)
-	ListProducts(tenantID entity.ID, page, limit int) ([]*entity.Product, error)
-	CreateProduct(tenantID entity.ID,
+	GetProduct(id id.ID) (*entity.Product, error)
+	SearchProducts(tenantID id.ID, q string, page, limit int) ([]*entity.Product, error)
+	ListProducts(tenantID id.ID, page, limit int) ([]*entity.Product, error)
+	CreateProduct(tenantID id.ID,
 		extID string,
 		extName string,
 		title string,
@@ -45,8 +48,8 @@ type UseCase interface {
 		maxAttendees int32,
 		format entity.ProductFormat,
 		isAutoApprove bool,
-	) (entity.ID, error)
+	) (id.ID, error)
 	UpdateProduct(e *entity.Product) error
-	DeleteProduct(id entity.ID) error
-	GetCount(id entity.ID) int
+	DeleteProduct(id id.ID) error
+	GetCount(id id.ID) int
 }

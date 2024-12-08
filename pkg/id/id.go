@@ -4,34 +4,34 @@
  * This code may not be used, copied, modified, or distributed without explicit permission.
  */
 
-package entity
+package id
 
 import (
+	"ac9/glad/pkg/uid"
 	"math/rand"
 	"strconv"
-	"ac9/glad/pkg/uid"
 )
 
 const (
 	IDInvalid = 0
 )
 
-// ID entity ID
+// ID identifier
 type ID uint64
 
-// NewID create a new entity ID
-func NewID() ID {
+// NewID create a new ID
+func New() ID {
 	randomShardID := rand.Intn(1024)
 	return ID(uid.Get(randomShardID))
 }
 
-// NewIDWithShard create a new entity ID with given Shard ID
+// NewIDWithShard create a new ID with given Shard ID
 func NewIDWithShard(shardID int) ID {
 	return ID(uid.Get(shardID))
 }
 
-// StringToID convert a string to an entity ID
-func StringToID(s string) (ID, error) {
+// StringToID convert a string to an ID
+func FromString(s string) (ID, error) {
 	id, err := strconv.ParseUint(s, 10, 64)
 	return ID(id), err
 }

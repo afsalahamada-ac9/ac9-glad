@@ -8,6 +8,7 @@ package presenter
 
 import (
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 
 	"github.com/ulule/deepcopier"
 )
@@ -15,9 +16,9 @@ import (
 // Course data - TenantID is returned in the HTTP header
 // X-GLAD-TenantID
 type Course struct {
-	ID           entity.ID            `json:"id"`
+	ID           id.ID                `json:"id"`
 	ExtID        *string              `json:"extID,omitempty"`
-	CenterID     *entity.ID           `json:"centerID,omitempty"`
+	CenterID     *id.ID               `json:"centerID,omitempty"`
 	Name         *string              `json:"name,omitempty"`
 	Notes        *string              `json:"notes,omitempty"`
 	Timezone     *string              `json:"timezone,omitempty"`
@@ -30,38 +31,38 @@ type Course struct {
 
 // Course teacher
 type CourseTeacher struct {
-	ID        entity.ID `json:"id"`
-	IsPrimary bool      `json:"is_primary"`
+	ID        id.ID `json:"id"`
+	IsPrimary bool  `json:"is_primary"`
 }
 
 // CourseReq struct used to create & update the course via REST API
 // TODO: Salesforce will send additional details: extID, URL (to be converted to shortURL), numAttendees
 type CourseReq struct {
 	Name         string               `json:"name"`
-	CenterID     entity.ID            `json:"centerID"`
-	ProductID    entity.ID            `json:"productID"`
+	CenterID     id.ID                `json:"centerID"`
+	ProductID    id.ID                `json:"productID"`
 	Mode         entity.CourseMode    `json:"mode"`
 	Timezone     string               `json:"timezone"`
-	Organizer    []entity.ID          `json:"organizer"`
-	Contact      []entity.ID          `json:"contact"`
+	Organizer    []id.ID              `json:"organizer"`
+	Contact      []id.ID              `json:"contact"`
 	Teacher      []CourseTeacher      `json:"teacher"`
 	Notes        *string              `json:"notes"`
 	Status       *entity.CourseStatus `json:"status"`
 	MaxAttendees *int32               `json:"maxAttendees"`
 	DateTime     []DateTime           `json:"date"`
 	Address      *Address             `json:"address"`
-	Notify       []entity.ID          `json:"notify"`
+	Notify       []id.ID              `json:"notify"`
 }
 
 // CourseResponse struct used as response to the create course request (REST API)
 type CourseResponse struct {
-	ID         entity.ID   `json:"id"`
-	DateTimeID []entity.ID `json:"dateID"`
-	ShortURL   *string     `json:"shortURL,omitempty"`
+	ID         id.ID   `json:"id"`
+	DateTimeID []id.ID `json:"dateID"`
+	ShortURL   *string `json:"shortURL,omitempty"`
 }
 
 // ToCourse creates course entity from course request
-func (cr CourseReq) ToCourse(tenantID entity.ID) (entity.Course, error) {
+func (cr CourseReq) ToCourse(tenantID id.ID) (entity.Course, error) {
 
 	var course entity.Course
 	deepcopier.Copy(cr).To(&course)

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 )
 
 // Service account usecase
@@ -26,7 +27,7 @@ func NewService(r Repository) *Service {
 
 // CreateAccount creates an account
 func (s *Service) CreateAccount(
-	tenantID entity.ID,
+	tenantID id.ID,
 	extID string,
 	cognitoID string,
 	username string,
@@ -55,7 +56,7 @@ func (s *Service) CreateAccount(
 }
 
 // GetAccount retrieves an account
-func (s *Service) GetAccount(id entity.ID) (*entity.Account, error) {
+func (s *Service) GetAccount(id id.ID) (*entity.Account, error) {
 	account, err := s.repo.Get(id)
 	if account == nil {
 		return nil, entity.ErrNotFound
@@ -68,7 +69,7 @@ func (s *Service) GetAccount(id entity.ID) (*entity.Account, error) {
 }
 
 // GetAccountByName retrieves an account using username
-func (s *Service) GetAccountByName(tenantID entity.ID, username string) (*entity.Account, error) {
+func (s *Service) GetAccountByName(tenantID id.ID, username string) (*entity.Account, error) {
 	account, err := s.repo.GetByName(tenantID, username)
 	if account == nil {
 		return nil, entity.ErrNotFound
@@ -81,7 +82,7 @@ func (s *Service) GetAccountByName(tenantID entity.ID, username string) (*entity
 }
 
 // ListAccounts list accounts
-func (s *Service) ListAccounts(tenantID entity.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
+func (s *Service) ListAccounts(tenantID id.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
 	accounts, err := s.repo.List(tenantID, page, limit, at)
 	if err != nil {
 		return nil, err
@@ -103,7 +104,7 @@ func (s *Service) UpdateAccount(t *entity.Account) error {
 }
 
 // DeleteAccount Deletes an account
-func (s *Service) DeleteAccount(id entity.ID) error {
+func (s *Service) DeleteAccount(id id.ID) error {
 	account, err := s.GetAccount(id)
 	if account == nil {
 		return entity.ErrNotFound
@@ -116,7 +117,7 @@ func (s *Service) DeleteAccount(id entity.ID) error {
 }
 
 // DeleteAccount Deletes an account using username
-func (s *Service) DeleteAccountByName(tenantID entity.ID, username string) error {
+func (s *Service) DeleteAccountByName(tenantID id.ID, username string) error {
 	account, err := s.GetAccountByName(tenantID, username)
 	if account == nil {
 		return entity.ErrNotFound
@@ -129,7 +130,7 @@ func (s *Service) DeleteAccountByName(tenantID entity.ID, username string) error
 }
 
 // GetCount gets total account count
-func (s *Service) GetCount(tenantID entity.ID) int {
+func (s *Service) GetCount(tenantID id.ID) int {
 	count, err := s.repo.GetCount(tenantID)
 	if err != nil {
 		return 0
@@ -139,7 +140,7 @@ func (s *Service) GetCount(tenantID entity.ID) int {
 }
 
 // SearchAccounts search accounts
-func (s *Service) SearchAccounts(tenantID entity.ID, query string, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
+func (s *Service) SearchAccounts(tenantID id.ID, query string, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
 	accounts, err := s.repo.Search(tenantID, query, page, limit, at)
 	if err != nil {
 		return nil, err

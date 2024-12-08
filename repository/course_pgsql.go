@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 	"ac9/glad/pkg/util"
 )
 
@@ -28,7 +29,7 @@ func NewCoursePGSQL(db *sql.DB) *CoursePGSQL {
 }
 
 // Insert creates a course
-func (r *CoursePGSQL) Create(e *entity.Course) (entity.ID, error) {
+func (r *CoursePGSQL) Create(e *entity.Course) (id.ID, error) {
 	addressJSON, err := json.Marshal(e.Address)
 	if err != nil {
 		return e.ID, err
@@ -71,7 +72,7 @@ func (r *CoursePGSQL) Create(e *entity.Course) (entity.ID, error) {
 }
 
 // Get retrieves a course
-func (r *CoursePGSQL) Get(id entity.ID) (*entity.Course, error) {
+func (r *CoursePGSQL) Get(id id.ID) (*entity.Course, error) {
 	stmt, err := r.db.Prepare(`
 		SELECT id, tenant_id, ext_id, center_id, product_id, name, notes, timezone, address,
 		status, mode, max_attendees, num_attendees, created_at
@@ -133,7 +134,7 @@ func (r *CoursePGSQL) Update(e *entity.Course) error {
 }
 
 // Search searches courses
-func (r *CoursePGSQL) Search(tenantID entity.ID, q string, page, limit int) ([]*entity.Course, error) {
+func (r *CoursePGSQL) Search(tenantID id.ID, q string, page, limit int) ([]*entity.Course, error) {
 	query := `
 		SELECT id, tenant_id, ext_id, center_id, product_id, name, notes, timezone, address,
 		status, mode, max_attendees, num_attendees, created_at
@@ -173,7 +174,7 @@ func (r *CoursePGSQL) Search(tenantID entity.ID, q string, page, limit int) ([]*
 }
 
 // List lists courses
-func (r *CoursePGSQL) List(tenantID entity.ID, page, limit int) ([]*entity.Course, error) {
+func (r *CoursePGSQL) List(tenantID id.ID, page, limit int) ([]*entity.Course, error) {
 	query := `
 		SELECT id, tenant_id, ext_id, center_id, product_id, name, notes, timezone, address,
 		status, mode, max_attendees, num_attendees, created_at
@@ -212,7 +213,7 @@ func (r *CoursePGSQL) List(tenantID entity.ID, page, limit int) ([]*entity.Cours
 }
 
 // Delete deletes a course
-func (r *CoursePGSQL) Delete(id entity.ID) error {
+func (r *CoursePGSQL) Delete(id id.ID) error {
 	res, err := r.db.Exec(`DELETE FROM course WHERE id = $1;`, id)
 	if err != nil {
 		return err
@@ -226,7 +227,7 @@ func (r *CoursePGSQL) Delete(id entity.ID) error {
 }
 
 // Get total courses
-func (r *CoursePGSQL) GetCount(tenantID entity.ID) (int, error) {
+func (r *CoursePGSQL) GetCount(tenantID id.ID) (int, error) {
 	stmt, err := r.db.Prepare(`SELECT count(*) FROM course WHERE tenant_id = $1;`)
 	if err != nil {
 		return 0, err
@@ -291,7 +292,7 @@ func (r *CoursePGSQL) scanRows(rows *sql.Rows) ([]*entity.Course, error) {
 // InsertCourseOrganizer creates course to organizer mapping
 // TODO: We should map error value appropriately to the API client. Ex. foreign key violation implies
 // that request is a bad request, etc. or, maybe we don't. Something to think about.
-func (r *CoursePGSQL) InsertCourseOrganizer(courseID entity.ID, cos []*entity.CourseOrganizer) error {
+func (r *CoursePGSQL) InsertCourseOrganizer(courseID id.ID, cos []*entity.CourseOrganizer) error {
 	values := func(index int) []interface{} {
 		return []interface{}{
 			courseID,
@@ -322,7 +323,7 @@ func (r *CoursePGSQL) InsertCourseOrganizer(courseID entity.ID, cos []*entity.Co
 }
 
 // GetCourseOrganizer gets course organizer for the given course id
-func (r *CoursePGSQL) GetCourseOrganizer(courseID entity.ID) ([]*entity.CourseOrganizer, error) {
+func (r *CoursePGSQL) GetCourseOrganizer(courseID id.ID) ([]*entity.CourseOrganizer, error) {
 	query := `SELECT organizer_id FROM course_organizer where course_id = $1;`
 
 	stmt, err := r.db.Prepare(query)
@@ -352,7 +353,7 @@ func (r *CoursePGSQL) GetCourseOrganizer(courseID entity.ID) ([]*entity.CourseOr
 }
 
 // UpdateCourseOrganizer updates course organizer for the given course id and the organizer
-func (r *CoursePGSQL) UpdateCourseOrganizer(courseID entity.ID, cos []*entity.CourseOrganizer) error {
+func (r *CoursePGSQL) UpdateCourseOrganizer(courseID id.ID, cos []*entity.CourseOrganizer) error {
 	// Note: It's possible we could use reflection and make this
 	// split of add and remove items more generic.
 	currentCOs, err := r.GetCourseOrganizer(courseID)
@@ -360,7 +361,7 @@ func (r *CoursePGSQL) UpdateCourseOrganizer(courseID entity.ID, cos []*entity.Co
 		return err
 	}
 
-	mapOrgID := make(map[entity.ID]bool)
+	mapOrgID := make(map[id.ID]bool)
 	for _, co := range currentCOs {
 		mapOrgID[co.ID] = true
 	}
@@ -401,7 +402,7 @@ func (r *CoursePGSQL) UpdateCourseOrganizer(courseID entity.ID, cos []*entity.Co
 }
 
 // DeleteCourseOrganizer deletes the given course organizer
-func (r *CoursePGSQL) DeleteCourseOrganizer(courseID entity.ID, cos []*entity.CourseOrganizer) error {
+func (r *CoursePGSQL) DeleteCourseOrganizer(courseID id.ID, cos []*entity.CourseOrganizer) error {
 	values := func(index int) []interface{} {
 		return []interface{}{
 			courseID,
@@ -431,7 +432,7 @@ func (r *CoursePGSQL) DeleteCourseOrganizer(courseID entity.ID, cos []*entity.Co
 }
 
 // DeleteCourseOrganizerByCourse deletes course organizer using course id
-func (r *CoursePGSQL) DeleteCourseOrganizerByCourse(courseID entity.ID) error {
+func (r *CoursePGSQL) DeleteCourseOrganizerByCourse(courseID id.ID) error {
 	res, err := r.db.Exec(`DELETE FROM course_organizer WHERE course_id = $1;`, courseID)
 	if err != nil {
 		return err
@@ -448,7 +449,7 @@ func (r *CoursePGSQL) DeleteCourseOrganizerByCourse(courseID entity.ID) error {
 // Course Teacher
 // --------------------------------------------------------------------------------
 // InsertCourseTeacher creates course to teacher mapping
-func (r *CoursePGSQL) InsertCourseTeacher(courseID entity.ID, cts []*entity.CourseTeacher) error {
+func (r *CoursePGSQL) InsertCourseTeacher(courseID id.ID, cts []*entity.CourseTeacher) error {
 	values := func(index int) []interface{} {
 		return []interface{}{
 			courseID,
@@ -480,7 +481,7 @@ func (r *CoursePGSQL) InsertCourseTeacher(courseID entity.ID, cts []*entity.Cour
 }
 
 // GetCourseTeacher gets course teacher for the given course id
-func (r *CoursePGSQL) GetCourseTeacher(courseID entity.ID) ([]*entity.CourseTeacher, error) {
+func (r *CoursePGSQL) GetCourseTeacher(courseID id.ID) ([]*entity.CourseTeacher, error) {
 	query := `SELECT teacher_id, is_primary FROM course_teacher WHERE course_id = $1;`
 
 	stmt, err := r.db.Prepare(query)
@@ -510,13 +511,13 @@ func (r *CoursePGSQL) GetCourseTeacher(courseID entity.ID) ([]*entity.CourseTeac
 }
 
 // UpdateCourseTeacher updates course teacher for the given course id and the teacher
-func (r *CoursePGSQL) UpdateCourseTeacher(courseID entity.ID, cts []*entity.CourseTeacher) error {
+func (r *CoursePGSQL) UpdateCourseTeacher(courseID id.ID, cts []*entity.CourseTeacher) error {
 	currentCTs, err := r.GetCourseTeacher(courseID)
 	if err != nil {
 		return err
 	}
 
-	mapTeacherID := make(map[entity.ID]*entity.CourseTeacher)
+	mapTeacherID := make(map[id.ID]*entity.CourseTeacher)
 	for _, ct := range currentCTs {
 		mapTeacherID[ct.ID] = ct
 	}
@@ -559,7 +560,7 @@ func (r *CoursePGSQL) UpdateCourseTeacher(courseID entity.ID, cts []*entity.Cour
 }
 
 // DeleteCourseTeacher deletes the given course teacher
-func (r *CoursePGSQL) DeleteCourseTeacher(courseID entity.ID, cts []*entity.CourseTeacher) error {
+func (r *CoursePGSQL) DeleteCourseTeacher(courseID id.ID, cts []*entity.CourseTeacher) error {
 	values := func(index int) []interface{} {
 		return []interface{}{
 			courseID,
@@ -589,7 +590,7 @@ func (r *CoursePGSQL) DeleteCourseTeacher(courseID entity.ID, cts []*entity.Cour
 }
 
 // DeleteCourseTeacherByCourse deletes course teachers using course id
-func (r *CoursePGSQL) DeleteCourseTeacherByCourse(courseID entity.ID) error {
+func (r *CoursePGSQL) DeleteCourseTeacherByCourse(courseID id.ID) error {
 	res, err := r.db.Exec(`DELETE FROM course_teacher WHERE course_id = $1;`, courseID)
 	if err != nil {
 		return err
@@ -605,7 +606,7 @@ func (r *CoursePGSQL) DeleteCourseTeacherByCourse(courseID entity.ID) error {
 // Course Contact
 // --------------------------------------------------------------------------------
 // InsertCourseContact creates course to contact mapping
-func (r *CoursePGSQL) InsertCourseContact(courseID entity.ID, ccs []*entity.CourseContact) error {
+func (r *CoursePGSQL) InsertCourseContact(courseID id.ID, ccs []*entity.CourseContact) error {
 	values := func(index int) []interface{} {
 		return []interface{}{
 			courseID,
@@ -636,7 +637,7 @@ func (r *CoursePGSQL) InsertCourseContact(courseID entity.ID, ccs []*entity.Cour
 }
 
 // GetCourseContact gets course contact for the given course id
-func (r *CoursePGSQL) GetCourseContact(courseID entity.ID) ([]*entity.CourseContact, error) {
+func (r *CoursePGSQL) GetCourseContact(courseID id.ID) ([]*entity.CourseContact, error) {
 	query := `SELECT contact_id FROM course_contact WHERE course_id = $1;`
 
 	stmt, err := r.db.Prepare(query)
@@ -666,13 +667,13 @@ func (r *CoursePGSQL) GetCourseContact(courseID entity.ID) ([]*entity.CourseCont
 }
 
 // UpdateCourseContact updates course contact for the given course id and the contact
-func (r *CoursePGSQL) UpdateCourseContact(courseID entity.ID, ccs []*entity.CourseContact) error {
+func (r *CoursePGSQL) UpdateCourseContact(courseID id.ID, ccs []*entity.CourseContact) error {
 	currentCCs, err := r.GetCourseContact(courseID)
 	if err != nil {
 		return err
 	}
 
-	mapContactID := make(map[entity.ID]bool)
+	mapContactID := make(map[id.ID]bool)
 	for _, cc := range currentCCs {
 		mapContactID[cc.ID] = true
 	}
@@ -713,7 +714,7 @@ func (r *CoursePGSQL) UpdateCourseContact(courseID entity.ID, ccs []*entity.Cour
 }
 
 // DeleteCourseContact deletes the given course contacts
-func (r *CoursePGSQL) DeleteCourseContact(courseID entity.ID, ccs []*entity.CourseContact) error {
+func (r *CoursePGSQL) DeleteCourseContact(courseID id.ID, ccs []*entity.CourseContact) error {
 	values := func(index int) []interface{} {
 		return []interface{}{
 			courseID,
@@ -743,7 +744,7 @@ func (r *CoursePGSQL) DeleteCourseContact(courseID entity.ID, ccs []*entity.Cour
 }
 
 // DeleteCourseContactByCourse deletes course contacts using course id
-func (r *CoursePGSQL) DeleteCourseContactByCourse(courseID entity.ID) error {
+func (r *CoursePGSQL) DeleteCourseContactByCourse(courseID id.ID) error {
 	res, err := r.db.Exec(`DELETE FROM course_contact WHERE course_id = $1;`, courseID)
 	if err != nil {
 		return err
@@ -759,7 +760,7 @@ func (r *CoursePGSQL) DeleteCourseContactByCourse(courseID entity.ID) error {
 // Course Notify
 // --------------------------------------------------------------------------------
 // InsertCourseNotify creates course to notify mapping
-func (r *CoursePGSQL) InsertCourseNotify(courseID entity.ID, cns []*entity.CourseNotify) error {
+func (r *CoursePGSQL) InsertCourseNotify(courseID id.ID, cns []*entity.CourseNotify) error {
 	values := func(index int) []interface{} {
 		return []interface{}{
 			courseID,
@@ -790,7 +791,7 @@ func (r *CoursePGSQL) InsertCourseNotify(courseID entity.ID, cns []*entity.Cours
 }
 
 // GetCourseNotify gets course notify for the given course id
-func (r *CoursePGSQL) GetCourseNotify(courseID entity.ID) ([]*entity.CourseNotify, error) {
+func (r *CoursePGSQL) GetCourseNotify(courseID id.ID) ([]*entity.CourseNotify, error) {
 	query := `SELECT notify_id FROM course_notify WHERE course_id = $1;`
 
 	stmt, err := r.db.Prepare(query)
@@ -820,13 +821,13 @@ func (r *CoursePGSQL) GetCourseNotify(courseID entity.ID) ([]*entity.CourseNotif
 }
 
 // UpdateCourseNotify updates course notify for the given course id and the notify
-func (r *CoursePGSQL) UpdateCourseNotify(courseID entity.ID, cns []*entity.CourseNotify) error {
+func (r *CoursePGSQL) UpdateCourseNotify(courseID id.ID, cns []*entity.CourseNotify) error {
 	currentCNs, err := r.GetCourseNotify(courseID)
 	if err != nil {
 		return err
 	}
 
-	mapNotifyID := make(map[entity.ID]bool)
+	mapNotifyID := make(map[id.ID]bool)
 	for _, cn := range currentCNs {
 		mapNotifyID[cn.ID] = true
 	}
@@ -867,7 +868,7 @@ func (r *CoursePGSQL) UpdateCourseNotify(courseID entity.ID, cns []*entity.Cours
 }
 
 // DeleteCourseNotify deletes the given course notify
-func (r *CoursePGSQL) DeleteCourseNotify(courseID entity.ID, cns []*entity.CourseNotify) error {
+func (r *CoursePGSQL) DeleteCourseNotify(courseID id.ID, cns []*entity.CourseNotify) error {
 	values := func(index int) []interface{} {
 		return []interface{}{
 			courseID,
@@ -897,7 +898,7 @@ func (r *CoursePGSQL) DeleteCourseNotify(courseID entity.ID, cns []*entity.Cours
 }
 
 // DeleteCourseNotifyByCourse deletes course notify using course id
-func (r *CoursePGSQL) DeleteCourseNotifyByCourse(courseID entity.ID) error {
+func (r *CoursePGSQL) DeleteCourseNotifyByCourse(courseID id.ID) error {
 	res, err := r.db.Exec(`DELETE FROM course_notify WHERE course_id = $1;`, courseID)
 	if err != nil {
 		return err

@@ -13,6 +13,7 @@ import (
 	"strconv"
 
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/id"
 	"ac9/glad/usecase/course"
 
 	"ac9/glad/services/coursed/presenter"
@@ -32,7 +33,7 @@ func listCourses(service course.UseCase) http.Handler {
 		search := r.URL.Query().Get(httpParamQuery)
 		page, _ := strconv.Atoi(r.URL.Query().Get(httpParamPage))
 		limit, _ := strconv.Atoi(r.URL.Query().Get(httpParamLimit))
-		tenantID, err := entity.StringToID(tenant)
+		tenantID, err := id.FromString(tenant)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("Unable to parse tenant id"))
@@ -107,7 +108,7 @@ func createCourse(service course.UseCase) http.Handler {
 		var input presenter.CourseReq
 
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
-		tenantID, err := entity.StringToID(tenant)
+		tenantID, err := id.FromString(tenant)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("Missing tenant ID"))
@@ -176,7 +177,7 @@ func getCourse(service course.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error reading course"
 		vars := mux.Vars(r)
-		id, err := entity.StringToID(vars["id"])
+		id, err := id.FromString(vars["id"])
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
@@ -242,7 +243,7 @@ func deleteCourse(service course.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error removing course"
 		vars := mux.Vars(r)
-		id, err := entity.StringToID(vars["id"])
+		id, err := id.FromString(vars["id"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage))
@@ -270,7 +271,7 @@ func updateCourse(service course.UseCase) http.Handler {
 		errorMessage := "Error updating course"
 
 		vars := mux.Vars(r)
-		id, err := entity.StringToID(vars["id"])
+		courseID, err := id.FromString(vars["id"])
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
@@ -279,7 +280,7 @@ func updateCourse(service course.UseCase) http.Handler {
 
 		var input presenter.CourseReq
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
-		tenantID, err := entity.StringToID(tenant)
+		tenantID, err := id.FromString(tenant)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("Missing tenant ID"))
@@ -304,7 +305,7 @@ func updateCourse(service course.UseCase) http.Handler {
 		// will be taken into consideration
 		// Bugs in client could cause more damage. We can add a check to see whether the
 		// ID sent in the body and the path are same.
-		course.ID = id
+		course.ID = courseID
 
 		cos, _ := input.ToCourseOrganizer()
 		cts, _ := input.ToCourseTeacher()

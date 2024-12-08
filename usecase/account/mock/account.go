@@ -5,8 +5,9 @@
 package mock_account
 
 import (
-	reflect "reflect"
 	entity "ac9/glad/entity"
+	id "ac9/glad/pkg/id"
+	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
 )
@@ -35,7 +36,7 @@ func (m *MockReader) EXPECT() *MockReaderMockRecorder {
 }
 
 // Get mocks base method.
-func (m *MockReader) Get(id entity.ID) (*entity.Account, error) {
+func (m *MockReader) Get(id id.ID) (*entity.Account, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", id)
 	ret0, _ := ret[0].(*entity.Account)
@@ -50,7 +51,7 @@ func (mr *MockReaderMockRecorder) Get(id interface{}) *gomock.Call {
 }
 
 // GetByName mocks base method.
-func (m *MockReader) GetByName(tenantID entity.ID, username string) (*entity.Account, error) {
+func (m *MockReader) GetByName(tenantID id.ID, username string) (*entity.Account, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetByName", tenantID, username)
 	ret0, _ := ret[0].(*entity.Account)
@@ -65,7 +66,7 @@ func (mr *MockReaderMockRecorder) GetByName(tenantID, username interface{}) *gom
 }
 
 // GetCount mocks base method.
-func (m *MockReader) GetCount(tenantId entity.ID) (int, error) {
+func (m *MockReader) GetCount(tenantId id.ID) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCount", tenantId)
 	ret0, _ := ret[0].(int)
@@ -80,7 +81,7 @@ func (mr *MockReaderMockRecorder) GetCount(tenantId interface{}) *gomock.Call {
 }
 
 // List mocks base method.
-func (m *MockReader) List(tenantID entity.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
+func (m *MockReader) List(tenantID id.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", tenantID, page, limit, at)
 	ret0, _ := ret[0].([]*entity.Account)
@@ -95,7 +96,7 @@ func (mr *MockReaderMockRecorder) List(tenantID, page, limit, at interface{}) *g
 }
 
 // Search mocks base method.
-func (m *MockReader) Search(tenantID entity.ID, query string, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
+func (m *MockReader) Search(tenantID id.ID, query string, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Search", tenantID, query, page, limit, at)
 	ret0, _ := ret[0].([]*entity.Account)
@@ -147,7 +148,7 @@ func (mr *MockWriterMockRecorder) Create(e interface{}) *gomock.Call {
 }
 
 // Delete mocks base method.
-func (m *MockWriter) Delete(id entity.ID) error {
+func (m *MockWriter) Delete(id id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", id)
 	ret0, _ := ret[0].(error)
@@ -161,7 +162,7 @@ func (mr *MockWriterMockRecorder) Delete(id interface{}) *gomock.Call {
 }
 
 // DeleteByName mocks base method.
-func (m *MockWriter) DeleteByName(tenantID entity.ID, username string) error {
+func (m *MockWriter) DeleteByName(tenantID id.ID, username string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteByName", tenantID, username)
 	ret0, _ := ret[0].(error)
@@ -226,7 +227,7 @@ func (mr *MockRepositoryMockRecorder) Create(e interface{}) *gomock.Call {
 }
 
 // Delete mocks base method.
-func (m *MockRepository) Delete(id entity.ID) error {
+func (m *MockRepository) Delete(id id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", id)
 	ret0, _ := ret[0].(error)
@@ -240,7 +241,7 @@ func (mr *MockRepositoryMockRecorder) Delete(id interface{}) *gomock.Call {
 }
 
 // DeleteByName mocks base method.
-func (m *MockRepository) DeleteByName(tenantID entity.ID, username string) error {
+func (m *MockRepository) DeleteByName(tenantID id.ID, username string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteByName", tenantID, username)
 	ret0, _ := ret[0].(error)
@@ -254,7 +255,7 @@ func (mr *MockRepositoryMockRecorder) DeleteByName(tenantID, username interface{
 }
 
 // Get mocks base method.
-func (m *MockRepository) Get(id entity.ID) (*entity.Account, error) {
+func (m *MockRepository) Get(id id.ID) (*entity.Account, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", id)
 	ret0, _ := ret[0].(*entity.Account)
@@ -269,7 +270,7 @@ func (mr *MockRepositoryMockRecorder) Get(id interface{}) *gomock.Call {
 }
 
 // GetByName mocks base method.
-func (m *MockRepository) GetByName(tenantID entity.ID, username string) (*entity.Account, error) {
+func (m *MockRepository) GetByName(tenantID id.ID, username string) (*entity.Account, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetByName", tenantID, username)
 	ret0, _ := ret[0].(*entity.Account)
@@ -284,7 +285,7 @@ func (mr *MockRepositoryMockRecorder) GetByName(tenantID, username interface{}) 
 }
 
 // GetCount mocks base method.
-func (m *MockRepository) GetCount(tenantId entity.ID) (int, error) {
+func (m *MockRepository) GetCount(tenantId id.ID) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCount", tenantId)
 	ret0, _ := ret[0].(int)
@@ -299,7 +300,7 @@ func (mr *MockRepositoryMockRecorder) GetCount(tenantId interface{}) *gomock.Cal
 }
 
 // List mocks base method.
-func (m *MockRepository) List(tenantID entity.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
+func (m *MockRepository) List(tenantID id.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", tenantID, page, limit, at)
 	ret0, _ := ret[0].([]*entity.Account)
@@ -314,7 +315,7 @@ func (mr *MockRepositoryMockRecorder) List(tenantID, page, limit, at interface{}
 }
 
 // Search mocks base method.
-func (m *MockRepository) Search(tenantID entity.ID, query string, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
+func (m *MockRepository) Search(tenantID id.ID, query string, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Search", tenantID, query, page, limit, at)
 	ret0, _ := ret[0].([]*entity.Account)
@@ -366,7 +367,7 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 }
 
 // CreateAccount mocks base method.
-func (m *MockUseCase) CreateAccount(tenantID entity.ID, extID, cognitoID, username, first_name, last_name, phone, email string, at entity.AccountType, as entity.AccountStatus) error {
+func (m *MockUseCase) CreateAccount(tenantID id.ID, extID, cognitoID, username, first_name, last_name, phone, email string, at entity.AccountType, as entity.AccountStatus) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateAccount", tenantID, extID, cognitoID, username, first_name, last_name, phone, email, at, as)
 	ret0, _ := ret[0].(error)
@@ -380,7 +381,7 @@ func (mr *MockUseCaseMockRecorder) CreateAccount(tenantID, extID, cognitoID, use
 }
 
 // DeleteAccount mocks base method.
-func (m *MockUseCase) DeleteAccount(id entity.ID) error {
+func (m *MockUseCase) DeleteAccount(id id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteAccount", id)
 	ret0, _ := ret[0].(error)
@@ -394,7 +395,7 @@ func (mr *MockUseCaseMockRecorder) DeleteAccount(id interface{}) *gomock.Call {
 }
 
 // DeleteAccountByName mocks base method.
-func (m *MockUseCase) DeleteAccountByName(tenantID entity.ID, username string) error {
+func (m *MockUseCase) DeleteAccountByName(tenantID id.ID, username string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteAccountByName", tenantID, username)
 	ret0, _ := ret[0].(error)
@@ -408,7 +409,7 @@ func (mr *MockUseCaseMockRecorder) DeleteAccountByName(tenantID, username interf
 }
 
 // GetAccount mocks base method.
-func (m *MockUseCase) GetAccount(id entity.ID) (*entity.Account, error) {
+func (m *MockUseCase) GetAccount(id id.ID) (*entity.Account, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAccount", id)
 	ret0, _ := ret[0].(*entity.Account)
@@ -423,7 +424,7 @@ func (mr *MockUseCaseMockRecorder) GetAccount(id interface{}) *gomock.Call {
 }
 
 // GetAccountByName mocks base method.
-func (m *MockUseCase) GetAccountByName(tenantID entity.ID, username string) (*entity.Account, error) {
+func (m *MockUseCase) GetAccountByName(tenantID id.ID, username string) (*entity.Account, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAccountByName", tenantID, username)
 	ret0, _ := ret[0].(*entity.Account)
@@ -438,7 +439,7 @@ func (mr *MockUseCaseMockRecorder) GetAccountByName(tenantID, username interface
 }
 
 // GetCount mocks base method.
-func (m *MockUseCase) GetCount(tenantId entity.ID) int {
+func (m *MockUseCase) GetCount(tenantId id.ID) int {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCount", tenantId)
 	ret0, _ := ret[0].(int)
@@ -452,7 +453,7 @@ func (mr *MockUseCaseMockRecorder) GetCount(tenantId interface{}) *gomock.Call {
 }
 
 // ListAccounts mocks base method.
-func (m *MockUseCase) ListAccounts(tenantID entity.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
+func (m *MockUseCase) ListAccounts(tenantID id.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListAccounts", tenantID, page, limit, at)
 	ret0, _ := ret[0].([]*entity.Account)
@@ -467,7 +468,7 @@ func (mr *MockUseCaseMockRecorder) ListAccounts(tenantID, page, limit, at interf
 }
 
 // SearchAccounts mocks base method.
-func (m *MockUseCase) SearchAccounts(tenantID entity.ID, query string, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
+func (m *MockUseCase) SearchAccounts(tenantID id.ID, query string, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SearchAccounts", tenantID, query, page, limit, at)
 	ret0, _ := ret[0].([]*entity.Account)

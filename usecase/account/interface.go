@@ -8,23 +8,24 @@ package account
 
 import (
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 )
 
 // Reader interface
 type Reader interface {
-	GetByName(tenantID entity.ID, username string) (*entity.Account, error)
-	Get(id entity.ID) (*entity.Account, error)
-	List(tenantID entity.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error)
-	Search(tenantID entity.ID, query string, page, limit int, at entity.AccountType) ([]*entity.Account, error)
-	GetCount(tenantId entity.ID) (int, error)
+	GetByName(tenantID id.ID, username string) (*entity.Account, error)
+	Get(id id.ID) (*entity.Account, error)
+	List(tenantID id.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error)
+	Search(tenantID id.ID, query string, page, limit int, at entity.AccountType) ([]*entity.Account, error)
+	GetCount(tenantId id.ID) (int, error)
 }
 
 // Writer interface
 type Writer interface {
 	Create(e *entity.Account) error
 	Update(e *entity.Account) error
-	Delete(id entity.ID) error
-	DeleteByName(tenantID entity.ID, username string) error
+	Delete(id id.ID) error
+	DeleteByName(tenantID id.ID, username string) error
 }
 
 // Repository interface
@@ -36,7 +37,7 @@ type Repository interface {
 // UseCase interface
 type UseCase interface {
 	CreateAccount(
-		tenantID entity.ID,
+		tenantID id.ID,
 		extID string,
 		cognitoID string,
 		username string,
@@ -47,12 +48,12 @@ type UseCase interface {
 		at entity.AccountType,
 		as entity.AccountStatus,
 	) error
-	GetAccount(id entity.ID) (*entity.Account, error)
-	GetAccountByName(tenantID entity.ID, username string) (*entity.Account, error)
-	ListAccounts(tenantID entity.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error)
+	GetAccount(id id.ID) (*entity.Account, error)
+	GetAccountByName(tenantID id.ID, username string) (*entity.Account, error)
+	ListAccounts(tenantID id.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error)
 	UpdateAccount(e *entity.Account) error
-	DeleteAccount(id entity.ID) error
-	DeleteAccountByName(tenantID entity.ID, username string) error
-	GetCount(tenantId entity.ID) int
-	SearchAccounts(tenantID entity.ID, query string, page, limit int, at entity.AccountType) ([]*entity.Account, error)
+	DeleteAccount(id id.ID) error
+	DeleteAccountByName(tenantID id.ID, username string) error
+	GetCount(tenantId id.ID) int
+	SearchAccounts(tenantID id.ID, query string, page, limit int, at entity.AccountType) ([]*entity.Account, error)
 }

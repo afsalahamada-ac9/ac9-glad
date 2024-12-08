@@ -10,29 +10,30 @@ import (
 	"strings"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 )
 
 // inmem in memory repo
 type inmem struct {
-	m map[entity.ID]*entity.Center
+	m map[id.ID]*entity.Center
 }
 
 // newInmem create new repository
 func newInmem() *inmem {
-	var m = map[entity.ID]*entity.Center{}
+	var m = map[id.ID]*entity.Center{}
 	return &inmem{
 		m: m,
 	}
 }
 
 // Create a center
-func (r *inmem) Create(e *entity.Center) (entity.ID, error) {
+func (r *inmem) Create(e *entity.Center) (id.ID, error) {
 	r.m[e.ID] = e
 	return e.ID, nil
 }
 
 // Get a center
-func (r *inmem) Get(id entity.ID) (*entity.Center, error) {
+func (r *inmem) Get(id id.ID) (*entity.Center, error) {
 	if r.m[id] == nil {
 		return nil, entity.ErrNotFound
 	}
@@ -50,7 +51,7 @@ func (r *inmem) Update(e *entity.Center) error {
 }
 
 // Search centers
-func (r *inmem) Search(tenantID entity.ID,
+func (r *inmem) Search(tenantID id.ID,
 	query string,
 	page, limit int,
 ) ([]*entity.Center, error) {
@@ -79,7 +80,7 @@ func (r *inmem) Search(tenantID entity.ID,
 }
 
 // List centers
-func (r *inmem) List(tenantID entity.ID, page, limit int) ([]*entity.Center, error) {
+func (r *inmem) List(tenantID id.ID, page, limit int) ([]*entity.Center, error) {
 	var centers []*entity.Center
 	for _, j := range r.m {
 		if j.TenantID == tenantID {
@@ -103,7 +104,7 @@ func (r *inmem) List(tenantID entity.ID, page, limit int) ([]*entity.Center, err
 }
 
 // Delete a center
-func (r *inmem) Delete(id entity.ID) error {
+func (r *inmem) Delete(id id.ID) error {
 	if r.m[id] == nil {
 		return entity.ErrNotFound
 	}
@@ -113,7 +114,7 @@ func (r *inmem) Delete(id entity.ID) error {
 }
 
 // GetCount gets total centers for a given tenant
-func (r *inmem) GetCount(tenantID entity.ID) (int, error) {
+func (r *inmem) GetCount(tenantID id.ID) (int, error) {
 	count := 0
 	for _, j := range r.m {
 		if j.TenantID == tenantID {

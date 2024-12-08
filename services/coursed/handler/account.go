@@ -13,6 +13,7 @@ import (
 	"strconv"
 
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/id"
 	l "ac9/glad/pkg/logger"
 	"ac9/glad/usecase/account"
 
@@ -36,7 +37,7 @@ func listAccounts(service account.UseCase) http.Handler {
 		limit, _ := strconv.Atoi(r.URL.Query().Get(httpParamLimit))
 		at := r.URL.Query().Get(httpParamType)
 
-		tenantID, err := entity.StringToID(tenant)
+		tenantID, err := id.FromString(tenant)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("Unable to parse tenant id"))
@@ -113,7 +114,7 @@ func listAccounts(service account.UseCase) http.Handler {
 // 		}
 
 // 		tenant := r.Header.Get(common.HttpHeaderTenantID)
-// 		tenantID, err := entity.StringToID(tenant)
+// 		tenantID, err := id.FromString(tenant)
 // 		if err != nil {
 // 			w.WriteHeader(http.StatusBadRequest)
 // 			_, _ = w.Write([]byte("Missing tenant ID"))
@@ -161,7 +162,7 @@ func getAccount(service account.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
 
-		tenantID, err := entity.StringToID(tenant)
+		tenantID, err := id.FromString(tenant)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("Unable to parse tenant id"))
@@ -199,7 +200,7 @@ func deleteAccount(service account.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
 
-		tenantID, err := entity.StringToID(tenant)
+		tenantID, err := id.FromString(tenant)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("Unable to parse tenant id"))
@@ -235,7 +236,7 @@ func updateAccount(service account.UseCase) http.Handler {
 
 		var input entity.Account
 		// tenant := r.Header.Get(common.HttpHeaderTenantID)
-		// tenantID, err := entity.StringToID(tenant)
+		// tenantID, err := id.FromString(tenant)
 		// if err != nil {
 		// 	w.WriteHeader(http.StatusBadRequest)
 		// 	_, _ = w.Write([]byte("Missing tenant ID"))

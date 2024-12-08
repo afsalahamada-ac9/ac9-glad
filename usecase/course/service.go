@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 )
 
 // Service course usecase
@@ -35,10 +36,10 @@ func (s *Service) CreateCourse(
 	ccs []*entity.CourseContact,
 	cns []*entity.CourseNotify,
 	courseTiming []*entity.CourseTiming,
-) (entity.ID, []entity.ID, error) {
+) (id.ID, []id.ID, error) {
 	c, err := course.New()
 	if err != nil {
-		return entity.IDInvalid, nil, err
+		return id.IDInvalid, nil, err
 	}
 
 	courseID, err := s.cRepo.Create(c)
@@ -50,7 +51,7 @@ func (s *Service) CreateCourse(
 		ct.CourseID = courseID
 		courseTiming[i], err = ct.New()
 		if err != nil {
-			return entity.IDInvalid, nil, err
+			return id.IDInvalid, nil, err
 		}
 	}
 
@@ -75,7 +76,7 @@ func (s *Service) CreateCourse(
 		return courseID, nil, err
 	}
 
-	var courseTimingID []entity.ID
+	var courseTimingID []id.ID
 	for _, ct := range courseTiming {
 		ctID, err := s.ctRepo.Create(ct)
 		if err != nil {
@@ -89,7 +90,7 @@ func (s *Service) CreateCourse(
 
 // GetCourse retrieves a course
 // TODO: Retrieve organizer, teacher, contact, notify and timing and return it
-func (s *Service) GetCourse(id entity.ID) (*entity.Course, error) {
+func (s *Service) GetCourse(id id.ID) (*entity.Course, error) {
 	t, err := s.cRepo.Get(id)
 	if t == nil {
 		return nil, entity.ErrNotFound
@@ -102,7 +103,7 @@ func (s *Service) GetCourse(id entity.ID) (*entity.Course, error) {
 }
 
 // SearchCourses searches course
-func (s *Service) SearchCourses(tenantID entity.ID,
+func (s *Service) SearchCourses(tenantID id.ID,
 	query string, page, limit int,
 ) ([]*entity.Course, error) {
 	courses, err := s.cRepo.Search(tenantID, strings.ToLower(query), page, limit)
@@ -116,7 +117,7 @@ func (s *Service) SearchCourses(tenantID entity.ID,
 }
 
 // ListCourses lists course
-func (s *Service) ListCourses(tenantID entity.ID, page, limit int) ([]*entity.Course, error) {
+func (s *Service) ListCourses(tenantID id.ID, page, limit int) ([]*entity.Course, error) {
 	courses, err := s.cRepo.List(tenantID, page, limit)
 	if err != nil {
 		return nil, err
@@ -129,7 +130,7 @@ func (s *Service) ListCourses(tenantID entity.ID, page, limit int) ([]*entity.Co
 
 // DeleteCourse deletes a course
 // Note: Since delete is cascaded to dependent tables, no need to call those functions explicitly
-func (s *Service) DeleteCourse(id entity.ID) error {
+func (s *Service) DeleteCourse(id id.ID) error {
 	t, err := s.GetCourse(id)
 	if t == nil {
 		return entity.ErrNotFound
@@ -142,7 +143,7 @@ func (s *Service) DeleteCourse(id entity.ID) error {
 }
 
 // GetCount gets total course count
-func (s *Service) GetCount(tenantID entity.ID) int {
+func (s *Service) GetCount(tenantID id.ID) int {
 	count, err := s.cRepo.GetCount(tenantID)
 	if err != nil {
 		return 0

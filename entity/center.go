@@ -7,6 +7,7 @@
 package entity
 
 import (
+	"ac9/glad/pkg/id"
 	"time"
 )
 
@@ -37,8 +38,8 @@ type CenterGeoLocation struct {
 
 // Center data
 type Center struct {
-	ID       ID
-	TenantID ID
+	ID       id.ID
+	TenantID id.ID
 	ExtID    string
 
 	ExtName     string
@@ -111,7 +112,7 @@ func (g *CenterGeoLocation) Validate() error {
 }
 
 // NewCenter create a new center
-func NewCenter(tenantID ID,
+func NewCenter(tenantID id.ID,
 	extID string,
 	extName string,
 	name string,
@@ -124,7 +125,7 @@ func NewCenter(tenantID ID,
 	isEnabled bool,
 ) (*Center, error) {
 	c := &Center{
-		ID:               NewID(),
+		ID:               id.New(),
 		TenantID:         tenantID,
 		ExtID:            extID,
 		ExtName:          extName,

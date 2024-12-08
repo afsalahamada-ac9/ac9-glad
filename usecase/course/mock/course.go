@@ -6,6 +6,7 @@ package mock_course
 
 import (
 	entity "ac9/glad/entity"
+	id "ac9/glad/pkg/id"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -35,7 +36,7 @@ func (m *MockCourseReader) EXPECT() *MockCourseReaderMockRecorder {
 }
 
 // Get mocks base method.
-func (m *MockCourseReader) Get(id entity.ID) (*entity.Course, error) {
+func (m *MockCourseReader) Get(id id.ID) (*entity.Course, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", id)
 	ret0, _ := ret[0].(*entity.Course)
@@ -50,7 +51,7 @@ func (mr *MockCourseReaderMockRecorder) Get(id interface{}) *gomock.Call {
 }
 
 // GetCount mocks base method.
-func (m *MockCourseReader) GetCount(id entity.ID) (int, error) {
+func (m *MockCourseReader) GetCount(id id.ID) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCount", id)
 	ret0, _ := ret[0].(int)
@@ -65,7 +66,7 @@ func (mr *MockCourseReaderMockRecorder) GetCount(id interface{}) *gomock.Call {
 }
 
 // List mocks base method.
-func (m *MockCourseReader) List(tenantID entity.ID, page, limit int) ([]*entity.Course, error) {
+func (m *MockCourseReader) List(tenantID id.ID, page, limit int) ([]*entity.Course, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", tenantID, page, limit)
 	ret0, _ := ret[0].([]*entity.Course)
@@ -80,7 +81,7 @@ func (mr *MockCourseReaderMockRecorder) List(tenantID, page, limit interface{}) 
 }
 
 // Search mocks base method.
-func (m *MockCourseReader) Search(tenantID entity.ID, query string, page, limit int) ([]*entity.Course, error) {
+func (m *MockCourseReader) Search(tenantID id.ID, query string, page, limit int) ([]*entity.Course, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Search", tenantID, query, page, limit)
 	ret0, _ := ret[0].([]*entity.Course)
@@ -118,10 +119,10 @@ func (m *MockCourseWriter) EXPECT() *MockCourseWriterMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockCourseWriter) Create(e *entity.Course) (entity.ID, error) {
+func (m *MockCourseWriter) Create(e *entity.Course) (id.ID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", e)
-	ret0, _ := ret[0].(entity.ID)
+	ret0, _ := ret[0].(id.ID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -133,7 +134,7 @@ func (mr *MockCourseWriterMockRecorder) Create(e interface{}) *gomock.Call {
 }
 
 // Delete mocks base method.
-func (m *MockCourseWriter) Delete(id entity.ID) error {
+func (m *MockCourseWriter) Delete(id id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", id)
 	ret0, _ := ret[0].(error)
@@ -184,7 +185,7 @@ func (m *MockCourseOrganizerWriter) EXPECT() *MockCourseOrganizerWriterMockRecor
 }
 
 // DeleteCourseOrganizer mocks base method.
-func (m *MockCourseOrganizerWriter) DeleteCourseOrganizer(arg0 entity.ID, arg1 []*entity.CourseOrganizer) error {
+func (m *MockCourseOrganizerWriter) DeleteCourseOrganizer(arg0 id.ID, arg1 []*entity.CourseOrganizer) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCourseOrganizer", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -198,7 +199,7 @@ func (mr *MockCourseOrganizerWriterMockRecorder) DeleteCourseOrganizer(arg0, arg
 }
 
 // DeleteCourseOrganizerByCourse mocks base method.
-func (m *MockCourseOrganizerWriter) DeleteCourseOrganizerByCourse(arg0 entity.ID) error {
+func (m *MockCourseOrganizerWriter) DeleteCourseOrganizerByCourse(arg0 id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCourseOrganizerByCourse", arg0)
 	ret0, _ := ret[0].(error)
@@ -212,7 +213,7 @@ func (mr *MockCourseOrganizerWriterMockRecorder) DeleteCourseOrganizerByCourse(a
 }
 
 // InsertCourseOrganizer mocks base method.
-func (m *MockCourseOrganizerWriter) InsertCourseOrganizer(arg0 entity.ID, arg1 []*entity.CourseOrganizer) error {
+func (m *MockCourseOrganizerWriter) InsertCourseOrganizer(arg0 id.ID, arg1 []*entity.CourseOrganizer) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InsertCourseOrganizer", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -226,7 +227,7 @@ func (mr *MockCourseOrganizerWriterMockRecorder) InsertCourseOrganizer(arg0, arg
 }
 
 // UpdateCourseOrganizer mocks base method.
-func (m *MockCourseOrganizerWriter) UpdateCourseOrganizer(arg0 entity.ID, arg1 []*entity.CourseOrganizer) error {
+func (m *MockCourseOrganizerWriter) UpdateCourseOrganizer(arg0 id.ID, arg1 []*entity.CourseOrganizer) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateCourseOrganizer", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -263,7 +264,7 @@ func (m *MockCourseOrganizerReader) EXPECT() *MockCourseOrganizerReaderMockRecor
 }
 
 // GetCourseOrganizer mocks base method.
-func (m *MockCourseOrganizerReader) GetCourseOrganizer(arg0 entity.ID) ([]*entity.CourseOrganizer, error) {
+func (m *MockCourseOrganizerReader) GetCourseOrganizer(arg0 id.ID) ([]*entity.CourseOrganizer, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCourseOrganizer", arg0)
 	ret0, _ := ret[0].([]*entity.CourseOrganizer)
@@ -301,7 +302,7 @@ func (m *MockCourseTeacherWriter) EXPECT() *MockCourseTeacherWriterMockRecorder 
 }
 
 // DeleteCourseTeacher mocks base method.
-func (m *MockCourseTeacherWriter) DeleteCourseTeacher(arg0 entity.ID, arg1 []*entity.CourseTeacher) error {
+func (m *MockCourseTeacherWriter) DeleteCourseTeacher(arg0 id.ID, arg1 []*entity.CourseTeacher) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCourseTeacher", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -315,7 +316,7 @@ func (mr *MockCourseTeacherWriterMockRecorder) DeleteCourseTeacher(arg0, arg1 in
 }
 
 // DeleteCourseTeacherByCourse mocks base method.
-func (m *MockCourseTeacherWriter) DeleteCourseTeacherByCourse(arg0 entity.ID) error {
+func (m *MockCourseTeacherWriter) DeleteCourseTeacherByCourse(arg0 id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCourseTeacherByCourse", arg0)
 	ret0, _ := ret[0].(error)
@@ -329,7 +330,7 @@ func (mr *MockCourseTeacherWriterMockRecorder) DeleteCourseTeacherByCourse(arg0 
 }
 
 // InsertCourseTeacher mocks base method.
-func (m *MockCourseTeacherWriter) InsertCourseTeacher(arg0 entity.ID, arg1 []*entity.CourseTeacher) error {
+func (m *MockCourseTeacherWriter) InsertCourseTeacher(arg0 id.ID, arg1 []*entity.CourseTeacher) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InsertCourseTeacher", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -343,7 +344,7 @@ func (mr *MockCourseTeacherWriterMockRecorder) InsertCourseTeacher(arg0, arg1 in
 }
 
 // UpdateCourseTeacher mocks base method.
-func (m *MockCourseTeacherWriter) UpdateCourseTeacher(arg0 entity.ID, arg1 []*entity.CourseTeacher) error {
+func (m *MockCourseTeacherWriter) UpdateCourseTeacher(arg0 id.ID, arg1 []*entity.CourseTeacher) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateCourseTeacher", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -380,7 +381,7 @@ func (m *MockCourseTeacherReader) EXPECT() *MockCourseTeacherReaderMockRecorder 
 }
 
 // GetCourseTeacher mocks base method.
-func (m *MockCourseTeacherReader) GetCourseTeacher(arg0 entity.ID) ([]*entity.CourseTeacher, error) {
+func (m *MockCourseTeacherReader) GetCourseTeacher(arg0 id.ID) ([]*entity.CourseTeacher, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCourseTeacher", arg0)
 	ret0, _ := ret[0].([]*entity.CourseTeacher)
@@ -418,7 +419,7 @@ func (m *MockCourseContactWriter) EXPECT() *MockCourseContactWriterMockRecorder 
 }
 
 // DeleteCourseContact mocks base method.
-func (m *MockCourseContactWriter) DeleteCourseContact(arg0 entity.ID, arg1 []*entity.CourseContact) error {
+func (m *MockCourseContactWriter) DeleteCourseContact(arg0 id.ID, arg1 []*entity.CourseContact) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCourseContact", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -432,7 +433,7 @@ func (mr *MockCourseContactWriterMockRecorder) DeleteCourseContact(arg0, arg1 in
 }
 
 // DeleteCourseContactByCourse mocks base method.
-func (m *MockCourseContactWriter) DeleteCourseContactByCourse(arg0 entity.ID) error {
+func (m *MockCourseContactWriter) DeleteCourseContactByCourse(arg0 id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCourseContactByCourse", arg0)
 	ret0, _ := ret[0].(error)
@@ -446,7 +447,7 @@ func (mr *MockCourseContactWriterMockRecorder) DeleteCourseContactByCourse(arg0 
 }
 
 // InsertCourseContact mocks base method.
-func (m *MockCourseContactWriter) InsertCourseContact(arg0 entity.ID, arg1 []*entity.CourseContact) error {
+func (m *MockCourseContactWriter) InsertCourseContact(arg0 id.ID, arg1 []*entity.CourseContact) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InsertCourseContact", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -460,7 +461,7 @@ func (mr *MockCourseContactWriterMockRecorder) InsertCourseContact(arg0, arg1 in
 }
 
 // UpdateCourseContact mocks base method.
-func (m *MockCourseContactWriter) UpdateCourseContact(arg0 entity.ID, arg1 []*entity.CourseContact) error {
+func (m *MockCourseContactWriter) UpdateCourseContact(arg0 id.ID, arg1 []*entity.CourseContact) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateCourseContact", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -497,7 +498,7 @@ func (m *MockCourseContactReader) EXPECT() *MockCourseContactReaderMockRecorder 
 }
 
 // GetCourseContact mocks base method.
-func (m *MockCourseContactReader) GetCourseContact(arg0 entity.ID) ([]*entity.CourseContact, error) {
+func (m *MockCourseContactReader) GetCourseContact(arg0 id.ID) ([]*entity.CourseContact, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCourseContact", arg0)
 	ret0, _ := ret[0].([]*entity.CourseContact)
@@ -535,7 +536,7 @@ func (m *MockCourseNotifyWriter) EXPECT() *MockCourseNotifyWriterMockRecorder {
 }
 
 // DeleteCourseNotify mocks base method.
-func (m *MockCourseNotifyWriter) DeleteCourseNotify(arg0 entity.ID, arg1 []*entity.CourseNotify) error {
+func (m *MockCourseNotifyWriter) DeleteCourseNotify(arg0 id.ID, arg1 []*entity.CourseNotify) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCourseNotify", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -549,7 +550,7 @@ func (mr *MockCourseNotifyWriterMockRecorder) DeleteCourseNotify(arg0, arg1 inte
 }
 
 // DeleteCourseNotifyByCourse mocks base method.
-func (m *MockCourseNotifyWriter) DeleteCourseNotifyByCourse(arg0 entity.ID) error {
+func (m *MockCourseNotifyWriter) DeleteCourseNotifyByCourse(arg0 id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCourseNotifyByCourse", arg0)
 	ret0, _ := ret[0].(error)
@@ -563,7 +564,7 @@ func (mr *MockCourseNotifyWriterMockRecorder) DeleteCourseNotifyByCourse(arg0 in
 }
 
 // InsertCourseNotify mocks base method.
-func (m *MockCourseNotifyWriter) InsertCourseNotify(arg0 entity.ID, arg1 []*entity.CourseNotify) error {
+func (m *MockCourseNotifyWriter) InsertCourseNotify(arg0 id.ID, arg1 []*entity.CourseNotify) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InsertCourseNotify", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -577,7 +578,7 @@ func (mr *MockCourseNotifyWriterMockRecorder) InsertCourseNotify(arg0, arg1 inte
 }
 
 // UpdateCourseNotify mocks base method.
-func (m *MockCourseNotifyWriter) UpdateCourseNotify(arg0 entity.ID, arg1 []*entity.CourseNotify) error {
+func (m *MockCourseNotifyWriter) UpdateCourseNotify(arg0 id.ID, arg1 []*entity.CourseNotify) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateCourseNotify", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -614,7 +615,7 @@ func (m *MockCourseNotifyReader) EXPECT() *MockCourseNotifyReaderMockRecorder {
 }
 
 // GetCourseNotify mocks base method.
-func (m *MockCourseNotifyReader) GetCourseNotify(arg0 entity.ID) ([]*entity.CourseNotify, error) {
+func (m *MockCourseNotifyReader) GetCourseNotify(arg0 id.ID) ([]*entity.CourseNotify, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCourseNotify", arg0)
 	ret0, _ := ret[0].([]*entity.CourseNotify)
@@ -652,10 +653,10 @@ func (m *MockCourseRepository) EXPECT() *MockCourseRepositoryMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockCourseRepository) Create(e *entity.Course) (entity.ID, error) {
+func (m *MockCourseRepository) Create(e *entity.Course) (id.ID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", e)
-	ret0, _ := ret[0].(entity.ID)
+	ret0, _ := ret[0].(id.ID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -667,7 +668,7 @@ func (mr *MockCourseRepositoryMockRecorder) Create(e interface{}) *gomock.Call {
 }
 
 // Delete mocks base method.
-func (m *MockCourseRepository) Delete(id entity.ID) error {
+func (m *MockCourseRepository) Delete(id id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", id)
 	ret0, _ := ret[0].(error)
@@ -681,7 +682,7 @@ func (mr *MockCourseRepositoryMockRecorder) Delete(id interface{}) *gomock.Call 
 }
 
 // DeleteCourseContact mocks base method.
-func (m *MockCourseRepository) DeleteCourseContact(arg0 entity.ID, arg1 []*entity.CourseContact) error {
+func (m *MockCourseRepository) DeleteCourseContact(arg0 id.ID, arg1 []*entity.CourseContact) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCourseContact", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -695,7 +696,7 @@ func (mr *MockCourseRepositoryMockRecorder) DeleteCourseContact(arg0, arg1 inter
 }
 
 // DeleteCourseContactByCourse mocks base method.
-func (m *MockCourseRepository) DeleteCourseContactByCourse(arg0 entity.ID) error {
+func (m *MockCourseRepository) DeleteCourseContactByCourse(arg0 id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCourseContactByCourse", arg0)
 	ret0, _ := ret[0].(error)
@@ -709,7 +710,7 @@ func (mr *MockCourseRepositoryMockRecorder) DeleteCourseContactByCourse(arg0 int
 }
 
 // DeleteCourseNotify mocks base method.
-func (m *MockCourseRepository) DeleteCourseNotify(arg0 entity.ID, arg1 []*entity.CourseNotify) error {
+func (m *MockCourseRepository) DeleteCourseNotify(arg0 id.ID, arg1 []*entity.CourseNotify) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCourseNotify", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -723,7 +724,7 @@ func (mr *MockCourseRepositoryMockRecorder) DeleteCourseNotify(arg0, arg1 interf
 }
 
 // DeleteCourseNotifyByCourse mocks base method.
-func (m *MockCourseRepository) DeleteCourseNotifyByCourse(arg0 entity.ID) error {
+func (m *MockCourseRepository) DeleteCourseNotifyByCourse(arg0 id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCourseNotifyByCourse", arg0)
 	ret0, _ := ret[0].(error)
@@ -737,7 +738,7 @@ func (mr *MockCourseRepositoryMockRecorder) DeleteCourseNotifyByCourse(arg0 inte
 }
 
 // DeleteCourseOrganizer mocks base method.
-func (m *MockCourseRepository) DeleteCourseOrganizer(arg0 entity.ID, arg1 []*entity.CourseOrganizer) error {
+func (m *MockCourseRepository) DeleteCourseOrganizer(arg0 id.ID, arg1 []*entity.CourseOrganizer) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCourseOrganizer", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -751,7 +752,7 @@ func (mr *MockCourseRepositoryMockRecorder) DeleteCourseOrganizer(arg0, arg1 int
 }
 
 // DeleteCourseOrganizerByCourse mocks base method.
-func (m *MockCourseRepository) DeleteCourseOrganizerByCourse(arg0 entity.ID) error {
+func (m *MockCourseRepository) DeleteCourseOrganizerByCourse(arg0 id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCourseOrganizerByCourse", arg0)
 	ret0, _ := ret[0].(error)
@@ -765,7 +766,7 @@ func (mr *MockCourseRepositoryMockRecorder) DeleteCourseOrganizerByCourse(arg0 i
 }
 
 // DeleteCourseTeacher mocks base method.
-func (m *MockCourseRepository) DeleteCourseTeacher(arg0 entity.ID, arg1 []*entity.CourseTeacher) error {
+func (m *MockCourseRepository) DeleteCourseTeacher(arg0 id.ID, arg1 []*entity.CourseTeacher) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCourseTeacher", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -779,7 +780,7 @@ func (mr *MockCourseRepositoryMockRecorder) DeleteCourseTeacher(arg0, arg1 inter
 }
 
 // DeleteCourseTeacherByCourse mocks base method.
-func (m *MockCourseRepository) DeleteCourseTeacherByCourse(arg0 entity.ID) error {
+func (m *MockCourseRepository) DeleteCourseTeacherByCourse(arg0 id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCourseTeacherByCourse", arg0)
 	ret0, _ := ret[0].(error)
@@ -793,7 +794,7 @@ func (mr *MockCourseRepositoryMockRecorder) DeleteCourseTeacherByCourse(arg0 int
 }
 
 // Get mocks base method.
-func (m *MockCourseRepository) Get(id entity.ID) (*entity.Course, error) {
+func (m *MockCourseRepository) Get(id id.ID) (*entity.Course, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", id)
 	ret0, _ := ret[0].(*entity.Course)
@@ -808,7 +809,7 @@ func (mr *MockCourseRepositoryMockRecorder) Get(id interface{}) *gomock.Call {
 }
 
 // GetCount mocks base method.
-func (m *MockCourseRepository) GetCount(id entity.ID) (int, error) {
+func (m *MockCourseRepository) GetCount(id id.ID) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCount", id)
 	ret0, _ := ret[0].(int)
@@ -823,7 +824,7 @@ func (mr *MockCourseRepositoryMockRecorder) GetCount(id interface{}) *gomock.Cal
 }
 
 // GetCourseContact mocks base method.
-func (m *MockCourseRepository) GetCourseContact(arg0 entity.ID) ([]*entity.CourseContact, error) {
+func (m *MockCourseRepository) GetCourseContact(arg0 id.ID) ([]*entity.CourseContact, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCourseContact", arg0)
 	ret0, _ := ret[0].([]*entity.CourseContact)
@@ -838,7 +839,7 @@ func (mr *MockCourseRepositoryMockRecorder) GetCourseContact(arg0 interface{}) *
 }
 
 // GetCourseNotify mocks base method.
-func (m *MockCourseRepository) GetCourseNotify(arg0 entity.ID) ([]*entity.CourseNotify, error) {
+func (m *MockCourseRepository) GetCourseNotify(arg0 id.ID) ([]*entity.CourseNotify, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCourseNotify", arg0)
 	ret0, _ := ret[0].([]*entity.CourseNotify)
@@ -853,7 +854,7 @@ func (mr *MockCourseRepositoryMockRecorder) GetCourseNotify(arg0 interface{}) *g
 }
 
 // GetCourseOrganizer mocks base method.
-func (m *MockCourseRepository) GetCourseOrganizer(arg0 entity.ID) ([]*entity.CourseOrganizer, error) {
+func (m *MockCourseRepository) GetCourseOrganizer(arg0 id.ID) ([]*entity.CourseOrganizer, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCourseOrganizer", arg0)
 	ret0, _ := ret[0].([]*entity.CourseOrganizer)
@@ -868,7 +869,7 @@ func (mr *MockCourseRepositoryMockRecorder) GetCourseOrganizer(arg0 interface{})
 }
 
 // GetCourseTeacher mocks base method.
-func (m *MockCourseRepository) GetCourseTeacher(arg0 entity.ID) ([]*entity.CourseTeacher, error) {
+func (m *MockCourseRepository) GetCourseTeacher(arg0 id.ID) ([]*entity.CourseTeacher, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCourseTeacher", arg0)
 	ret0, _ := ret[0].([]*entity.CourseTeacher)
@@ -883,7 +884,7 @@ func (mr *MockCourseRepositoryMockRecorder) GetCourseTeacher(arg0 interface{}) *
 }
 
 // InsertCourseContact mocks base method.
-func (m *MockCourseRepository) InsertCourseContact(arg0 entity.ID, arg1 []*entity.CourseContact) error {
+func (m *MockCourseRepository) InsertCourseContact(arg0 id.ID, arg1 []*entity.CourseContact) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InsertCourseContact", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -897,7 +898,7 @@ func (mr *MockCourseRepositoryMockRecorder) InsertCourseContact(arg0, arg1 inter
 }
 
 // InsertCourseNotify mocks base method.
-func (m *MockCourseRepository) InsertCourseNotify(arg0 entity.ID, arg1 []*entity.CourseNotify) error {
+func (m *MockCourseRepository) InsertCourseNotify(arg0 id.ID, arg1 []*entity.CourseNotify) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InsertCourseNotify", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -911,7 +912,7 @@ func (mr *MockCourseRepositoryMockRecorder) InsertCourseNotify(arg0, arg1 interf
 }
 
 // InsertCourseOrganizer mocks base method.
-func (m *MockCourseRepository) InsertCourseOrganizer(arg0 entity.ID, arg1 []*entity.CourseOrganizer) error {
+func (m *MockCourseRepository) InsertCourseOrganizer(arg0 id.ID, arg1 []*entity.CourseOrganizer) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InsertCourseOrganizer", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -925,7 +926,7 @@ func (mr *MockCourseRepositoryMockRecorder) InsertCourseOrganizer(arg0, arg1 int
 }
 
 // InsertCourseTeacher mocks base method.
-func (m *MockCourseRepository) InsertCourseTeacher(arg0 entity.ID, arg1 []*entity.CourseTeacher) error {
+func (m *MockCourseRepository) InsertCourseTeacher(arg0 id.ID, arg1 []*entity.CourseTeacher) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InsertCourseTeacher", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -939,7 +940,7 @@ func (mr *MockCourseRepositoryMockRecorder) InsertCourseTeacher(arg0, arg1 inter
 }
 
 // List mocks base method.
-func (m *MockCourseRepository) List(tenantID entity.ID, page, limit int) ([]*entity.Course, error) {
+func (m *MockCourseRepository) List(tenantID id.ID, page, limit int) ([]*entity.Course, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", tenantID, page, limit)
 	ret0, _ := ret[0].([]*entity.Course)
@@ -954,7 +955,7 @@ func (mr *MockCourseRepositoryMockRecorder) List(tenantID, page, limit interface
 }
 
 // Search mocks base method.
-func (m *MockCourseRepository) Search(tenantID entity.ID, query string, page, limit int) ([]*entity.Course, error) {
+func (m *MockCourseRepository) Search(tenantID id.ID, query string, page, limit int) ([]*entity.Course, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Search", tenantID, query, page, limit)
 	ret0, _ := ret[0].([]*entity.Course)
@@ -983,7 +984,7 @@ func (mr *MockCourseRepositoryMockRecorder) Update(e interface{}) *gomock.Call {
 }
 
 // UpdateCourseContact mocks base method.
-func (m *MockCourseRepository) UpdateCourseContact(arg0 entity.ID, arg1 []*entity.CourseContact) error {
+func (m *MockCourseRepository) UpdateCourseContact(arg0 id.ID, arg1 []*entity.CourseContact) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateCourseContact", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -997,7 +998,7 @@ func (mr *MockCourseRepositoryMockRecorder) UpdateCourseContact(arg0, arg1 inter
 }
 
 // UpdateCourseNotify mocks base method.
-func (m *MockCourseRepository) UpdateCourseNotify(arg0 entity.ID, arg1 []*entity.CourseNotify) error {
+func (m *MockCourseRepository) UpdateCourseNotify(arg0 id.ID, arg1 []*entity.CourseNotify) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateCourseNotify", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -1011,7 +1012,7 @@ func (mr *MockCourseRepositoryMockRecorder) UpdateCourseNotify(arg0, arg1 interf
 }
 
 // UpdateCourseOrganizer mocks base method.
-func (m *MockCourseRepository) UpdateCourseOrganizer(arg0 entity.ID, arg1 []*entity.CourseOrganizer) error {
+func (m *MockCourseRepository) UpdateCourseOrganizer(arg0 id.ID, arg1 []*entity.CourseOrganizer) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateCourseOrganizer", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -1025,7 +1026,7 @@ func (mr *MockCourseRepositoryMockRecorder) UpdateCourseOrganizer(arg0, arg1 int
 }
 
 // UpdateCourseTeacher mocks base method.
-func (m *MockCourseRepository) UpdateCourseTeacher(arg0 entity.ID, arg1 []*entity.CourseTeacher) error {
+func (m *MockCourseRepository) UpdateCourseTeacher(arg0 id.ID, arg1 []*entity.CourseTeacher) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateCourseTeacher", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -1062,7 +1063,7 @@ func (m *MockCourseTimingReader) EXPECT() *MockCourseTimingReaderMockRecorder {
 }
 
 // Get mocks base method.
-func (m *MockCourseTimingReader) Get(id entity.ID) (*entity.CourseTiming, error) {
+func (m *MockCourseTimingReader) Get(id id.ID) (*entity.CourseTiming, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", id)
 	ret0, _ := ret[0].(*entity.CourseTiming)
@@ -1077,7 +1078,7 @@ func (mr *MockCourseTimingReaderMockRecorder) Get(id interface{}) *gomock.Call {
 }
 
 // GetByCourse mocks base method.
-func (m *MockCourseTimingReader) GetByCourse(courseID entity.ID) ([]*entity.CourseTiming, error) {
+func (m *MockCourseTimingReader) GetByCourse(courseID id.ID) ([]*entity.CourseTiming, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetByCourse", courseID)
 	ret0, _ := ret[0].([]*entity.CourseTiming)
@@ -1130,10 +1131,10 @@ func (m *MockCourseTimingWriter) EXPECT() *MockCourseTimingWriterMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockCourseTimingWriter) Create(e *entity.CourseTiming) (entity.ID, error) {
+func (m *MockCourseTimingWriter) Create(e *entity.CourseTiming) (id.ID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", e)
-	ret0, _ := ret[0].(entity.ID)
+	ret0, _ := ret[0].(id.ID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1145,7 +1146,7 @@ func (mr *MockCourseTimingWriterMockRecorder) Create(e interface{}) *gomock.Call
 }
 
 // Delete mocks base method.
-func (m *MockCourseTimingWriter) Delete(id entity.ID) error {
+func (m *MockCourseTimingWriter) Delete(id id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", id)
 	ret0, _ := ret[0].(error)
@@ -1196,10 +1197,10 @@ func (m *MockCourseTimingRepository) EXPECT() *MockCourseTimingRepositoryMockRec
 }
 
 // Create mocks base method.
-func (m *MockCourseTimingRepository) Create(e *entity.CourseTiming) (entity.ID, error) {
+func (m *MockCourseTimingRepository) Create(e *entity.CourseTiming) (id.ID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", e)
-	ret0, _ := ret[0].(entity.ID)
+	ret0, _ := ret[0].(id.ID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1211,7 +1212,7 @@ func (mr *MockCourseTimingRepositoryMockRecorder) Create(e interface{}) *gomock.
 }
 
 // Delete mocks base method.
-func (m *MockCourseTimingRepository) Delete(id entity.ID) error {
+func (m *MockCourseTimingRepository) Delete(id id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", id)
 	ret0, _ := ret[0].(error)
@@ -1225,7 +1226,7 @@ func (mr *MockCourseTimingRepositoryMockRecorder) Delete(id interface{}) *gomock
 }
 
 // Get mocks base method.
-func (m *MockCourseTimingRepository) Get(id entity.ID) (*entity.CourseTiming, error) {
+func (m *MockCourseTimingRepository) Get(id id.ID) (*entity.CourseTiming, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", id)
 	ret0, _ := ret[0].(*entity.CourseTiming)
@@ -1240,7 +1241,7 @@ func (mr *MockCourseTimingRepositoryMockRecorder) Get(id interface{}) *gomock.Ca
 }
 
 // GetByCourse mocks base method.
-func (m *MockCourseTimingRepository) GetByCourse(courseID entity.ID) ([]*entity.CourseTiming, error) {
+func (m *MockCourseTimingRepository) GetByCourse(courseID id.ID) ([]*entity.CourseTiming, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetByCourse", courseID)
 	ret0, _ := ret[0].([]*entity.CourseTiming)
@@ -1307,11 +1308,11 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 }
 
 // CreateCourse mocks base method.
-func (m *MockUseCase) CreateCourse(course entity.Course, cos []*entity.CourseOrganizer, cts []*entity.CourseTeacher, ccs []*entity.CourseContact, cns []*entity.CourseNotify, courseTimings []*entity.CourseTiming) (entity.ID, []entity.ID, error) {
+func (m *MockUseCase) CreateCourse(course entity.Course, cos []*entity.CourseOrganizer, cts []*entity.CourseTeacher, ccs []*entity.CourseContact, cns []*entity.CourseNotify, courseTimings []*entity.CourseTiming) (id.ID, []id.ID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateCourse", course, cos, cts, ccs, cns, courseTimings)
-	ret0, _ := ret[0].(entity.ID)
-	ret1, _ := ret[1].([]entity.ID)
+	ret0, _ := ret[0].(id.ID)
+	ret1, _ := ret[1].([]id.ID)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
 }
@@ -1323,7 +1324,7 @@ func (mr *MockUseCaseMockRecorder) CreateCourse(course, cos, cts, ccs, cns, cour
 }
 
 // DeleteCourse mocks base method.
-func (m *MockUseCase) DeleteCourse(id entity.ID) error {
+func (m *MockUseCase) DeleteCourse(id id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCourse", id)
 	ret0, _ := ret[0].(error)
@@ -1337,7 +1338,7 @@ func (mr *MockUseCaseMockRecorder) DeleteCourse(id interface{}) *gomock.Call {
 }
 
 // GetCount mocks base method.
-func (m *MockUseCase) GetCount(id entity.ID) int {
+func (m *MockUseCase) GetCount(id id.ID) int {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCount", id)
 	ret0, _ := ret[0].(int)
@@ -1351,7 +1352,7 @@ func (mr *MockUseCaseMockRecorder) GetCount(id interface{}) *gomock.Call {
 }
 
 // GetCourse mocks base method.
-func (m *MockUseCase) GetCourse(id entity.ID) (*entity.Course, error) {
+func (m *MockUseCase) GetCourse(id id.ID) (*entity.Course, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCourse", id)
 	ret0, _ := ret[0].(*entity.Course)
@@ -1366,7 +1367,7 @@ func (mr *MockUseCaseMockRecorder) GetCourse(id interface{}) *gomock.Call {
 }
 
 // ListCourses mocks base method.
-func (m *MockUseCase) ListCourses(tenantID entity.ID, page, limit int) ([]*entity.Course, error) {
+func (m *MockUseCase) ListCourses(tenantID id.ID, page, limit int) ([]*entity.Course, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListCourses", tenantID, page, limit)
 	ret0, _ := ret[0].([]*entity.Course)
@@ -1381,7 +1382,7 @@ func (mr *MockUseCaseMockRecorder) ListCourses(tenantID, page, limit interface{}
 }
 
 // SearchCourses mocks base method.
-func (m *MockUseCase) SearchCourses(tenantID entity.ID, query string, page, limit int) ([]*entity.Course, error) {
+func (m *MockUseCase) SearchCourses(tenantID id.ID, query string, page, limit int) ([]*entity.Course, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SearchCourses", tenantID, query, page, limit)
 	ret0, _ := ret[0].([]*entity.Course)

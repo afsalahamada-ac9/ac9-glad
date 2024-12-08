@@ -6,7 +6,10 @@
 
 package entity
 
-import "time"
+import (
+	"ac9/glad/pkg/id"
+	"time"
+)
 
 // ProductVisibility represents the visibility status of a product
 type ProductVisibility string
@@ -27,9 +30,9 @@ const (
 
 // Product represents a product entity
 type Product struct {
-	ID               ID
+	ID               id.ID
 	ExtID            string
-	TenantID         ID
+	TenantID         id.ID
 	ExtName          string
 	Title            string
 	CType            string
@@ -46,7 +49,7 @@ type Product struct {
 }
 
 // NewProduct creates a new product with the given parameters
-func NewProduct(tenantID ID,
+func NewProduct(tenantID id.ID,
 	extID string,
 	extName string,
 	title string,
@@ -59,7 +62,7 @@ func NewProduct(tenantID ID,
 	isAutoApprove bool,
 ) (*Product, error) {
 	p := &Product{
-		ID:               NewID(),
+		ID:               id.New(),
 		ExtID:            extID,
 		TenantID:         tenantID,
 		ExtName:          extName,

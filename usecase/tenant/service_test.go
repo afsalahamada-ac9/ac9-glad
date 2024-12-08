@@ -11,12 +11,13 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 
 	"github.com/stretchr/testify/assert"
 )
 
 const (
-	tenantDefault entity.ID = 13790492210917015554
+	tenantDefault id.ID = 13790492210917015554
 )
 
 func newFixtureTenant() *entity.Tenant {

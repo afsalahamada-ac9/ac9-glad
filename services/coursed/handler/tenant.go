@@ -12,14 +12,15 @@ import (
 	"net/http"
 	"strconv"
 
+	"ac9/glad/pkg/id"
 	"ac9/glad/usecase/tenant"
 
 	"ac9/glad/services/coursed/presenter"
 
 	"ac9/glad/entity"
 
-	"github.com/urfave/negroni"
 	"github.com/gorilla/mux"
+	"github.com/urfave/negroni"
 )
 
 // TODO: Add pagination support
@@ -79,14 +80,14 @@ func createTenant(service tenant.UseCase) http.Handler {
 			return
 		}
 
-		id, err := service.CreateTenant(input.Name, input.Country)
+		tenantID, err := service.CreateTenant(input.Name, input.Country)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
 		}
 		toJ := &presenter.Tenant{
-			ID:      id,
+			ID:      tenantID,
 			Name:    input.Name,
 			Country: input.Country,
 		}
@@ -105,13 +106,13 @@ func getTenant(service tenant.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error reading tenant"
 		vars := mux.Vars(r)
-		id, err := entity.StringToID(vars["id"])
+		tenantID, err := id.FromString(vars["id"])
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
-		data, err := service.GetTenant(id)
+		data, err := service.GetTenant(tenantID)
 		if err != nil && err != entity.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
@@ -142,13 +143,13 @@ func deleteTenant(service tenant.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error removing tenant"
 		vars := mux.Vars(r)
-		id, err := entity.StringToID(vars["id"])
+		tenantID, err := id.FromString(vars["id"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage))
 			return
 		}
-		err = service.DeleteTenant(id)
+		err = service.DeleteTenant(tenantID)
 		switch err {
 		case nil:
 			w.WriteHeader(http.StatusOK)
@@ -214,7 +215,7 @@ func updateTenant(service tenant.UseCase) http.Handler {
 		errorMessage := "Error updating tenant"
 
 		vars := mux.Vars(r)
-		id, err := entity.StringToID(vars["id"])
+		tenantID, err := id.FromString(vars["id"])
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
@@ -237,7 +238,7 @@ func updateTenant(service tenant.UseCase) http.Handler {
 			return
 		}
 
-		input.ID = id
+		input.ID = tenantID
 		toJ := &presenter.Tenant{
 			ID:      input.ID,
 			Name:    input.Name,

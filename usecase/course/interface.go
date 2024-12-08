@@ -8,73 +8,74 @@ package course
 
 import (
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 )
 
 // CourseReader course reader
 type CourseReader interface {
-	Get(id entity.ID) (*entity.Course, error)
-	Search(tenantID entity.ID, query string, page, limit int) ([]*entity.Course, error)
-	List(tenantID entity.ID, page, limit int) ([]*entity.Course, error)
-	GetCount(id entity.ID) (int, error)
+	Get(id id.ID) (*entity.Course, error)
+	Search(tenantID id.ID, query string, page, limit int) ([]*entity.Course, error)
+	List(tenantID id.ID, page, limit int) ([]*entity.Course, error)
+	GetCount(id id.ID) (int, error)
 }
 
 // CourseWriter course writer
 type CourseWriter interface {
-	Create(e *entity.Course) (entity.ID, error)
+	Create(e *entity.Course) (id.ID, error)
 	Update(e *entity.Course) error
-	Delete(id entity.ID) error
+	Delete(id id.ID) error
 }
 
 // CourseOrganizerWriter course organizer writer
 type CourseOrganizerWriter interface {
-	InsertCourseOrganizer(entity.ID, []*entity.CourseOrganizer) error
-	UpdateCourseOrganizer(entity.ID, []*entity.CourseOrganizer) error
-	DeleteCourseOrganizer(entity.ID, []*entity.CourseOrganizer) error
-	DeleteCourseOrganizerByCourse(entity.ID) error
+	InsertCourseOrganizer(id.ID, []*entity.CourseOrganizer) error
+	UpdateCourseOrganizer(id.ID, []*entity.CourseOrganizer) error
+	DeleteCourseOrganizer(id.ID, []*entity.CourseOrganizer) error
+	DeleteCourseOrganizerByCourse(id.ID) error
 }
 
 // CourseOrganizerReader course organizer reader
 type CourseOrganizerReader interface {
-	GetCourseOrganizer(entity.ID) ([]*entity.CourseOrganizer, error)
+	GetCourseOrganizer(id.ID) ([]*entity.CourseOrganizer, error)
 }
 
 // CourseTeacherWriter course teacher writer
 type CourseTeacherWriter interface {
-	InsertCourseTeacher(entity.ID, []*entity.CourseTeacher) error
-	UpdateCourseTeacher(entity.ID, []*entity.CourseTeacher) error
-	DeleteCourseTeacher(entity.ID, []*entity.CourseTeacher) error
-	DeleteCourseTeacherByCourse(entity.ID) error
+	InsertCourseTeacher(id.ID, []*entity.CourseTeacher) error
+	UpdateCourseTeacher(id.ID, []*entity.CourseTeacher) error
+	DeleteCourseTeacher(id.ID, []*entity.CourseTeacher) error
+	DeleteCourseTeacherByCourse(id.ID) error
 }
 
 // CourseTeacherReader course teacher reader
 type CourseTeacherReader interface {
-	GetCourseTeacher(entity.ID) ([]*entity.CourseTeacher, error)
+	GetCourseTeacher(id.ID) ([]*entity.CourseTeacher, error)
 }
 
 // CourseContactWriter course contact writer
 type CourseContactWriter interface {
-	InsertCourseContact(entity.ID, []*entity.CourseContact) error
-	UpdateCourseContact(entity.ID, []*entity.CourseContact) error
-	DeleteCourseContact(entity.ID, []*entity.CourseContact) error
-	DeleteCourseContactByCourse(entity.ID) error
+	InsertCourseContact(id.ID, []*entity.CourseContact) error
+	UpdateCourseContact(id.ID, []*entity.CourseContact) error
+	DeleteCourseContact(id.ID, []*entity.CourseContact) error
+	DeleteCourseContactByCourse(id.ID) error
 }
 
 // CourseContactReader course contact reader
 type CourseContactReader interface {
-	GetCourseContact(entity.ID) ([]*entity.CourseContact, error)
+	GetCourseContact(id.ID) ([]*entity.CourseContact, error)
 }
 
 // CourseNotifyWriter course notify writer
 type CourseNotifyWriter interface {
-	InsertCourseNotify(entity.ID, []*entity.CourseNotify) error
-	UpdateCourseNotify(entity.ID, []*entity.CourseNotify) error
-	DeleteCourseNotify(entity.ID, []*entity.CourseNotify) error
-	DeleteCourseNotifyByCourse(entity.ID) error
+	InsertCourseNotify(id.ID, []*entity.CourseNotify) error
+	UpdateCourseNotify(id.ID, []*entity.CourseNotify) error
+	DeleteCourseNotify(id.ID, []*entity.CourseNotify) error
+	DeleteCourseNotifyByCourse(id.ID) error
 }
 
 // CourseNotifyReader course notify reader
 type CourseNotifyReader interface {
-	GetCourseNotify(entity.ID) ([]*entity.CourseNotify, error)
+	GetCourseNotify(id.ID) ([]*entity.CourseNotify, error)
 }
 
 // Course repository interface
@@ -93,16 +94,16 @@ type CourseRepository interface {
 
 // CourseTimingReader course timing reader
 type CourseTimingReader interface {
-	Get(id entity.ID) (*entity.CourseTiming, error)
-	GetByCourse(courseID entity.ID) ([]*entity.CourseTiming, error)
+	Get(id id.ID) (*entity.CourseTiming, error)
+	GetByCourse(courseID id.ID) ([]*entity.CourseTiming, error)
 	GetCount() (int, error)
 }
 
 // CourseTimingWriter course timing writer
 type CourseTimingWriter interface {
-	Create(e *entity.CourseTiming) (entity.ID, error)
+	Create(e *entity.CourseTiming) (id.ID, error)
 	Update(e *entity.CourseTiming) error
-	Delete(id entity.ID) error
+	Delete(id id.ID) error
 }
 
 // Course timing repository interface
@@ -113,9 +114,9 @@ type CourseTimingRepository interface {
 
 // UseCase interface
 type UseCase interface {
-	GetCourse(id entity.ID) (*entity.Course, error)
-	SearchCourses(tenantID entity.ID, query string, page, limit int) ([]*entity.Course, error)
-	ListCourses(tenantID entity.ID, page, limit int) ([]*entity.Course, error)
+	GetCourse(id id.ID) (*entity.Course, error)
+	SearchCourses(tenantID id.ID, query string, page, limit int) ([]*entity.Course, error)
+	ListCourses(tenantID id.ID, page, limit int) ([]*entity.Course, error)
 	CreateCourse(
 		course entity.Course,
 		cos []*entity.CourseOrganizer,
@@ -123,7 +124,7 @@ type UseCase interface {
 		ccs []*entity.CourseContact,
 		cns []*entity.CourseNotify,
 		courseTimings []*entity.CourseTiming,
-	) (entity.ID, []entity.ID, error)
+	) (id.ID, []id.ID, error)
 	UpdateCourse(
 		course entity.Course,
 		cos []*entity.CourseOrganizer,
@@ -132,6 +133,6 @@ type UseCase interface {
 		cns []*entity.CourseNotify,
 		courseTimings []*entity.CourseTiming,
 	) error
-	DeleteCourse(id entity.ID) error
-	GetCount(id entity.ID) int
+	DeleteCourse(id id.ID) error
+	GetCount(id id.ID) int
 }

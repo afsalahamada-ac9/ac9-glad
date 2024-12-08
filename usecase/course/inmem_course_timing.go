@@ -7,32 +7,33 @@
 package course
 
 import (
-	"log"
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
+	"log"
 )
 
 // inmemCourseTiming in memory repo
 type inmemCourseTiming struct {
-	m map[entity.ID]*entity.CourseTiming
+	m map[id.ID]*entity.CourseTiming
 }
 
 // newInmem create new repository
 func newInmemCourseTiming() *inmemCourseTiming {
-	var m = map[entity.ID]*entity.CourseTiming{}
+	var m = map[id.ID]*entity.CourseTiming{}
 	return &inmemCourseTiming{
 		m: m,
 	}
 }
 
 // Create a course
-func (r *inmemCourseTiming) Create(e *entity.CourseTiming) (entity.ID, error) {
+func (r *inmemCourseTiming) Create(e *entity.CourseTiming) (id.ID, error) {
 	// log.Printf("Create course timing; id=%v, details=%#v", e.ID, e)
 	r.m[e.ID] = e
 	return e.ID, nil
 }
 
 // Get a course
-func (r *inmemCourseTiming) Get(id entity.ID) (*entity.CourseTiming, error) {
+func (r *inmemCourseTiming) Get(id id.ID) (*entity.CourseTiming, error) {
 	if r.m[id] == nil {
 		log.Printf("Inmem CourseTiming Get() id=%#v, not found", id)
 		return nil, entity.ErrNotFound
@@ -52,7 +53,7 @@ func (r *inmemCourseTiming) Update(e *entity.CourseTiming) error {
 }
 
 // List courses
-func (r *inmemCourseTiming) GetByCourse(courseID entity.ID) ([]*entity.CourseTiming, error) {
+func (r *inmemCourseTiming) GetByCourse(courseID id.ID) ([]*entity.CourseTiming, error) {
 	var courses []*entity.CourseTiming
 	for _, j := range r.m {
 		if j.CourseID == courseID {
@@ -63,7 +64,7 @@ func (r *inmemCourseTiming) GetByCourse(courseID entity.ID) ([]*entity.CourseTim
 }
 
 // Delete a course
-func (r *inmemCourseTiming) Delete(id entity.ID) error {
+func (r *inmemCourseTiming) Delete(id id.ID) error {
 	if r.m[id] == nil {
 		return entity.ErrNotFound
 	}

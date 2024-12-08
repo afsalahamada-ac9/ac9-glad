@@ -7,8 +7,8 @@
 package handler
 
 import (
-	"ac9/glad/entity"
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/id"
 	l "ac9/glad/pkg/logger"
 	"ac9/glad/services/pushd/presenter"
 	"encoding/json"
@@ -24,7 +24,7 @@ func registerPushNotify() http.Handler {
 		var input presenter.PushNotifyInfo
 
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
-		_, err := entity.StringToID(tenant)
+		_, err := id.FromString(tenant)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("Missing tenant ID"))

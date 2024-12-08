@@ -7,6 +7,7 @@
 package entity
 
 import (
+	"ac9/glad/pkg/id"
 	"time"
 )
 
@@ -34,8 +35,8 @@ const (
 
 // Account data
 type Account struct {
-	ID        ID
-	TenantID  ID
+	ID        id.ID
+	TenantID  id.ID
 	ExtID     string
 	CognitoID string
 
@@ -53,7 +54,7 @@ type Account struct {
 }
 
 // NewAccount create a new account
-func NewAccount(tenantID ID,
+func NewAccount(tenantID id.ID,
 	extID string,
 	cognitoID string,
 	username string,
@@ -65,7 +66,7 @@ func NewAccount(tenantID ID,
 	as AccountStatus,
 ) (*Account, error) {
 	t := &Account{
-		ID:        NewID(),
+		ID:        id.New(),
 		TenantID:  tenantID,
 		ExtID:     extID,
 		CognitoID: cognitoID,

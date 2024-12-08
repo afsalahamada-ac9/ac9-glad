@@ -6,15 +6,13 @@
 
 package presenter
 
-import (
-	"ac9/glad/entity"
-)
+import "ac9/glad/pkg/id"
 
 // Tenant data
 type Tenant struct {
-	ID      entity.ID `json:"id"`
-	Name    string    `json:"name"`
-	Country string    `json:"country"`
+	ID      id.ID  `json:"id"`
+	Name    string `json:"name"`
+	Country string `json:"country"`
 	// Do not return password
 	// AuthToken is returned at login
 	AuthToken string `json:"token,omitempty"`

@@ -8,29 +8,30 @@ package tenant
 
 import (
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 )
 
 // inmem in memory repo
 type inmem struct {
-	m map[entity.ID]*entity.Tenant
+	m map[id.ID]*entity.Tenant
 }
 
 // newInmem create new repository
 func newInmem() *inmem {
-	var m = map[entity.ID]*entity.Tenant{}
+	var m = map[id.ID]*entity.Tenant{}
 	return &inmem{
 		m: m,
 	}
 }
 
 // Create a tenant
-func (r *inmem) Create(e *entity.Tenant) (entity.ID, error) {
+func (r *inmem) Create(e *entity.Tenant) (id.ID, error) {
 	r.m[e.ID] = e
 	return e.ID, nil
 }
 
 // Get a tenant
-func (r *inmem) Get(id entity.ID) (*entity.Tenant, error) {
+func (r *inmem) Get(id id.ID) (*entity.Tenant, error) {
 	if r.m[id] == nil {
 		return nil, entity.ErrNotFound
 	}
@@ -80,7 +81,7 @@ func (r *inmem) List(page, limit int) ([]*entity.Tenant, error) {
 }
 
 // Delete a tenant
-func (r *inmem) Delete(id entity.ID) error {
+func (r *inmem) Delete(id id.ID) error {
 	if r.m[id] == nil {
 		return entity.ErrNotFound
 	}

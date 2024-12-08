@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 )
 
 // TenantPGSQL mysql repo
@@ -26,7 +27,7 @@ func NewTenantPGSQL(db *sql.DB) *TenantPGSQL {
 }
 
 // Create a Tenant
-func (r *TenantPGSQL) Create(e *entity.Tenant) (entity.ID, error) {
+func (r *TenantPGSQL) Create(e *entity.Tenant) (id.ID, error) {
 
 	stmt, err := r.db.Prepare(`
 		INSERT INTO tenant (id, name, country, created_at) 
@@ -51,7 +52,7 @@ func (r *TenantPGSQL) Create(e *entity.Tenant) (entity.ID, error) {
 }
 
 // Get a Tenant
-func (r *TenantPGSQL) Get(id entity.ID) (*entity.Tenant, error) {
+func (r *TenantPGSQL) Get(id id.ID) (*entity.Tenant, error) {
 	stmt, err := r.db.Prepare(`
 		SELECT id, name, country, created_at FROM tenant WHERE id = $1;
 	`)
@@ -140,7 +141,7 @@ func (r *TenantPGSQL) List(page, limit int) ([]*entity.Tenant, error) {
 }
 
 // Delete a Tenant
-func (r *TenantPGSQL) Delete(id entity.ID) error {
+func (r *TenantPGSQL) Delete(id id.ID) error {
 	res, err := r.db.Exec(`DELETE FROM tenant WHERE id = $1;`, id)
 	if err != nil {
 		return err

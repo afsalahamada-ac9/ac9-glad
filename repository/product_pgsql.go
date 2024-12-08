@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 )
 
 // ProductPGSQL postgres repo
@@ -20,7 +21,7 @@ func NewProductPGSQL(db *sql.DB) *ProductPGSQL {
 }
 
 // Create creates a product
-func (r *ProductPGSQL) Create(e *entity.Product) (entity.ID, error) {
+func (r *ProductPGSQL) Create(e *entity.Product) (id.ID, error) {
 	stmt, err := r.db.Prepare(`
 		INSERT INTO product (id, ext_id, tenant_id, ext_name, title, ctype, base_product_ext_id, 
 			duration_days, visibility, max_attendees, format, is_auto_approve, created_at)
@@ -54,7 +55,7 @@ func (r *ProductPGSQL) Create(e *entity.Product) (entity.ID, error) {
 }
 
 // Get retrieves a product
-func (r *ProductPGSQL) Get(id entity.ID) (*entity.Product, error) {
+func (r *ProductPGSQL) Get(id id.ID) (*entity.Product, error) {
 	stmt, err := r.db.Prepare(`
 		SELECT id, tenant_id, ext_id, ext_name, title, ctype, base_product_ext_id, 
 			duration_days, visibility, max_attendees, format, is_auto_approve, created_at 
@@ -127,7 +128,7 @@ func (r *ProductPGSQL) Update(e *entity.Product) error {
 }
 
 // Search searches products
-func (r *ProductPGSQL) Search(tenantID entity.ID, q string, page, limit int) ([]*entity.Product, error) {
+func (r *ProductPGSQL) Search(tenantID id.ID, q string, page, limit int) ([]*entity.Product, error) {
 	query := `
 		SELECT id, tenant_id, ext_id, ext_name, title, ctype, base_product_ext_id,
 			duration_days, visibility, max_attendees, format, is_auto_approve, created_at
@@ -166,7 +167,7 @@ func (r *ProductPGSQL) Search(tenantID entity.ID, q string, page, limit int) ([]
 }
 
 // List lists products
-func (r *ProductPGSQL) List(tenantID entity.ID, page, limit int) ([]*entity.Product, error) {
+func (r *ProductPGSQL) List(tenantID id.ID, page, limit int) ([]*entity.Product, error) {
 	query := `
 		SELECT id, tenant_id, ext_id, ext_name, title, ctype, base_product_ext_id,
 			duration_days, visibility, max_attendees, format, is_auto_approve, created_at
@@ -205,7 +206,7 @@ func (r *ProductPGSQL) List(tenantID entity.ID, page, limit int) ([]*entity.Prod
 }
 
 // Delete deletes a product
-func (r *ProductPGSQL) Delete(id entity.ID) error {
+func (r *ProductPGSQL) Delete(id id.ID) error {
 	res, err := r.db.Exec(`DELETE FROM product WHERE id = $1;`, id)
 	if err != nil {
 		return err
@@ -219,7 +220,7 @@ func (r *ProductPGSQL) Delete(id entity.ID) error {
 }
 
 // GetCount gets total products count for a tenant
-func (r *ProductPGSQL) GetCount(tenantID entity.ID) (int, error) {
+func (r *ProductPGSQL) GetCount(tenantID id.ID) (int, error) {
 	stmt, err := r.db.Prepare(`
 		SELECT COUNT(*) 
 		FROM product 

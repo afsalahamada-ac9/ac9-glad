@@ -11,24 +11,25 @@ import (
 	"sync"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 )
 
 // inmem in memory repo
 type inmem struct {
-	m   map[entity.ID]*entity.Product
+	m   map[id.ID]*entity.Product
 	mut *sync.RWMutex
 }
 
 // NewInmem creates a new in memory product repository
 func NewInmem() *inmem {
 	return &inmem{
-		m:   make(map[entity.ID]*entity.Product),
+		m:   make(map[id.ID]*entity.Product),
 		mut: &sync.RWMutex{},
 	}
 }
 
 // Create stores a product in memory
-func (r *inmem) Create(e *entity.Product) (entity.ID, error) {
+func (r *inmem) Create(e *entity.Product) (id.ID, error) {
 	r.mut.Lock()
 	defer r.mut.Unlock()
 
@@ -37,7 +38,7 @@ func (r *inmem) Create(e *entity.Product) (entity.ID, error) {
 }
 
 // Get retrieves a product from memory
-func (r *inmem) Get(id entity.ID) (*entity.Product, error) {
+func (r *inmem) Get(id id.ID) (*entity.Product, error) {
 	r.mut.RLock()
 	defer r.mut.RUnlock()
 
@@ -62,7 +63,7 @@ func (r *inmem) Update(e *entity.Product) error {
 }
 
 // List returns all products from memory for the specified tenant
-func (r *inmem) List(tenantID entity.ID, page, limit int) ([]*entity.Product, error) {
+func (r *inmem) List(tenantID id.ID, page, limit int) ([]*entity.Product, error) {
 	r.mut.RLock()
 	defer r.mut.RUnlock()
 
@@ -90,7 +91,7 @@ func (r *inmem) List(tenantID entity.ID, page, limit int) ([]*entity.Product, er
 }
 
 // Delete marks a product as deleted in memory
-func (r *inmem) Delete(id entity.ID) error {
+func (r *inmem) Delete(id id.ID) error {
 	r.mut.Lock()
 	defer r.mut.Unlock()
 
@@ -103,7 +104,7 @@ func (r *inmem) Delete(id entity.ID) error {
 }
 
 // Search searches for products in memory
-func (r *inmem) Search(tenantID entity.ID, query string, page, limit int) ([]*entity.Product, error) {
+func (r *inmem) Search(tenantID id.ID, query string, page, limit int) ([]*entity.Product, error) {
 	r.mut.RLock()
 	defer r.mut.RUnlock()
 
@@ -133,7 +134,7 @@ func (r *inmem) Search(tenantID entity.ID, query string, page, limit int) ([]*en
 }
 
 // GetCount returns count of products for a specific tenant
-func (r *inmem) GetCount(tenantID entity.ID) (int, error) {
+func (r *inmem) GetCount(tenantID id.ID) (int, error) {
 	r.mut.RLock()
 	defer r.mut.RUnlock()
 
@@ -150,7 +151,7 @@ func (r *inmem) GetCount(tenantID entity.ID) (int, error) {
 func (r *inmem) Clean() {
 	r.mut.Lock()
 	defer r.mut.Unlock()
-	r.m = make(map[entity.ID]*entity.Product)
+	r.m = make(map[id.ID]*entity.Product)
 }
 
 func (r *inmem) Count() int {

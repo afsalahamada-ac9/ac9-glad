@@ -8,6 +8,7 @@ package presenter
 
 import (
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 
 	"github.com/ulule/deepcopier"
 )
@@ -15,7 +16,7 @@ import (
 // Account data - TenantID is returned in the HTTP header (may be not, as account is global?)
 // X-GLAD-TenantID
 type Account struct {
-	ID        entity.ID          `json:"id"`
+	ID        id.ID              `json:"id"`
 	Username  string             `json:"username"`
 	FirstName string             `json:"firstName,omitempty"`
 	LastName  string             `json:"lastName,omitempty"`

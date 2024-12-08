@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -19,17 +20,17 @@ const (
 	accountUsernameAlice  string = "12345550001"
 	accountUsername2Alice string = "12345550002"
 
-	accountIDAlice  entity.ID = 13790492210917010000
-	accountID2Alice entity.ID = 13790492210917010002
-	tenantAlice     entity.ID = 13790492210917015554
-	aliceExtID                = "001aliceExtID"
-	alice2ExtID               = "002aliceExtID"
+	accountIDAlice  id.ID = 13790492210917010000
+	accountID2Alice id.ID = 13790492210917010002
+	tenantAlice     id.ID = 13790492210917015554
+	aliceExtID            = "001aliceExtID"
+	alice2ExtID           = "002aliceExtID"
 
 	aliceCognitoID  = "aws:cognito:alice"
 	alice2CognitoID = "aws:cognito:alice2"
 
 	// todo: add multi-tenant support
-	// tenantBob entity.ID = 13790492210917015555
+	// tenantBob id.ID = 13790492210917015555
 )
 
 func newFixtureAccount() *entity.Account {

@@ -5,8 +5,9 @@
 package mock_product
 
 import (
-	reflect "reflect"
 	entity "ac9/glad/entity"
+	id "ac9/glad/pkg/id"
+	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
 )
@@ -35,7 +36,7 @@ func (m *MockReader) EXPECT() *MockReaderMockRecorder {
 }
 
 // Get mocks base method.
-func (m *MockReader) Get(id entity.ID) (*entity.Product, error) {
+func (m *MockReader) Get(id id.ID) (*entity.Product, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", id)
 	ret0, _ := ret[0].(*entity.Product)
@@ -50,7 +51,7 @@ func (mr *MockReaderMockRecorder) Get(id interface{}) *gomock.Call {
 }
 
 // GetCount mocks base method.
-func (m *MockReader) GetCount(tenantID entity.ID) (int, error) {
+func (m *MockReader) GetCount(tenantID id.ID) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCount", tenantID)
 	ret0, _ := ret[0].(int)
@@ -65,7 +66,7 @@ func (mr *MockReaderMockRecorder) GetCount(tenantID interface{}) *gomock.Call {
 }
 
 // List mocks base method.
-func (m *MockReader) List(tenantID entity.ID, page, limit int) ([]*entity.Product, error) {
+func (m *MockReader) List(tenantID id.ID, page, limit int) ([]*entity.Product, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", tenantID, page, limit)
 	ret0, _ := ret[0].([]*entity.Product)
@@ -80,7 +81,7 @@ func (mr *MockReaderMockRecorder) List(tenantID, page, limit interface{}) *gomoc
 }
 
 // Search mocks base method.
-func (m *MockReader) Search(tenantID entity.ID, q string, page, limit int) ([]*entity.Product, error) {
+func (m *MockReader) Search(tenantID id.ID, q string, page, limit int) ([]*entity.Product, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Search", tenantID, q, page, limit)
 	ret0, _ := ret[0].([]*entity.Product)
@@ -118,10 +119,10 @@ func (m *MockWriter) EXPECT() *MockWriterMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockWriter) Create(product *entity.Product) (entity.ID, error) {
+func (m *MockWriter) Create(product *entity.Product) (id.ID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", product)
-	ret0, _ := ret[0].(entity.ID)
+	ret0, _ := ret[0].(id.ID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -133,7 +134,7 @@ func (mr *MockWriterMockRecorder) Create(product interface{}) *gomock.Call {
 }
 
 // Delete mocks base method.
-func (m *MockWriter) Delete(id entity.ID) error {
+func (m *MockWriter) Delete(id id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", id)
 	ret0, _ := ret[0].(error)
@@ -184,10 +185,10 @@ func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockRepository) Create(product *entity.Product) (entity.ID, error) {
+func (m *MockRepository) Create(product *entity.Product) (id.ID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", product)
-	ret0, _ := ret[0].(entity.ID)
+	ret0, _ := ret[0].(id.ID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -199,7 +200,7 @@ func (mr *MockRepositoryMockRecorder) Create(product interface{}) *gomock.Call {
 }
 
 // Delete mocks base method.
-func (m *MockRepository) Delete(id entity.ID) error {
+func (m *MockRepository) Delete(id id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", id)
 	ret0, _ := ret[0].(error)
@@ -213,7 +214,7 @@ func (mr *MockRepositoryMockRecorder) Delete(id interface{}) *gomock.Call {
 }
 
 // Get mocks base method.
-func (m *MockRepository) Get(id entity.ID) (*entity.Product, error) {
+func (m *MockRepository) Get(id id.ID) (*entity.Product, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", id)
 	ret0, _ := ret[0].(*entity.Product)
@@ -228,7 +229,7 @@ func (mr *MockRepositoryMockRecorder) Get(id interface{}) *gomock.Call {
 }
 
 // GetCount mocks base method.
-func (m *MockRepository) GetCount(tenantID entity.ID) (int, error) {
+func (m *MockRepository) GetCount(tenantID id.ID) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCount", tenantID)
 	ret0, _ := ret[0].(int)
@@ -243,7 +244,7 @@ func (mr *MockRepositoryMockRecorder) GetCount(tenantID interface{}) *gomock.Cal
 }
 
 // List mocks base method.
-func (m *MockRepository) List(tenantID entity.ID, page, limit int) ([]*entity.Product, error) {
+func (m *MockRepository) List(tenantID id.ID, page, limit int) ([]*entity.Product, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", tenantID, page, limit)
 	ret0, _ := ret[0].([]*entity.Product)
@@ -258,7 +259,7 @@ func (mr *MockRepositoryMockRecorder) List(tenantID, page, limit interface{}) *g
 }
 
 // Search mocks base method.
-func (m *MockRepository) Search(tenantID entity.ID, q string, page, limit int) ([]*entity.Product, error) {
+func (m *MockRepository) Search(tenantID id.ID, q string, page, limit int) ([]*entity.Product, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Search", tenantID, q, page, limit)
 	ret0, _ := ret[0].([]*entity.Product)
@@ -310,10 +311,10 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 }
 
 // CreateProduct mocks base method.
-func (m *MockUseCase) CreateProduct(tenantID entity.ID, extID, extName, title, ctype, baseProductExtID string, durationDays int32, visibility entity.ProductVisibility, maxAttendees int32, format entity.ProductFormat, isAutoApprove bool) (entity.ID, error) {
+func (m *MockUseCase) CreateProduct(tenantID id.ID, extID, extName, title, ctype, baseProductExtID string, durationDays int32, visibility entity.ProductVisibility, maxAttendees int32, format entity.ProductFormat, isAutoApprove bool) (id.ID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateProduct", tenantID, extID, extName, title, ctype, baseProductExtID, durationDays, visibility, maxAttendees, format, isAutoApprove)
-	ret0, _ := ret[0].(entity.ID)
+	ret0, _ := ret[0].(id.ID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -325,7 +326,7 @@ func (mr *MockUseCaseMockRecorder) CreateProduct(tenantID, extID, extName, title
 }
 
 // DeleteProduct mocks base method.
-func (m *MockUseCase) DeleteProduct(id entity.ID) error {
+func (m *MockUseCase) DeleteProduct(id id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteProduct", id)
 	ret0, _ := ret[0].(error)
@@ -339,7 +340,7 @@ func (mr *MockUseCaseMockRecorder) DeleteProduct(id interface{}) *gomock.Call {
 }
 
 // GetCount mocks base method.
-func (m *MockUseCase) GetCount(id entity.ID) int {
+func (m *MockUseCase) GetCount(id id.ID) int {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCount", id)
 	ret0, _ := ret[0].(int)
@@ -353,7 +354,7 @@ func (mr *MockUseCaseMockRecorder) GetCount(id interface{}) *gomock.Call {
 }
 
 // GetProduct mocks base method.
-func (m *MockUseCase) GetProduct(id entity.ID) (*entity.Product, error) {
+func (m *MockUseCase) GetProduct(id id.ID) (*entity.Product, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetProduct", id)
 	ret0, _ := ret[0].(*entity.Product)
@@ -368,7 +369,7 @@ func (mr *MockUseCaseMockRecorder) GetProduct(id interface{}) *gomock.Call {
 }
 
 // ListProducts mocks base method.
-func (m *MockUseCase) ListProducts(tenantID entity.ID, page, limit int) ([]*entity.Product, error) {
+func (m *MockUseCase) ListProducts(tenantID id.ID, page, limit int) ([]*entity.Product, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListProducts", tenantID, page, limit)
 	ret0, _ := ret[0].([]*entity.Product)
@@ -383,7 +384,7 @@ func (mr *MockUseCaseMockRecorder) ListProducts(tenantID, page, limit interface{
 }
 
 // SearchProducts mocks base method.
-func (m *MockUseCase) SearchProducts(tenantID entity.ID, q string, page, limit int) ([]*entity.Product, error) {
+func (m *MockUseCase) SearchProducts(tenantID id.ID, q string, page, limit int) ([]*entity.Product, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SearchProducts", tenantID, q, page, limit)
 	ret0, _ := ret[0].([]*entity.Product)

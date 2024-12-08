@@ -5,8 +5,9 @@
 package mock_tenant
 
 import (
-	reflect "reflect"
 	entity "ac9/glad/entity"
+	id "ac9/glad/pkg/id"
+	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
 )
@@ -35,7 +36,7 @@ func (m *MockReader) EXPECT() *MockReaderMockRecorder {
 }
 
 // Get mocks base method.
-func (m *MockReader) Get(id entity.ID) (*entity.Tenant, error) {
+func (m *MockReader) Get(id id.ID) (*entity.Tenant, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", id)
 	ret0, _ := ret[0].(*entity.Tenant)
@@ -118,10 +119,10 @@ func (m *MockWriter) EXPECT() *MockWriterMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockWriter) Create(e *entity.Tenant) (entity.ID, error) {
+func (m *MockWriter) Create(e *entity.Tenant) (id.ID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", e)
-	ret0, _ := ret[0].(entity.ID)
+	ret0, _ := ret[0].(id.ID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -133,7 +134,7 @@ func (mr *MockWriterMockRecorder) Create(e interface{}) *gomock.Call {
 }
 
 // Delete mocks base method.
-func (m *MockWriter) Delete(id entity.ID) error {
+func (m *MockWriter) Delete(id id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", id)
 	ret0, _ := ret[0].(error)
@@ -184,10 +185,10 @@ func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockRepository) Create(e *entity.Tenant) (entity.ID, error) {
+func (m *MockRepository) Create(e *entity.Tenant) (id.ID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", e)
-	ret0, _ := ret[0].(entity.ID)
+	ret0, _ := ret[0].(id.ID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -199,7 +200,7 @@ func (mr *MockRepositoryMockRecorder) Create(e interface{}) *gomock.Call {
 }
 
 // Delete mocks base method.
-func (m *MockRepository) Delete(id entity.ID) error {
+func (m *MockRepository) Delete(id id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", id)
 	ret0, _ := ret[0].(error)
@@ -213,7 +214,7 @@ func (mr *MockRepositoryMockRecorder) Delete(id interface{}) *gomock.Call {
 }
 
 // Get mocks base method.
-func (m *MockRepository) Get(id entity.ID) (*entity.Tenant, error) {
+func (m *MockRepository) Get(id id.ID) (*entity.Tenant, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", id)
 	ret0, _ := ret[0].(*entity.Tenant)
@@ -310,10 +311,10 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 }
 
 // CreateTenant mocks base method.
-func (m *MockUseCase) CreateTenant(username, country string) (entity.ID, error) {
+func (m *MockUseCase) CreateTenant(username, country string) (id.ID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateTenant", username, country)
-	ret0, _ := ret[0].(entity.ID)
+	ret0, _ := ret[0].(id.ID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -325,7 +326,7 @@ func (mr *MockUseCaseMockRecorder) CreateTenant(username, country interface{}) *
 }
 
 // DeleteTenant mocks base method.
-func (m *MockUseCase) DeleteTenant(id entity.ID) error {
+func (m *MockUseCase) DeleteTenant(id id.ID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteTenant", id)
 	ret0, _ := ret[0].(error)
@@ -353,7 +354,7 @@ func (mr *MockUseCaseMockRecorder) GetCount() *gomock.Call {
 }
 
 // GetTenant mocks base method.
-func (m *MockUseCase) GetTenant(id entity.ID) (*entity.Tenant, error) {
+func (m *MockUseCase) GetTenant(id id.ID) (*entity.Tenant, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetTenant", id)
 	ret0, _ := ret[0].(*entity.Tenant)

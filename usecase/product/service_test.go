@@ -5,15 +5,16 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 
 	"github.com/stretchr/testify/assert"
 )
 
 const (
-	productDefault entity.ID = 13790493495087071234
-	tenantAlice    entity.ID = 13790492210917015554
-	aliceExtID               = "000aliceExtID"
-	bobExtID                 = "000bobExtID"
+	productDefault id.ID = 13790493495087071234
+	tenantAlice    id.ID = 13790492210917015554
+	aliceExtID           = "000aliceExtID"
+	bobExtID             = "000bobExtID"
 )
 
 func newFixtureProduct() *entity.Product {

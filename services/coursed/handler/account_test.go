@@ -16,6 +16,7 @@ import (
 
 	"ac9/glad/entity"
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/id"
 	"ac9/glad/pkg/logger"
 	"ac9/glad/services/coursed/presenter"
 
@@ -28,8 +29,8 @@ import (
 )
 
 const (
-	accountIDPrimary   entity.ID = 13790492210917010000
-	accountIDSecondary entity.ID = 13790492210917010002
+	accountIDPrimary   id.ID = 13790492210917010000
+	accountIDSecondary id.ID = 13790492210917010002
 
 	accountUsernamePrimary   string = "12345550001"
 	accountUsernameSecondary string = "12345550002"
@@ -59,7 +60,7 @@ func Test_listAccounts(t *testing.T) {
 	path, err := r.GetRoute("listAccounts").GetPathTemplate()
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/accounts", path)
-	tmpl := &entity.Account{
+	account := &entity.Account{
 		ID:       accountIDPrimary,
 		ExtID:    aliceExtID,
 		Username: accountUsernamePrimary,
@@ -68,7 +69,7 @@ func Test_listAccounts(t *testing.T) {
 	service.EXPECT().GetCount(tenantAlice).Return(1)
 	service.EXPECT().
 		ListAccounts(tenantAlice, gomock.Any(), gomock.Any(), gomock.Any()).
-		Return([]*entity.Account{tmpl}, nil)
+		Return([]*entity.Account{account}, nil)
 	ts := httptest.NewServer(listAccounts(service))
 	defer ts.Close()
 
@@ -91,7 +92,7 @@ func Test_listAccounts(t *testing.T) {
 // 	assert.Nil(t, err)
 // 	assert.Equal(t, "/v1/accounts", path)
 
-// 	id := entity.NewID()
+// 	id := id.New()
 // 	service.EXPECT().
 // 		CreateAccount(gomock.Any(),
 // 			gomock.Any(),
@@ -104,7 +105,7 @@ func Test_listAccounts(t *testing.T) {
 // 	defer ts.Close()
 
 // 	payload := struct {
-// 		TenantID entity.ID          `json:"tenant_id"`
+// 		TenantID id.ID          `json:"tenant_id"`
 // 		Username     string             `json:"Username"`
 // 		Type     entity.AccountType `json:"type"`
 // 		Content  string             `json:"content"`
@@ -126,12 +127,12 @@ func Test_listAccounts(t *testing.T) {
 // 	assert.Nil(t, err)
 // 	assert.Equal(t, http.StatusCreated, res.StatusCode)
 
-// 	var tmpl *presenter.Account
-// 	json.NewDecoder(res.Body).Decode(&tmpl)
-// 	assert.Equal(t, id, tmpl.ID)
-// 	assert.Equal(t, payload.Content, tmpl.Content)
-// 	assert.Equal(t, payload.Username, tmpl.Username)
-// 	assert.Equal(t, payload.Type, tmpl.Type)
+// 	var account *presenter.Account
+// 	json.NewDecoder(res.Body).Decode(&account)
+// 	assert.Equal(t, id, account.ID)
+// 	assert.Equal(t, payload.Content, account.Content)
+// 	assert.Equal(t, payload.Username, account.Username)
+// 	assert.Equal(t, payload.Type, account.Type)
 // 	assert.Equal(t, tenantAlice, res.Header.Get(common.HttpHeaderTenantID))
 // }
 
@@ -145,7 +146,7 @@ func Test_getAccount(t *testing.T) {
 	path, err := r.GetRoute("getAccount").GetPathTemplate()
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/accounts/{username}", path)
-	tmpl := &entity.Account{
+	account := &entity.Account{
 		ID:       accountIDPrimary,
 		TenantID: tenantAlice,
 		ExtID:    aliceExtID,
@@ -153,8 +154,8 @@ func Test_getAccount(t *testing.T) {
 		Type:     entity.AccountTeacher,
 	}
 	service.EXPECT().
-		GetAccountByName(tmpl.TenantID, tmpl.Username).
-		Return(tmpl, nil)
+		GetAccountByName(account.TenantID, account.Username).
+		Return(account, nil)
 
 	handler := getAccount(service)
 	r.Handle("/v1/accounts/{username}", handler)
@@ -162,7 +163,7 @@ func Test_getAccount(t *testing.T) {
 	defer ts.Close()
 
 	client := &http.Client{}
-	req, _ := http.NewRequest(http.MethodGet, ts.URL+"/v1/accounts/"+tmpl.Username, nil)
+	req, _ := http.NewRequest(http.MethodGet, ts.URL+"/v1/accounts/"+account.Username, nil)
 	req.Header.Set(common.HttpHeaderTenantID, tenantAlice.String())
 	res, err := client.Do(req)
 	assert.Nil(t, err)
@@ -173,9 +174,9 @@ func Test_getAccount(t *testing.T) {
 	json.NewDecoder(res.Body).Decode(&d)
 	assert.NotNil(t, d)
 
-	assert.Equal(t, tmpl.ID, d.ID)
-	assert.Equal(t, tmpl.Username, d.Username)
-	assert.Equal(t, tmpl.Type, d.Type)
+	assert.Equal(t, account.ID, d.ID)
+	assert.Equal(t, account.Username, d.Username)
+	assert.Equal(t, account.Type, d.Type)
 	assert.Equal(t, tenantAlice.String(), res.Header.Get(common.HttpHeaderTenantID))
 }
 

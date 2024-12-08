@@ -11,6 +11,7 @@ import (
 	"net/http"
 
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/id"
 	"ac9/glad/services/coursed/presenter"
 	"ac9/glad/usecase/account"
 
@@ -27,7 +28,7 @@ func getParticipantByCourse(service account.UseCase) http.Handler {
 		errorMessage := "Error reading participants"
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
 
-		tenantID, err := entity.StringToID(tenant)
+		tenantID, err := id.FromString(tenant)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("Unable to parse tenant id"))

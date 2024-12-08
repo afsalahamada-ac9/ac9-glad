@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 )
 
 // Service tenant usecase
@@ -25,7 +26,7 @@ func NewService(r Repository) *Service {
 }
 
 // CreateTenant create a tenant
-func (s *Service) CreateTenant(name, country string) (entity.ID, error) {
+func (s *Service) CreateTenant(name, country string) (id.ID, error) {
 	// TODO: Check whether tenant already exists with same name
 
 	t, err := entity.NewTenant(name, country)
@@ -36,7 +37,7 @@ func (s *Service) CreateTenant(name, country string) (entity.ID, error) {
 }
 
 // GetTenant get a tenant
-func (s *Service) GetTenant(id entity.ID) (*entity.Tenant, error) {
+func (s *Service) GetTenant(id id.ID) (*entity.Tenant, error) {
 	t, err := s.repo.Get(id)
 	if t == nil {
 		return nil, entity.ErrNotFound
@@ -74,7 +75,7 @@ func (s *Service) ListTenants(page, limit int) ([]*entity.Tenant, error) {
 }
 
 // DeleteTenant Delete a tenant
-func (s *Service) DeleteTenant(id entity.ID) error {
+func (s *Service) DeleteTenant(id id.ID) error {
 	t, err := s.GetTenant(id)
 	if t == nil {
 		return entity.ErrNotFound

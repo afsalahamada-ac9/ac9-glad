@@ -13,6 +13,7 @@ import (
 	"strconv"
 
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/id"
 	"ac9/glad/usecase/center"
 
 	"ac9/glad/services/coursed/presenter"
@@ -37,7 +38,7 @@ func listCenters(service center.UseCase) http.Handler {
 		page, _ := strconv.Atoi(r.URL.Query().Get(httpParamPage))
 		limit, _ := strconv.Atoi(r.URL.Query().Get(httpParamLimit))
 
-		tenantID, err := entity.StringToID(tenant)
+		tenantID, err := id.FromString(tenant)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("Unable to parse tenant id"))
@@ -109,7 +110,7 @@ func createCenter(service center.UseCase) http.Handler {
 		}
 
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
-		tenantID, err := entity.StringToID(tenant)
+		tenantID, err := id.FromString(tenant)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("Missing tenant ID"))
@@ -157,7 +158,7 @@ func getCenter(service center.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error reading center"
 		vars := mux.Vars(r)
-		id, err := entity.StringToID(vars["id"])
+		id, err := id.FromString(vars["id"])
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
@@ -195,7 +196,7 @@ func deleteCenter(service center.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error removing center"
 		vars := mux.Vars(r)
-		id, err := entity.StringToID(vars["id"])
+		id, err := id.FromString(vars["id"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage))
@@ -223,7 +224,7 @@ func updateCenter(service center.UseCase) http.Handler {
 		errorMessage := "Error updating center"
 
 		vars := mux.Vars(r)
-		id, err := entity.StringToID(vars["id"])
+		centerID, err := id.FromString(vars["id"])
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
@@ -232,7 +233,7 @@ func updateCenter(service center.UseCase) http.Handler {
 
 		var input entity.Center
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
-		tenantID, err := entity.StringToID(tenant)
+		tenantID, err := id.FromString(tenant)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("Missing tenant ID"))
@@ -247,7 +248,7 @@ func updateCenter(service center.UseCase) http.Handler {
 			return
 		}
 
-		input.ID = id
+		input.ID = centerID
 		input.TenantID = tenantID
 		err = service.UpdateCenter(&input)
 		if err != nil {

@@ -7,6 +7,7 @@
 package entity
 
 import (
+	"ac9/glad/pkg/id"
 	"time"
 )
 
@@ -19,8 +20,8 @@ type CourseDateTime struct {
 
 // Course Timings
 type CourseTiming struct {
-	ID       ID
-	CourseID ID
+	ID       id.ID
+	CourseID id.ID
 	ExtID    *string
 	DateTime CourseDateTime
 
@@ -60,13 +61,13 @@ func (dt *CourseDateTime) Validate() error {
 // Note: Tenant id is not needed here, because this is linked to the course internally.
 // This object is not exposed externally via API. So, tenant ID can be mapped via the course.
 func NewCourseTiming(
-	courseID ID,
+	courseID id.ID,
 	extID *string,
 	dateTime CourseDateTime,
 ) (*CourseTiming, error) {
 
 	ct := &CourseTiming{
-		ID:        NewID(),
+		ID:        id.New(),
 		CourseID:  courseID,
 		ExtID:     extID,
 		DateTime:  dateTime,
@@ -79,12 +80,13 @@ func NewCourseTiming(
 	return ct, nil
 }
 
+// TODO: This must be renamed to Clone
 // New creates a new course timing from existing course timing and overrides id and created & updated date
 func (ct CourseTiming) New() (*CourseTiming, error) {
 	courseTiming := &CourseTiming{}
 	*courseTiming = ct
 
-	courseTiming.ID = NewID()
+	courseTiming.ID = id.New()
 	courseTiming.CreatedAt = time.Now()
 	courseTiming.UpdatedAt = courseTiming.CreatedAt
 
@@ -97,7 +99,7 @@ func (ct CourseTiming) New() (*CourseTiming, error) {
 
 // Validate validate course timings
 func (ct *CourseTiming) Validate() error {
-	if ct.CourseID == IDInvalid {
+	if ct.CourseID == id.IDInvalid {
 		return ErrInvalidEntity
 	}
 

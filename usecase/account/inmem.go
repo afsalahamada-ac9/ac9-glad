@@ -7,18 +7,19 @@
 package account
 
 import (
-	"strings"
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
+	"strings"
 )
 
 // inmem in memory repo
 type inmem struct {
-	m map[entity.ID]*entity.Account
+	m map[id.ID]*entity.Account
 }
 
 // newInmem create new repository
 func newInmem() *inmem {
-	var m = map[entity.ID]*entity.Account{}
+	var m = map[id.ID]*entity.Account{}
 	return &inmem{
 		m: m,
 	}
@@ -31,7 +32,7 @@ func (r *inmem) Create(e *entity.Account) error {
 }
 
 // Get retrieves an account
-func (r *inmem) Get(id entity.ID) (*entity.Account, error) {
+func (r *inmem) Get(id id.ID) (*entity.Account, error) {
 	for _, j := range r.m {
 		if j.ID == id {
 			return r.m[j.ID], nil
@@ -42,7 +43,7 @@ func (r *inmem) Get(id entity.ID) (*entity.Account, error) {
 }
 
 // Get retrieves an account using username
-func (r *inmem) GetByName(tenantID entity.ID, username string) (*entity.Account, error) {
+func (r *inmem) GetByName(tenantID id.ID, username string) (*entity.Account, error) {
 	for _, j := range r.m {
 		if j.Username == username && j.TenantID == tenantID {
 			return r.m[j.ID], nil
@@ -70,7 +71,7 @@ func (r *inmem) Update(e *entity.Account) error {
 }
 
 // List list accounts
-func (r *inmem) List(tenantID entity.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
+func (r *inmem) List(tenantID id.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
 	var d []*entity.Account
 	for _, j := range r.m {
 		// TenantID check removed
@@ -91,7 +92,7 @@ func (r *inmem) List(tenantID entity.ID, page, limit int, at entity.AccountType)
 }
 
 // Delete deletes an account
-func (r *inmem) Delete(id entity.ID) error {
+func (r *inmem) Delete(id id.ID) error {
 	account, err := r.Get(id)
 	if err != nil {
 		return err
@@ -103,7 +104,7 @@ func (r *inmem) Delete(id entity.ID) error {
 }
 
 // DeleteByName deletes an account using username
-func (r *inmem) DeleteByName(tenantID entity.ID, username string) error {
+func (r *inmem) DeleteByName(tenantID id.ID, username string) error {
 	account, err := r.GetByName(tenantID, username)
 	if err != nil {
 		return err
@@ -115,7 +116,7 @@ func (r *inmem) DeleteByName(tenantID entity.ID, username string) error {
 }
 
 // GetCount gets total accounts for a given tenant
-func (r *inmem) GetCount(tenantID entity.ID) (int, error) {
+func (r *inmem) GetCount(tenantID id.ID) (int, error) {
 	count := 0
 	for _, j := range r.m {
 		if j.TenantID == tenantID {
@@ -126,7 +127,7 @@ func (r *inmem) GetCount(tenantID entity.ID) (int, error) {
 }
 
 // Search search accounts
-func (r *inmem) Search(tenantID entity.ID, query string, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
+func (r *inmem) Search(tenantID id.ID, query string, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
 	var d []*entity.Account
 	for _, j := range r.m {
 		if j.TenantID == tenantID &&

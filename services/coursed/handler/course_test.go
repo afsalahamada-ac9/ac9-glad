@@ -15,6 +15,7 @@ import (
 
 	"ac9/glad/entity"
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/id"
 	"ac9/glad/services/coursed/presenter"
 
 	mock "ac9/glad/usecase/course/mock"
@@ -35,15 +36,15 @@ func Test_listCourses(t *testing.T) {
 	path, err := r.GetRoute("listCourses").GetPathTemplate()
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/courses", path)
-	tmpl := &entity.Course{
-		ID:       entity.NewID(),
+	course := &entity.Course{
+		ID:       id.New(),
 		TenantID: tenantAlice,
 		Name:     "default-0",
 	}
-	service.EXPECT().GetCount(tmpl.TenantID).Return(1)
+	service.EXPECT().GetCount(course.TenantID).Return(1)
 	service.EXPECT().
-		ListCourses(tmpl.TenantID, gomock.Any(), gomock.Any()).
-		Return([]*entity.Course{tmpl}, nil)
+		ListCourses(course.TenantID, gomock.Any(), gomock.Any()).
+		Return([]*entity.Course{course}, nil)
 	ts := httptest.NewServer(listCourses(service))
 	defer ts.Close()
 
@@ -81,15 +82,15 @@ func Test_listCourses_Search(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	service := mock.NewMockUseCase(controller)
-	tmpl := &entity.Course{
-		ID:       entity.NewID(),
+	course := &entity.Course{
+		ID:       id.New(),
 		TenantID: tenantAlice,
 		Name:     "default-0",
 	}
-	service.EXPECT().GetCount(tmpl.TenantID).Return(1)
+	service.EXPECT().GetCount(course.TenantID).Return(1)
 	service.EXPECT().
-		SearchCourses(tmpl.TenantID, "default", gomock.Any(), gomock.Any()).
-		Return([]*entity.Course{tmpl}, nil)
+		SearchCourses(course.TenantID, "default", gomock.Any(), gomock.Any()).
+		Return([]*entity.Course{course}, nil)
 	ts := httptest.NewServer(listCourses(service))
 	defer ts.Close()
 
@@ -115,7 +116,7 @@ func Test_createCourse(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/courses", path)
 
-	id := entity.NewID()
+	courseID := id.New()
 	// TODO: Check the length of the courseTimings and same number of
 	// courseTimingIDs to be returned
 	service.EXPECT().
@@ -125,18 +126,18 @@ func Test_createCourse(t *testing.T) {
 			gomock.Any(),
 			gomock.Any(),
 			gomock.Any()).
-		Return(id, nil, nil)
+		Return(courseID, nil, nil)
 	h := createCourse(service)
 
 	ts := httptest.NewServer(h)
 	defer ts.Close()
 
 	payload := struct {
-		// TenantID entity.ID         `json:"tenant_id"`
+		// TenantID id.ID         `json:"tenant_id"`
 		ExtID string            `json:"extID"`
 		Name  string            `json:"name"`
 		Mode  entity.CourseMode `json:"mode"`
-		// CenterID entity.ID         `json:"center_id"`
+		// CenterID id.ID         `json:"center_id"`
 	}{
 		// TenantID: tenantAlice,
 		ExtID: aliceExtID,
@@ -158,9 +159,9 @@ func Test_createCourse(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusCreated, res.StatusCode)
 
-	var tmpl *presenter.Course
-	json.NewDecoder(res.Body).Decode(&tmpl)
-	assert.Equal(t, id, tmpl.ID)
+	var course *presenter.Course
+	json.NewDecoder(res.Body).Decode(&course)
+	assert.Equal(t, courseID, course.ID)
 	assert.Equal(t, tenantAlice.String(), res.Header.Get(common.HttpHeaderTenantID))
 }
 
@@ -175,21 +176,21 @@ func Test_getCourse(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/courses/{id}", path)
 	extID := aliceExtID
-	tmpl := &entity.Course{
-		ID:       entity.NewID(),
+	course := &entity.Course{
+		ID:       id.New(),
 		TenantID: tenantAlice,
 		ExtID:    &extID,
 		Name:     "default-0",
 		Mode:     entity.CourseInPerson,
 	}
 	service.EXPECT().
-		GetCourse(tmpl.ID).
-		Return(tmpl, nil)
+		GetCourse(course.ID).
+		Return(course, nil)
 	handler := getCourse(service)
 	r.Handle("/v1/courses/{id}", handler)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
-	res, err := http.Get(ts.URL + "/v1/courses/" + tmpl.ID.String())
+	res, err := http.Get(ts.URL + "/v1/courses/" + course.ID.String())
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
@@ -198,9 +199,9 @@ func Test_getCourse(t *testing.T) {
 	json.NewDecoder(res.Body).Decode(&d)
 	assert.NotNil(t, d)
 
-	assert.Equal(t, tmpl.ID, d.ID)
-	assert.Equal(t, tmpl.Name, *d.Name)
-	assert.Equal(t, tmpl.Mode, *d.Mode)
+	assert.Equal(t, course.ID, d.ID)
+	assert.Equal(t, course.Name, *d.Name)
+	assert.Equal(t, course.Mode, *d.Mode)
 	assert.Equal(t, tenantAlice.String(), res.Header.Get(common.HttpHeaderTenantID))
 }
 
@@ -215,7 +216,7 @@ func Test_deleteCourse(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/courses/{id}", path)
 
-	id := entity.NewID()
+	id := id.New()
 	service.EXPECT().DeleteCourse(id).Return(nil)
 	handler := deleteCourse(service)
 	req, _ := http.NewRequest("DELETE", "/v1/courses/"+id.String(), nil)
@@ -236,7 +237,7 @@ func Test_deleteCourseNonExistent(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/courses/{id}", path)
 
-	id := entity.NewID()
+	id := id.New()
 	service.EXPECT().DeleteCourse(id).Return(entity.ErrNotFound)
 	handler := deleteCourse(service)
 	req, _ := http.NewRequest("DELETE", "/v1/courses/"+id.String(), nil)

@@ -8,12 +8,13 @@ package presenter
 
 import (
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 )
 
 // Product data - TenantID is returned in the HTTP header
 // X-GLAD-TenantID
 type Product struct {
-	ID               entity.ID                `json:"id"`
+	ID               id.ID                    `json:"id"`
 	ExtName          string                   `json:"extName"`
 	Title            string                   `json:"title"`
 	CType            string                   `json:"ctype"`

@@ -14,6 +14,7 @@ import (
 
 	"ac9/glad/entity"
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/id"
 	"ac9/glad/services/coursed/presenter"
 	"ac9/glad/usecase/product"
 
@@ -31,7 +32,7 @@ func listProducts(service product.UseCase) http.Handler {
 		page, _ := strconv.Atoi(r.URL.Query().Get(httpParamPage))
 		limit, _ := strconv.Atoi(r.URL.Query().Get(httpParamLimit))
 
-		tenantID, err := entity.StringToID(tenant)
+		tenantID, err := id.FromString(tenant)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("Unable to parse tenant id"))
@@ -111,7 +112,7 @@ func createProduct(service product.UseCase) http.Handler {
 		}
 
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
-		tenantID, err := entity.StringToID(tenant)
+		tenantID, err := id.FromString(tenant)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("Missing tenant ID"))
@@ -171,7 +172,7 @@ func getProduct(service product.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error reading product"
 		vars := mux.Vars(r)
-		id, err := entity.StringToID(vars["id"])
+		id, err := id.FromString(vars["id"])
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
@@ -215,7 +216,7 @@ func deleteProduct(service product.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error removing product"
 		vars := mux.Vars(r)
-		id, err := entity.StringToID(vars["id"])
+		id, err := id.FromString(vars["id"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage))
@@ -243,7 +244,7 @@ func updateProduct(service product.UseCase) http.Handler {
 		errorMessage := "Error updating product"
 
 		vars := mux.Vars(r)
-		id, err := entity.StringToID(vars["id"])
+		productID, err := id.FromString(vars["id"])
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
@@ -252,7 +253,7 @@ func updateProduct(service product.UseCase) http.Handler {
 
 		var input entity.Product
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
-		tenantID, err := entity.StringToID(tenant)
+		tenantID, err := id.FromString(tenant)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("Missing tenant ID"))
@@ -267,7 +268,7 @@ func updateProduct(service product.UseCase) http.Handler {
 			return
 		}
 
-		input.ID = id
+		input.ID = productID
 		input.TenantID = tenantID
 		err = service.UpdateProduct(&input)
 		if err != nil {

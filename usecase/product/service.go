@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/id"
 )
 
 // Service product usecase
@@ -20,7 +21,7 @@ func NewService(r Repository) *Service {
 }
 
 // CreateProduct creates a product
-func (s *Service) CreateProduct(tenantID entity.ID,
+func (s *Service) CreateProduct(tenantID id.ID,
 	extID string,
 	extName string,
 	title string,
@@ -31,7 +32,7 @@ func (s *Service) CreateProduct(tenantID entity.ID,
 	maxAttendees int32,
 	format entity.ProductFormat,
 	isAutoApprove bool,
-) (entity.ID, error) {
+) (id.ID, error) {
 	p, err := entity.NewProduct(tenantID,
 		extID,
 		extName,
@@ -45,14 +46,14 @@ func (s *Service) CreateProduct(tenantID entity.ID,
 		isAutoApprove,
 	)
 	if err != nil {
-		return entity.IDInvalid, err
+		return id.IDInvalid, err
 	}
 
 	return s.repo.Create(p)
 }
 
 // GetProduct retrieves a product
-func (s *Service) GetProduct(id entity.ID) (*entity.Product, error) {
+func (s *Service) GetProduct(id id.ID) (*entity.Product, error) {
 	p, err := s.repo.Get(id)
 	if p == nil {
 		return nil, entity.ErrNotFound
@@ -65,7 +66,7 @@ func (s *Service) GetProduct(id entity.ID) (*entity.Product, error) {
 }
 
 // SearchProducts search product
-func (s *Service) SearchProducts(tenantID entity.ID, q string, page, limit int) ([]*entity.Product, error) {
+func (s *Service) SearchProducts(tenantID id.ID, q string, page, limit int) ([]*entity.Product, error) {
 	products, err := s.repo.Search(tenantID, strings.ToLower(q), page, limit)
 	if err != nil {
 		return nil, err
@@ -77,7 +78,7 @@ func (s *Service) SearchProducts(tenantID entity.ID, q string, page, limit int) 
 }
 
 // ListProducts list products
-func (s *Service) ListProducts(tenantID entity.ID, page, limit int) ([]*entity.Product, error) {
+func (s *Service) ListProducts(tenantID id.ID, page, limit int) ([]*entity.Product, error) {
 	products, err := s.repo.List(tenantID, page, limit)
 	if err != nil {
 		return nil, err
@@ -99,7 +100,7 @@ func (s *Service) UpdateProduct(p *entity.Product) error {
 }
 
 // DeleteProduct Delete a product
-func (s *Service) DeleteProduct(id entity.ID) error {
+func (s *Service) DeleteProduct(id id.ID) error {
 	p, err := s.GetProduct(id)
 	if p == nil {
 		return entity.ErrNotFound
@@ -112,7 +113,7 @@ func (s *Service) DeleteProduct(id entity.ID) error {
 }
 
 // GetCount gets total product count
-func (s *Service) GetCount(tenantID entity.ID) int {
+func (s *Service) GetCount(tenantID id.ID) int {
 	count, err := s.repo.GetCount(tenantID)
 	if err != nil {
 		return 0

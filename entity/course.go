@@ -7,6 +7,7 @@
 package entity
 
 import (
+	"ac9/glad/pkg/id"
 	"time"
 )
 
@@ -49,31 +50,31 @@ type CourseAddress struct {
 
 // Course organizer
 type CourseOrganizer struct {
-	ID
+	id.ID
 }
 
 // Course teacher
 type CourseTeacher struct {
-	ID        ID
+	ID        id.ID
 	IsPrimary bool
 }
 
 // Course contact
 type CourseContact struct {
-	ID
+	id.ID
 }
 
 // Course notify
 type CourseNotify struct {
-	ID
+	id.ID
 }
 
 // Course data
 type Course struct {
-	ID        ID
-	TenantID  ID
-	CenterID  ID
-	ProductID ID
+	ID        id.ID
+	TenantID  id.ID
+	CenterID  id.ID
+	ProductID id.ID
 
 	// TODO: Check whether sql.NullString is a better option
 	ExtID *string
@@ -128,10 +129,10 @@ func (l *CourseAddress) Validate() error {
 }
 
 // NewCourse create a new course
-func NewCourse(tenantID ID,
+func NewCourse(tenantID id.ID,
 	extID *string,
-	centerID ID,
-	productID ID,
+	centerID id.ID,
+	productID id.ID,
 	name string,
 	notes string,
 	timezone string,
@@ -142,7 +143,7 @@ func NewCourse(tenantID ID,
 	numAttendees int32,
 ) (*Course, error) {
 	c := &Course{
-		ID:           NewID(),
+		ID:           id.New(),
 		TenantID:     tenantID,
 		ExtID:        extID,
 		CenterID:     centerID,
@@ -168,7 +169,7 @@ func NewCourse(tenantID ID,
 func (c Course) New() (*Course, error) {
 	course := &c
 
-	course.ID = NewID()
+	course.ID = id.New()
 	course.CreatedAt = time.Now()
 	course.UpdatedAt = course.CreatedAt
 
