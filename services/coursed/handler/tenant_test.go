@@ -15,6 +15,7 @@ import (
 
 	"ac9/glad/entity"
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	"ac9/glad/services/coursed/presenter"
 
@@ -175,7 +176,7 @@ func Test_deleteTenantNonExistent(t *testing.T) {
 	assert.Equal(t, "/v1/tenants/{id}", path)
 
 	id := id.New()
-	service.EXPECT().DeleteTenant(id).Return(entity.ErrNotFound)
+	service.EXPECT().DeleteTenant(id).Return(glad.ErrNotFound)
 	handler := deleteTenant(service)
 	req, _ := http.NewRequest("DELETE", "/v1/tenants/"+id.String(), nil)
 	r.Handle("/v1/tenants/{id}", handler).Methods("DELETE", "OPTIONS")

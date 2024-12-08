@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 )
 
@@ -46,7 +47,7 @@ func (s *Service) CreateCenter(tenantID id.ID,
 func (s *Service) GetCenter(id id.ID) (*entity.Center, error) {
 	t, err := s.repo.Get(id)
 	if t == nil {
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
@@ -64,7 +65,7 @@ func (s *Service) SearchCenters(tenantID id.ID,
 		return nil, err
 	}
 	if len(centers) == 0 {
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	return centers, nil
 }
@@ -76,7 +77,7 @@ func (s *Service) ListCenters(tenantID id.ID, page, limit int) ([]*entity.Center
 		return nil, err
 	}
 	if len(centers) == 0 {
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	return centers, nil
 }
@@ -85,7 +86,7 @@ func (s *Service) ListCenters(tenantID id.ID, page, limit int) ([]*entity.Center
 func (s *Service) DeleteCenter(id id.ID) error {
 	t, err := s.GetCenter(id)
 	if t == nil {
-		return entity.ErrNotFound
+		return glad.ErrNotFound
 	}
 	if err != nil {
 		return err

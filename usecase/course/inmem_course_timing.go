@@ -8,6 +8,7 @@ package course
 
 import (
 	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	"log"
 )
@@ -36,7 +37,7 @@ func (r *inmemCourseTiming) Create(e *entity.CourseTiming) (id.ID, error) {
 func (r *inmemCourseTiming) Get(id id.ID) (*entity.CourseTiming, error) {
 	if r.m[id] == nil {
 		log.Printf("Inmem CourseTiming Get() id=%#v, not found", id)
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	return r.m[id], nil
 }
@@ -66,7 +67,7 @@ func (r *inmemCourseTiming) GetByCourse(courseID id.ID) ([]*entity.CourseTiming,
 // Delete a course
 func (r *inmemCourseTiming) Delete(id id.ID) error {
 	if r.m[id] == nil {
-		return entity.ErrNotFound
+		return glad.ErrNotFound
 	}
 	r.m[id] = nil
 	delete(r.m, id)

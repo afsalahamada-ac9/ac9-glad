@@ -7,6 +7,7 @@
 package entity
 
 import (
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	"time"
 )
@@ -81,7 +82,7 @@ func NewAccount(tenantID id.ID,
 	}
 	err := t.Validate()
 	if err != nil {
-		return nil, ErrInvalidEntity
+		return nil, glad.ErrInvalidEntity
 	}
 	return t, nil
 }
@@ -89,7 +90,7 @@ func NewAccount(tenantID id.ID,
 // Validate validate account
 func (t *Account) Validate() error {
 	if t.Username == "" {
-		return ErrInvalidEntity
+		return glad.ErrInvalidEntity
 	}
 
 	return nil

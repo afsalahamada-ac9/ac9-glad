@@ -14,6 +14,7 @@ import (
 
 	"ac9/glad/entity"
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	"ac9/glad/services/coursed/presenter"
 	"ac9/glad/usecase/product"
@@ -48,7 +49,7 @@ func listProducts(service product.UseCase) http.Handler {
 			data, err = service.SearchProducts(tenantID, search, page, limit)
 		}
 		w.Header().Set("Content-Type", "application/json")
-		if err != nil && err != entity.ErrNotFound {
+		if err != nil && err != glad.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
@@ -169,7 +170,7 @@ func getProduct(service product.UseCase) http.Handler {
 			return
 		}
 		data, err := service.GetProduct(id)
-		if err != nil && err != entity.ErrNotFound {
+		if err != nil && err != glad.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
@@ -217,7 +218,7 @@ func deleteProduct(service product.UseCase) http.Handler {
 		case nil:
 			w.WriteHeader(http.StatusOK)
 			return
-		case entity.ErrNotFound:
+		case glad.ErrNotFound:
 			w.WriteHeader(http.StatusNotFound)
 			_, _ = w.Write([]byte("Product doesn't exist"))
 			return

@@ -7,7 +7,7 @@
 package common
 
 import (
-	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"net/http"
 	"strconv"
 )
@@ -55,7 +55,7 @@ func HttpGetPathParams(
 	if limit > MaxHttpPaginationLimit {
 		w.WriteHeader(http.StatusBadRequest)
 		_, _ = w.Write([]byte("Page size requested is more than allowed limit"))
-		err = entity.ErrInvalidEntity // TODO
+		err = glad.ErrInvalidEntity // TODO
 		return
 	}
 

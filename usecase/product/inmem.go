@@ -11,6 +11,7 @@ import (
 	"sync"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 )
 
@@ -45,7 +46,7 @@ func (r *inmem) Get(id id.ID) (*entity.Product, error) {
 	if product, ok := r.m[id]; ok {
 		return product, nil
 	}
-	return nil, entity.ErrNotFound
+	return nil, glad.ErrNotFound
 }
 
 // Update updates a product in memory
@@ -55,7 +56,7 @@ func (r *inmem) Update(e *entity.Product) error {
 
 	_, ok := r.m[e.ID]
 	if !ok {
-		return entity.ErrNotFound
+		return glad.ErrNotFound
 	}
 
 	r.m[e.ID] = e
@@ -100,7 +101,7 @@ func (r *inmem) Delete(id id.ID) error {
 		delete(r.m, id)
 		return nil
 	}
-	return entity.ErrNotFound
+	return glad.ErrNotFound
 }
 
 // Search searches for products in memory

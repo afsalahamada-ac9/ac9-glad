@@ -7,6 +7,7 @@
 package entity
 
 import (
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	"time"
 )
@@ -79,7 +80,7 @@ func NewProduct(tenantID id.ID,
 
 	err := p.Validate()
 	if err != nil {
-		return nil, ErrInvalidEntity
+		return nil, glad.ErrInvalidEntity
 	}
 
 	return p, nil
@@ -88,19 +89,19 @@ func NewProduct(tenantID id.ID,
 // Validate validates the product fields
 func (p *Product) Validate() error {
 	if p.TenantID == 0 {
-		return ErrInvalidEntity
+		return glad.ErrInvalidEntity
 	}
 
 	if p.ExtName == "" {
-		return ErrInvalidEntity
+		return glad.ErrInvalidEntity
 	}
 
 	if p.Title == "" {
-		return ErrInvalidEntity
+		return glad.ErrInvalidEntity
 	}
 
 	if p.CType == "" {
-		return ErrInvalidEntity
+		return glad.ErrInvalidEntity
 	}
 
 	return nil

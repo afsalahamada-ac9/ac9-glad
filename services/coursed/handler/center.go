@@ -13,6 +13,7 @@ import (
 	"strconv"
 
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	"ac9/glad/usecase/center"
 
@@ -57,7 +58,7 @@ func listCenters(service center.UseCase) http.Handler {
 			data, err = service.SearchCenters(tenantID, search, page, limit)
 		}
 		w.Header().Set("Content-Type", "application/json")
-		if err != nil && err != entity.ErrNotFound {
+		if err != nil && err != glad.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
@@ -155,7 +156,7 @@ func getCenter(service center.UseCase) http.Handler {
 			return
 		}
 		data, err := service.GetCenter(id)
-		if err != nil && err != entity.ErrNotFound {
+		if err != nil && err != glad.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
@@ -197,7 +198,7 @@ func deleteCenter(service center.UseCase) http.Handler {
 		case nil:
 			w.WriteHeader(http.StatusOK)
 			return
-		case entity.ErrNotFound:
+		case glad.ErrNotFound:
 			w.WriteHeader(http.StatusNotFound)
 			_, _ = w.Write([]byte("Center doesn't exist"))
 			return

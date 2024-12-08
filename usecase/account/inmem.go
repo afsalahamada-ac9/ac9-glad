@@ -8,6 +8,7 @@ package account
 
 import (
 	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	"strings"
 )
@@ -39,7 +40,7 @@ func (r *inmem) Get(id id.ID) (*entity.Account, error) {
 		}
 	}
 
-	return nil, entity.ErrNotFound
+	return nil, glad.ErrNotFound
 }
 
 // Get retrieves an account using username
@@ -50,14 +51,14 @@ func (r *inmem) GetByName(tenantID id.ID, username string) (*entity.Account, err
 		}
 	}
 
-	return nil, entity.ErrNotFound
+	return nil, glad.ErrNotFound
 }
 
 // Update an account
 func (r *inmem) Update(e *entity.Account) error {
 	account := r.m[e.ID]
 	if account == nil {
-		return entity.ErrNotFound
+		return glad.ErrNotFound
 	}
 
 	account.ExtID = e.ExtID

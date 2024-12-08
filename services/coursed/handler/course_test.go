@@ -15,6 +15,7 @@ import (
 
 	"ac9/glad/entity"
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	"ac9/glad/services/coursed/presenter"
 
@@ -66,7 +67,7 @@ func Test_listCourses_NotFound(t *testing.T) {
 	service.EXPECT().GetCount(tenantID).Return(0)
 	service.EXPECT().
 		SearchCourses(tenantID, "non-existent", gomock.Any(), gomock.Any()).
-		Return(nil, entity.ErrNotFound)
+		Return(nil, glad.ErrNotFound)
 
 	client := &http.Client{}
 	req, _ := http.NewRequest(http.MethodGet,
@@ -238,7 +239,7 @@ func Test_deleteCourseNonExistent(t *testing.T) {
 	assert.Equal(t, "/v1/courses/{id}", path)
 
 	id := id.New()
-	service.EXPECT().DeleteCourse(id).Return(entity.ErrNotFound)
+	service.EXPECT().DeleteCourse(id).Return(glad.ErrNotFound)
 	handler := deleteCourse(service)
 	req, _ := http.NewRequest("DELETE", "/v1/courses/"+id.String(), nil)
 	r.Handle("/v1/courses/{id}", handler).Methods("DELETE", "OPTIONS")

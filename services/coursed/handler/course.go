@@ -13,6 +13,7 @@ import (
 	"strconv"
 
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	"ac9/glad/usecase/course"
 
@@ -52,7 +53,7 @@ func listCourses(service course.UseCase) http.Handler {
 			data, err = service.SearchCourses(tenantID, search, page, limit)
 		}
 		w.Header().Set("Content-Type", "application/json")
-		if err != nil && err != entity.ErrNotFound {
+		if err != nil && err != glad.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
@@ -174,7 +175,7 @@ func getCourse(service course.UseCase) http.Handler {
 			return
 		}
 		data, err := service.GetCourse(id)
-		if err != nil && err != entity.ErrNotFound {
+		if err != nil && err != glad.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
@@ -204,7 +205,7 @@ func getCourseMe(service course.UseCase) http.Handler {
 
 		// hard-coded value
 		data, err := service.GetCourse(5312925492834409472)
-		if err != nil && err != entity.ErrNotFound {
+		if err != nil && err != glad.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
@@ -244,7 +245,7 @@ func deleteCourse(service course.UseCase) http.Handler {
 		case nil:
 			w.WriteHeader(http.StatusOK)
 			return
-		case entity.ErrNotFound:
+		case glad.ErrNotFound:
 			w.WriteHeader(http.StatusNotFound)
 			_, _ = w.Write([]byte("Course doesn't exist"))
 			return

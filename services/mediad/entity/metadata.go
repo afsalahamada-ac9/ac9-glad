@@ -7,7 +7,7 @@
 package entity
 
 import (
-	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"time"
 )
 
@@ -30,9 +30,9 @@ type Media struct {
 // NewQuote creates a new Quote instance
 func NewQuote(version int64, url string, total int) (*Quote, error) {
 	q := &Quote{
-		Version:     version,
-		URL:         url,
-		Total:       total,
+		Version: version,
+		URL:     url,
+		Total:   total,
 	}
 	if err := q.Validate(); err != nil {
 		return nil, err
@@ -43,9 +43,9 @@ func NewQuote(version int64, url string, total int) (*Quote, error) {
 // NewMedia creates a new Media instance
 func NewMedia(version int64, url string, total int) (*Media, error) {
 	m := &Media{
-		Version:     version,
-		URL:         url,
-		Total:       total,
+		Version: version,
+		URL:     url,
+		Total:   total,
 	}
 	if err := m.Validate(); err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func NewMedia(version int64, url string, total int) (*Media, error) {
 // Validate validates the Quote fields
 func (q *Quote) Validate() error {
 	if q.URL == "" || q.Version < 0 {
-		return entity.ErrInvalidEntity
+		return glad.ErrInvalidEntity
 	}
 	return nil
 }
@@ -64,7 +64,7 @@ func (q *Quote) Validate() error {
 // Validate validates the Media fields
 func (m *Media) Validate() error {
 	if m.URL == "" || m.Version < 0 {
-		return entity.ErrInvalidEntity
+		return glad.ErrInvalidEntity
 	}
 	return nil
 }

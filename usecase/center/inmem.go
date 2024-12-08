@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 )
 
@@ -35,7 +36,7 @@ func (r *inmem) Create(e *entity.Center) (id.ID, error) {
 // Get a center
 func (r *inmem) Get(id id.ID) (*entity.Center, error) {
 	if r.m[id] == nil {
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	return r.m[id], nil
 }
@@ -106,7 +107,7 @@ func (r *inmem) List(tenantID id.ID, page, limit int) ([]*entity.Center, error) 
 // Delete a center
 func (r *inmem) Delete(id id.ID) error {
 	if r.m[id] == nil {
-		return entity.ErrNotFound
+		return glad.ErrNotFound
 	}
 	r.m[id] = nil
 	delete(r.m, id)

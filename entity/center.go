@@ -7,6 +7,7 @@
 package entity
 
 import (
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	"time"
 )
@@ -77,7 +78,7 @@ func NewCenterAddress(street1 string,
 	}
 	err := l.Validate()
 	if err != nil {
-		return nil, ErrInvalidEntity
+		return nil, glad.ErrInvalidEntity
 	}
 	return l, nil
 }
@@ -85,7 +86,7 @@ func NewCenterAddress(street1 string,
 // Validate validates center address
 func (l *CenterAddress) Validate() error {
 	if l.Street1 == "" || l.City == "" || l.State == "" || l.Zip == "" || l.Country == "" {
-		return ErrInvalidEntity
+		return glad.ErrInvalidEntity
 	}
 	return nil
 }
@@ -98,7 +99,7 @@ func NewCenterGeoLocation(lat float64, long float64) (*CenterGeoLocation, error)
 	}
 	err := g.Validate()
 	if err != nil {
-		return nil, ErrInvalidEntity
+		return nil, glad.ErrInvalidEntity
 	}
 	return g, nil
 }
@@ -106,7 +107,7 @@ func NewCenterGeoLocation(lat float64, long float64) (*CenterGeoLocation, error)
 // Validate validates center geo location
 func (g *CenterGeoLocation) Validate() error {
 	if g.Lat == 0 || g.Long == 0 {
-		return ErrInvalidEntity
+		return glad.ErrInvalidEntity
 	}
 	return nil
 }
@@ -141,7 +142,7 @@ func NewCenter(tenantID id.ID,
 	}
 	err := c.Validate()
 	if err != nil {
-		return nil, ErrInvalidEntity
+		return nil, glad.ErrInvalidEntity
 	}
 	return c, nil
 }
@@ -149,7 +150,7 @@ func NewCenter(tenantID id.ID,
 // Validate validate center
 func (c *Center) Validate() error {
 	if c.ExtID == "" || c.Name == "" {
-		return ErrInvalidEntity
+		return glad.ErrInvalidEntity
 	}
 	return nil
 }

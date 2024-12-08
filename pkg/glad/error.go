@@ -4,14 +4,14 @@
  * This code may not be used, copied, modified, or distributed without explicit permission.
  */
 
-package entity
+package glad
 
 import "errors"
 
 // ErrNotFound not found
 var ErrNotFound = errors.New("not found")
 
-// ErrInvalidEntity invalid entity
+// glad.ErrInvalidEntity invalid entity
 var ErrInvalidEntity = errors.New("invalid entity")
 
 // ErrTokenMismatch auth token invalid (error)

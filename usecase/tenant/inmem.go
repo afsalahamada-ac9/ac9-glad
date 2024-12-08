@@ -8,6 +8,7 @@ package tenant
 
 import (
 	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 )
 
@@ -33,7 +34,7 @@ func (r *inmem) Create(e *entity.Tenant) (id.ID, error) {
 // Get a tenant
 func (r *inmem) Get(id id.ID) (*entity.Tenant, error) {
 	if r.m[id] == nil {
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	return r.m[id], nil
 }
@@ -45,7 +46,7 @@ func (r *inmem) GetByName(name string) (*entity.Tenant, error) {
 			return j, nil
 		}
 	}
-	return nil, entity.ErrNotFound
+	return nil, glad.ErrNotFound
 }
 
 // Update a tenant
@@ -83,7 +84,7 @@ func (r *inmem) List(page, limit int) ([]*entity.Tenant, error) {
 // Delete a tenant
 func (r *inmem) Delete(id id.ID) error {
 	if r.m[id] == nil {
-		return entity.ErrNotFound
+		return glad.ErrNotFound
 	}
 	r.m[id] = nil
 	delete(r.m, id)

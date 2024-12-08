@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 
 	"github.com/stretchr/testify/assert"
@@ -141,7 +142,7 @@ func Test_Update(t *testing.T) {
 	assert.Nil(t, m.UpdateAccount(saved))
 
 	_, err = m.GetAccountByName(tenantAlice, account.Username)
-	assert.Equal(t, entity.ErrNotFound, err)
+	assert.Equal(t, glad.ErrNotFound, err)
 
 	updated, err := m.GetAccountByName(tenantAlice, saved.Username)
 	assert.Nil(t, err)
@@ -171,11 +172,11 @@ func TestDelete(t *testing.T) {
 	)
 
 	err := m.DeleteAccountByName(tenantAlice, account1.Username)
-	assert.Equal(t, entity.ErrNotFound, err)
+	assert.Equal(t, glad.ErrNotFound, err)
 
 	err = m.DeleteAccountByName(tenantAlice, account2.Username)
 	assert.Nil(t, err)
 
 	_, err = m.GetAccountByName(tenantAlice, account2.Username)
-	assert.Equal(t, entity.ErrNotFound, err)
+	assert.Equal(t, glad.ErrNotFound, err)
 }

@@ -11,11 +11,10 @@ import (
 	"net/http"
 
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	"ac9/glad/services/coursed/presenter"
 	"ac9/glad/usecase/account"
-
-	"ac9/glad/entity"
 
 	"github.com/gorilla/mux"
 	"github.com/ulule/deepcopier"
@@ -37,7 +36,7 @@ func getParticipantByCourse(service account.UseCase) http.Handler {
 
 		// hard-coded value
 		data, err := service.GetAccountByName(tenantID, "Sri Sri Ravi Shankar")
-		if err != nil && err != entity.ErrNotFound {
+		if err != nil && err != glad.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return

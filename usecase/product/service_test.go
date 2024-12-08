@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 
 	"github.com/stretchr/testify/assert"
@@ -105,7 +106,7 @@ func Test_SearchAndFind(t *testing.T) {
 		assert.Equal(t, 2, len(res))
 
 		res, err = m.SearchProducts(tmpl1.TenantID, "non-existent", 0, 0)
-		assert.Equal(t, entity.ErrNotFound, err)
+		assert.Equal(t, glad.ErrNotFound, err)
 		assert.Nil(t, res)
 	})
 
@@ -177,10 +178,10 @@ func TestDeleteProduct(t *testing.T) {
 	)
 
 	err := m.DeleteProduct(tmpl1.ID)
-	assert.Equal(t, entity.ErrNotFound, err)
+	assert.Equal(t, glad.ErrNotFound, err)
 
 	err = m.DeleteProduct(id2)
 	assert.Nil(t, err)
 	_, err = m.GetProduct(id2)
-	assert.Equal(t, entity.ErrNotFound, err)
+	assert.Equal(t, glad.ErrNotFound, err)
 }

@@ -7,6 +7,7 @@
 package entity
 
 import (
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	"time"
 )
@@ -44,7 +45,7 @@ func NewCourseDateTime(
 	}
 	err := dt.Validate()
 	if err != nil {
-		return nil, ErrInvalidEntity
+		return nil, glad.ErrInvalidEntity
 	}
 	return dt, nil
 }
@@ -52,7 +53,7 @@ func NewCourseDateTime(
 // Validate validates course date/time
 func (dt *CourseDateTime) Validate() error {
 	if dt.Date == "" || dt.StartTime == "" || dt.EndTime == "" {
-		return ErrInvalidEntity
+		return glad.ErrInvalidEntity
 	}
 	return nil
 }
@@ -75,7 +76,7 @@ func NewCourseTiming(
 	}
 	err := ct.Validate()
 	if err != nil {
-		return nil, ErrInvalidEntity
+		return nil, glad.ErrInvalidEntity
 	}
 	return ct, nil
 }
@@ -92,7 +93,7 @@ func (ct CourseTiming) New() (*CourseTiming, error) {
 
 	err := courseTiming.Validate()
 	if err != nil {
-		return nil, ErrInvalidEntity
+		return nil, glad.ErrInvalidEntity
 	}
 	return courseTiming, nil
 }
@@ -100,7 +101,7 @@ func (ct CourseTiming) New() (*CourseTiming, error) {
 // Validate validate course timings
 func (ct *CourseTiming) Validate() error {
 	if ct.CourseID == id.IDInvalid {
-		return ErrInvalidEntity
+		return glad.ErrInvalidEntity
 	}
 
 	return nil

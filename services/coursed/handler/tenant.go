@@ -13,6 +13,7 @@ import (
 	"strconv"
 
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	"ac9/glad/usecase/tenant"
 
@@ -38,7 +39,7 @@ func listTenants(service tenant.UseCase) http.Handler {
 
 		data, err = service.ListTenants(page, limit)
 		w.Header().Set("Content-Type", "application/json")
-		if err != nil && err != entity.ErrNotFound {
+		if err != nil && err != glad.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
@@ -118,7 +119,7 @@ func getTenant(service tenant.UseCase) http.Handler {
 			return
 		}
 		data, err := service.GetTenant(tenantID)
-		if err != nil && err != entity.ErrNotFound {
+		if err != nil && err != glad.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
@@ -159,7 +160,7 @@ func deleteTenant(service tenant.UseCase) http.Handler {
 		case nil:
 			w.WriteHeader(http.StatusOK)
 			return
-		case entity.ErrNotFound:
+		case glad.ErrNotFound:
 			w.WriteHeader(http.StatusNotFound)
 			_, _ = w.Write([]byte("Tenant doesn't exist"))
 			return
@@ -192,7 +193,7 @@ func login(service tenant.UseCase) http.Handler {
 		case nil:
 			break
 		// intentionally returning same response for auth failure and not found scenarios
-		case entity.ErrAuthFailure, entity.ErrNotFound:
+		case glad.ErrAuthFailure, glad.ErrNotFound:
 			w.WriteHeader(http.StatusUnauthorized)
 			_, _ = w.Write([]byte("Invalid login credentials"))
 			return

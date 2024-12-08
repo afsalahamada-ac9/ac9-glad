@@ -7,6 +7,7 @@
 package entity
 
 import (
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	"time"
 )
@@ -115,7 +116,7 @@ func NewCourseAddress(street1 string,
 	}
 	err := l.Validate()
 	if err != nil {
-		return nil, ErrInvalidEntity
+		return nil, glad.ErrInvalidEntity
 	}
 	return l, nil
 }
@@ -123,7 +124,7 @@ func NewCourseAddress(street1 string,
 // Validate validates course address
 func (l *CourseAddress) Validate() error {
 	if l.Street1 == "" || l.City == "" || l.State == "" || l.Zip == "" || l.Country == "" {
-		return ErrInvalidEntity
+		return glad.ErrInvalidEntity
 	}
 	return nil
 }
@@ -160,7 +161,7 @@ func NewCourse(tenantID id.ID,
 	}
 	err := c.Validate()
 	if err != nil {
-		return nil, ErrInvalidEntity
+		return nil, glad.ErrInvalidEntity
 	}
 	return c, nil
 }
@@ -175,7 +176,7 @@ func (c Course) New() (*Course, error) {
 
 	err := course.Validate()
 	if err != nil {
-		return nil, ErrInvalidEntity
+		return nil, glad.ErrInvalidEntity
 	}
 	return course, nil
 }
@@ -183,7 +184,7 @@ func (c Course) New() (*Course, error) {
 // Validate validate course
 func (c *Course) Validate() error {
 	if c.Name == "" {
-		return ErrInvalidEntity
+		return glad.ErrInvalidEntity
 	}
 	return nil
 }

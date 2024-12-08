@@ -7,6 +7,7 @@
 package entity
 
 import (
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	"crypto/sha256"
 	"encoding/base64"
@@ -39,7 +40,7 @@ func NewTenant(name, country string) (*Tenant, error) {
 	}
 	err := t.Validate()
 	if err != nil {
-		return nil, ErrInvalidEntity
+		return nil, glad.ErrInvalidEntity
 	}
 	return t, nil
 }
@@ -48,11 +49,11 @@ func NewTenant(name, country string) (*Tenant, error) {
 func (t *Tenant) Validate() error {
 	if t.Country == "" {
 		log.Printf("Invalid country")
-		return ErrInvalidEntity
+		return glad.ErrInvalidEntity
 	}
 
 	if t.Name == "" {
-		return ErrInvalidEntity
+		return glad.ErrInvalidEntity
 	}
 	return nil
 }
@@ -80,7 +81,7 @@ func (t *Tenant) ValidatePassword(p1, p2 string) error {
 // ValidateToken validate tenant auth token
 func (t *Tenant) ValidateToken(token, password string) error {
 	if token != t.genToken(password) {
-		return ErrTokenMismatch
+		return glad.ErrTokenMismatch
 	}
 
 	return nil

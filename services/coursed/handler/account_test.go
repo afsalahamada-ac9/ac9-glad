@@ -16,6 +16,7 @@ import (
 
 	"ac9/glad/entity"
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	"ac9/glad/pkg/logger"
 	"ac9/glad/services/coursed/presenter"
@@ -214,7 +215,7 @@ func Test_deleteAccountNonExistent(t *testing.T) {
 	assert.Equal(t, "/v1/accounts/{username}", path)
 
 	username := accountUsernamePrimary
-	service.EXPECT().DeleteAccountByName(tenantAlice, username).Return(entity.ErrNotFound)
+	service.EXPECT().DeleteAccountByName(tenantAlice, username).Return(glad.ErrNotFound)
 	handler := deleteAccount(service)
 	req, _ := http.NewRequest("DELETE", "/v1/accounts/"+username, nil)
 	req.Header.Set(common.HttpHeaderTenantID, tenantAlice.String())

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 
 	"github.com/stretchr/testify/assert"
@@ -90,12 +91,12 @@ func TestDelete(t *testing.T) {
 	t2ID, _ := m.CreateTenant(t2.Name, t2.Country)
 
 	err := m.DeleteTenant(t1.ID)
-	assert.Equal(t, entity.ErrNotFound, err)
+	assert.Equal(t, glad.ErrNotFound, err)
 
 	err = m.DeleteTenant(t2ID)
 	assert.Nil(t, err)
 	_, err = m.GetTenant(t2ID)
-	assert.Equal(t, entity.ErrNotFound, err)
+	assert.Equal(t, glad.ErrNotFound, err)
 }
 
 func TestLogin(t *testing.T) {
@@ -121,7 +122,7 @@ func TestLogin(t *testing.T) {
 	// Not a valid test case
 	// t.Run("invalid credentials", func(t *testing.T) {
 	// 	tenant, err := m.Login(t1.Name, "CountryInvalid")
-	// 	assert.Equal(t, err, entity.ErrAuthFailure)
+	// 	assert.Equal(t, err, glad.ErrAuthFailure)
 	// 	assert.Nil(t, tenant)
 	// })
 }

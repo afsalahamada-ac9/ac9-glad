@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 )
 
@@ -40,7 +41,7 @@ func (s *Service) CreateTenant(name, country string) (id.ID, error) {
 func (s *Service) GetTenant(id id.ID) (*entity.Tenant, error) {
 	t, err := s.repo.Get(id)
 	if t == nil {
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
@@ -53,7 +54,7 @@ func (s *Service) GetTenant(id id.ID) (*entity.Tenant, error) {
 func (s *Service) GetTenantByName(name string) (*entity.Tenant, error) {
 	t, err := s.repo.GetByName(name)
 	if t == nil {
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
@@ -69,7 +70,7 @@ func (s *Service) ListTenants(page, limit int) ([]*entity.Tenant, error) {
 		return nil, err
 	}
 	if len(tenants) == 0 {
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	return tenants, nil
 }
@@ -78,7 +79,7 @@ func (s *Service) ListTenants(page, limit int) ([]*entity.Tenant, error) {
 func (s *Service) DeleteTenant(id id.ID) error {
 	t, err := s.GetTenant(id)
 	if t == nil {
-		return entity.ErrNotFound
+		return glad.ErrNotFound
 	}
 	if err != nil {
 		return err
@@ -123,12 +124,12 @@ func (s *Service) Login(name, password string) (*entity.Tenant, error) {
 
 	// // Validate credentials
 	// if t.ValidatePassword(password) != nil {
-	// 	return nil, entity.ErrAuthFailure
+	// 	return nil, glad.ErrAuthFailure
 	// }
 
 	// // Generate token
 	// if t.GenToken() != nil {
-	// 	return nil, entity.ErrCreateToken
+	// 	return nil, glad.ErrCreateToken
 	// }
 
 	// Update tenant: store token to database

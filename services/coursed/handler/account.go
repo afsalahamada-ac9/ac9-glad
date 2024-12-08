@@ -13,6 +13,7 @@ import (
 	"strconv"
 
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	l "ac9/glad/pkg/logger"
 	"ac9/glad/usecase/account"
@@ -55,7 +56,7 @@ func listAccounts(service account.UseCase) http.Handler {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		if err != nil && err != entity.ErrNotFound {
+		if err != nil && err != glad.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
@@ -161,7 +162,7 @@ func getAccount(service account.UseCase) http.Handler {
 		vars := mux.Vars(r)
 		username := vars["username"]
 		data, err := service.GetAccountByName(tenantID, username)
-		if err != nil && err != entity.ErrNotFound {
+		if err != nil && err != glad.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
@@ -203,7 +204,7 @@ func deleteAccount(service account.UseCase) http.Handler {
 		case nil:
 			w.WriteHeader(http.StatusOK)
 			return
-		case entity.ErrNotFound:
+		case glad.ErrNotFound:
 			w.WriteHeader(http.StatusNotFound)
 			_, _ = w.Write([]byte("Account doesn't exist"))
 			return

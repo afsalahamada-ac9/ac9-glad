@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 )
 
@@ -59,7 +60,7 @@ func (s *Service) CreateAccount(
 func (s *Service) GetAccount(id id.ID) (*entity.Account, error) {
 	account, err := s.repo.Get(id)
 	if account == nil {
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
@@ -72,7 +73,7 @@ func (s *Service) GetAccount(id id.ID) (*entity.Account, error) {
 func (s *Service) GetAccountByName(tenantID id.ID, username string) (*entity.Account, error) {
 	account, err := s.repo.GetByName(tenantID, username)
 	if account == nil {
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
@@ -88,7 +89,7 @@ func (s *Service) ListAccounts(tenantID id.ID, page, limit int, at entity.Accoun
 		return nil, err
 	}
 	if len(accounts) == 0 {
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	return accounts, nil
 }
@@ -107,7 +108,7 @@ func (s *Service) UpdateAccount(t *entity.Account) error {
 func (s *Service) DeleteAccount(id id.ID) error {
 	account, err := s.GetAccount(id)
 	if account == nil {
-		return entity.ErrNotFound
+		return glad.ErrNotFound
 	}
 	if err != nil {
 		return err
@@ -120,7 +121,7 @@ func (s *Service) DeleteAccount(id id.ID) error {
 func (s *Service) DeleteAccountByName(tenantID id.ID, username string) error {
 	account, err := s.GetAccountByName(tenantID, username)
 	if account == nil {
-		return entity.ErrNotFound
+		return glad.ErrNotFound
 	}
 	if err != nil {
 		return err
@@ -146,7 +147,7 @@ func (s *Service) SearchAccounts(tenantID id.ID, query string, page, limit int, 
 		return nil, err
 	}
 	if len(accounts) == 0 {
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	return accounts, nil
 }

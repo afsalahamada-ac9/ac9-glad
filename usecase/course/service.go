@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 )
 
@@ -93,7 +94,7 @@ func (s *Service) CreateCourse(
 func (s *Service) GetCourse(id id.ID) (*entity.Course, error) {
 	t, err := s.cRepo.Get(id)
 	if t == nil {
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
@@ -111,7 +112,7 @@ func (s *Service) SearchCourses(tenantID id.ID,
 		return nil, err
 	}
 	if len(courses) == 0 {
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	return courses, nil
 }
@@ -123,7 +124,7 @@ func (s *Service) ListCourses(tenantID id.ID, page, limit int) ([]*entity.Course
 		return nil, err
 	}
 	if len(courses) == 0 {
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	return courses, nil
 }
@@ -133,7 +134,7 @@ func (s *Service) ListCourses(tenantID id.ID, page, limit int) ([]*entity.Course
 func (s *Service) DeleteCourse(id id.ID) error {
 	t, err := s.GetCourse(id)
 	if t == nil {
-		return entity.ErrNotFound
+		return glad.ErrNotFound
 	}
 	if err != nil {
 		return err

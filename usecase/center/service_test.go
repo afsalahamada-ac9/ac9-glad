@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 
 	"github.com/stretchr/testify/assert"
@@ -72,7 +73,7 @@ func Test_SearchAndFind(t *testing.T) {
 		assert.Equal(t, 2, len(res))
 
 		res, err = m.SearchCenters(tmpl1.TenantID, "non-existent", 0, 0)
-		assert.Equal(t, entity.ErrNotFound, err)
+		assert.Equal(t, glad.ErrNotFound, err)
 		assert.Nil(t, res)
 	})
 	t.Run("list all", func(t *testing.T) {
@@ -117,10 +118,10 @@ func TestDelete(t *testing.T) {
 	t2ID, _ := m.CreateCenter(tmpl2.TenantID, tmpl2.ExtID, tmpl2.ExtName, tmpl2.Name, tmpl2.Mode, tmpl2.IsEnabled)
 
 	err := m.DeleteCenter(tmpl1.ID)
-	assert.Equal(t, entity.ErrNotFound, err)
+	assert.Equal(t, glad.ErrNotFound, err)
 
 	err = m.DeleteCenter(t2ID)
 	assert.Nil(t, err)
 	_, err = m.GetCenter(t2ID)
-	assert.Equal(t, entity.ErrNotFound, err)
+	assert.Equal(t, glad.ErrNotFound, err)
 }

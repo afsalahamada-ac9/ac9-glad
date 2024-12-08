@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 )
 
@@ -56,7 +57,7 @@ func (s *Service) CreateProduct(tenantID id.ID,
 func (s *Service) GetProduct(id id.ID) (*entity.Product, error) {
 	p, err := s.repo.Get(id)
 	if p == nil {
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
@@ -72,7 +73,7 @@ func (s *Service) SearchProducts(tenantID id.ID, q string, page, limit int) ([]*
 		return nil, err
 	}
 	if len(products) == 0 {
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	return products, nil
 }
@@ -84,7 +85,7 @@ func (s *Service) ListProducts(tenantID id.ID, page, limit int) ([]*entity.Produ
 		return nil, err
 	}
 	if len(products) == 0 {
-		return nil, entity.ErrNotFound
+		return nil, glad.ErrNotFound
 	}
 	return products, nil
 }
@@ -103,7 +104,7 @@ func (s *Service) UpdateProduct(p *entity.Product) error {
 func (s *Service) DeleteProduct(id id.ID) error {
 	p, err := s.GetProduct(id)
 	if p == nil {
-		return entity.ErrNotFound
+		return glad.ErrNotFound
 	}
 	if err != nil {
 		return err
