@@ -4,20 +4,20 @@
  * This code may not be used, copied, modified, or distributed without explicit permission.
  */
 
-package entity
+package uuid
 
-import "github.com/google/uuid"
+import guuid "github.com/google/uuid"
 
 // ID entity ID
-type UUID = uuid.UUID
+type UUID = guuid.UUID
 
 // NewID create a new entity UUID
-func NewUUID() UUID {
-	return UUID(uuid.New())
+func New() UUID {
+	return UUID(guuid.New())
 }
 
-// StringToID convert a string to an entity UUID
-func StringToUUID(s string) (UUID, error) {
-	id, err := uuid.Parse(s)
+// FromString convert a string to an entity UUID
+func FromString(s string) (UUID, error) {
+	id, err := guuid.Parse(s)
 	return UUID(id), err
 }
