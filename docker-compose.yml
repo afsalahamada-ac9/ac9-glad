@@ -21,6 +21,25 @@ services:
       timeout: 5s
       retries: 5
 
+  pushd-db-pg:
+    image: postgres:15.8
+    environment:
+      POSTGRES_USER: glad_user
+      POSTGRES_PASSWORD: glad1234
+    ports:
+      - "5442:5432"
+    volumes:
+      - ./services/pushd/ops/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - pushd_db_pg_data:/var/lib/postgresql/data
+    container_name: glad-pushd-pg
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U glad_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   coursed:
     image: coursed:dev
     environment:
@@ -114,32 +133,11 @@ services:
     container_name: glad-pushd
     networks:
       - default
+    depends_on:
+      pushd-db-pg:
+        condition: service_healthy
 
-  # url:
-  #   image: coursed:dev
-  #   environment:
-  #     ME: url
-  #     API_HOST: coursed:8080
-  #     API_PORT: 8080
-  #     DB_USER: glad_user
-  #     DB_PASSWORD: glad1234
-  #     DB_DATABASE: glad
-  #     # TODO: localhost to be changed to DB hostname instead cluster
-  #     DB_HOST: postgres
-  #     DB_PORT: 5432
-  #     DB_SSLMODE: disable # require
-  #   expose:
-  #     - 8080
-  #   ports:
-  #     - "8090:8080"
-  #   container_name: url-api
-  #   networks:
-  #     - default
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-
-  # host:
+  # bastian:
   #   image: alpine:latest
   #   networks:
   #     - default
@@ -178,6 +176,7 @@ services:
 
 volumes:
   postgres_data:
+  pushd_db_pg_data:
 
 networks:
   default:

@@ -1,4 +1,4 @@
-CREATE DATABASE glad-pushd
+CREATE DATABASE glad_pushd
     WITH 
     OWNER = glad_user
     ENCODING = 'UTF8'
@@ -8,60 +8,29 @@ CREATE DATABASE glad-pushd
     CONNECTION LIMIT = -1;
 
 -- Connect to the new database (only works in psql)
-\c glad-pushd;
+\c glad_pushd;
 
 -- Create custom ENUM types (add these before the table creation)
 
--- Create tables
--- CREATE TABLE IF NOT EXISTS tenant (
---     id BIGSERIAL PRIMARY KEY,
---     is_default BOOLEAN UNIQUE,
---     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
---     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
--- );
+CREATE TABLE IF NOT EXISTS device (
+    id BIGSERIAL PRIMARY KEY,
 
--- PRODUCT entity
--- Note: In Salesforce, this is called as "master". Need to check with PIM experts, but to me
--- Base product (in Salesforce, it is Product) and Product sounds easier to understand.
--- Other possible terminologies are primary product, variants, SKU, etc.
-CREATE TABLE IF NOT EXISTS token (
-    id SERIAL PRIMARY KEY,
-    token VARCHAR(32) NOT NULL UNIQUE,
     -- Note: Do not want to delete tenant if product exists
     -- Tenant can be mapped to organization entity
-    tenant_id BIGINT NOT NULL REFERENCES tenant(id),
+    tenant_id BIGINT NOT NULL,
+    account_id BIGINT NOT NULL,
 
-    -- ext_name is the salesforce's internal name
-    ext_name VARCHAR(80) NOT NULL UNIQUE,
+    token VARCHAR(1024) NOT NULL UNIQUE,
+    revoke_id VARCHAR(1024) UNIQUE,
+    app_version VARCHAR(16) NOT NULL,
 
-    -- User visible name of the product
-    title VARCHAR(255) NOT NULL,
-
-    -- Note: Though it appears like a numeric identifier, alpha prefix is present in Salesforce for
-    -- this field. Thus, it's marked as a string. Technically, this can be shorter (32 or 16 bytes)
-    -- in length.
-    ctype VARCHAR(100) NOT NULL,
-    
-    -- This maps to 'Product' entity in Salesforce via SF's id
-    base_product_ext_id VARCHAR(32),
-
-    -- Duration (in days)
-    duration_days INTEGER,
-
-    -- Only Public products are made visible on the site. We can filter based on this.
-    visibility product_visibility,
-
-    -- maximum attendees
-    max_attendees INTEGER,
-    format product_format,
-
-    is_auto_approve BOOLEAN DEFAULT FALSE,
-    -- is_deleted is an internal field in Salesforce. Hence, need not be synced
+    -- For analytics purposes. Based on the data sent, this may be placed in a different service.
+    device_info JSONB,
+    platform_info JSONB,
 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-CREATE INDEX idx_product_ext_id ON product(ext_id);
-CREATE INDEX idx_product_tenant_id ON product(tenant_id);
-CREATE INDEX idx_product_name ON product(ext_name);
-CREATE INDEX idx_product_title ON product(title);
+CREATE INDEX idx_device_tenant_id ON device(tenant_id);
+CREATE INDEX idx_device_account_id ON device(account_id);
+CREATE INDEX idx_device_revoke_id ON device(revoke_id);
