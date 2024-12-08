@@ -18,13 +18,14 @@ import (
 
 func getConfig() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// dev tier auth configuration
 		auth := presenter.Auth{
-			ClientID:     "abcd567efghijkl",
-			ClientSecret: "abcd567efghijklabcd567efghijkl",
-			Domain:       "http://auth.ac9ai.com",
+			ClientID:     "tff3trookhlm3dgn21l2vqneq",
+			ClientSecret: "f693v008mar6g5adhtlne91b9k1t98vha3dvhq0u7bv85pu3fd1",
+			Domain:       "https://us-east-2ivzhx0vms.auth.us-east-2.amazoncognito.com",
 			Region:       "us-east-2",
-			UserPoolID:   "JMzj123s",
-			URL:          "http://ac9.ai.com/", // url not defined in spec
+			UserPoolID:   "us-east-2_IVzhX0vMs",
+			URL:          "https://cognito-idp.us-east-2.amazonaws.com/us-east-2_IVzhX0vMs/.well-known/openid-configuration",
 		}
 
 		config := presenter.Config{
