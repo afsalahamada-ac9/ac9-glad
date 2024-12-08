@@ -55,7 +55,7 @@ func HttpGetPathParams(
 	if limit > MaxHttpPaginationLimit {
 		w.WriteHeader(http.StatusBadRequest)
 		_, _ = w.Write([]byte("Page size requested is more than allowed limit"))
-		err = glad.ErrInvalidEntity // TODO
+		err = glad.ErrInvalidValue
 		return
 	}
 

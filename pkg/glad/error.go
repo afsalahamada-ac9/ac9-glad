@@ -28,3 +28,6 @@ var ErrTooManyLabels = errors.New("too many labels")
 
 // ErrLabelAlreadySet label already set
 var ErrLabelAlreadySet = errors.New("label already set")
+
+// ErrInvalidValue value is not value
+var ErrInvalidValue = errors.New("invalid value")
