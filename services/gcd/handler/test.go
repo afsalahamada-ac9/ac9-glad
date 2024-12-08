@@ -30,7 +30,7 @@ func getConfig() http.Handler {
 
 		config := presenter.Config{
 			Version:  1,
-			Timezone: []string{"EST", "Americas/New York", "CST", "MST", "PST", "Americas/Los Angeles", "HST", "AST"},
+			Timezone: []string{"EST", "CST", "MST", "PST", "HST", "AKST"},
 			Auth:     auth,
 		}
 
