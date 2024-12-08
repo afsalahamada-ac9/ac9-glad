@@ -28,9 +28,6 @@ func listProducts(service product.UseCase) http.Handler {
 		var data []*entity.Product
 		var err error
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
-		search := r.URL.Query().Get(httpParamQuery)
-		page, _ := strconv.Atoi(r.URL.Query().Get(httpParamPage))
-		limit, _ := strconv.Atoi(r.URL.Query().Get(httpParamLimit))
 
 		tenantID, err := id.FromString(tenant)
 		if err != nil {
@@ -39,15 +36,8 @@ func listProducts(service product.UseCase) http.Handler {
 			return
 		}
 
-		// Guard rails to limit the items queried from DB and sent
-		if page == 0 && limit == 0 {
-			page = defaultHttpPageNumber
-			limit = min(defaultHttpPageLimit, maxHttpPaginationLimit)
-		}
-
-		if limit > maxHttpPaginationLimit {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte("Page size requested is more than allowed limit"))
+		search, page, limit, err := common.HttpGetPathParams(w, r)
+		if err != nil {
 			return
 		}
 
@@ -65,7 +55,7 @@ func listProducts(service product.UseCase) http.Handler {
 		}
 
 		total := service.GetCount(tenantID)
-		w.Header().Set(httpHeaderTotalCount, strconv.Itoa(total))
+		w.Header().Set(common.HttpHeaderTotalCount, strconv.Itoa(total))
 
 		if data == nil {
 			w.WriteHeader(http.StatusNotFound)

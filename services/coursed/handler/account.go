@@ -31,11 +31,7 @@ func listAccounts(service account.UseCase) http.Handler {
 		var data []*entity.Account
 		var err error
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
-		search := r.URL.Query().Get(httpParamQuery)
-
-		page, _ := strconv.Atoi(r.URL.Query().Get(httpParamPage))
-		limit, _ := strconv.Atoi(r.URL.Query().Get(httpParamLimit))
-		at := r.URL.Query().Get(httpParamType)
+		at := r.URL.Query().Get(common.HttpParamType)
 
 		tenantID, err := id.FromString(tenant)
 		if err != nil {
@@ -46,16 +42,8 @@ func listAccounts(service account.UseCase) http.Handler {
 
 		l.Log.Debugf("Test")
 
-		// TODO: Common code: Need to make it reusable
-		// Guard rails to limit the items queried from DB and sent
-		if page == 0 && limit == 0 {
-			page = defaultHttpPageNumber
-			limit = min(defaultHttpPageLimit, maxHttpPaginationLimit)
-		}
-
-		if limit > maxHttpPaginationLimit {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte("Page size requested is more than allowed limit"))
+		search, page, limit, err := common.HttpGetPathParams(w, r)
+		if err != nil {
 			return
 		}
 
@@ -76,7 +64,7 @@ func listAccounts(service account.UseCase) http.Handler {
 		// TODO: For search, this count should be equal to the number of records
 		// that match the given search query
 		total := service.GetCount(tenantID)
-		w.Header().Set(httpHeaderTotalCount, strconv.Itoa(total))
+		w.Header().Set(common.HttpHeaderTotalCount, strconv.Itoa(total))
 		w.Header().Set(common.HttpHeaderTenantID, tenant)
 
 		if data == nil {

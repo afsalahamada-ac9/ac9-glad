@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"ac9/glad/pkg/common"
 	"ac9/glad/pkg/id"
 	"ac9/glad/usecase/tenant"
 
@@ -29,8 +30,12 @@ func listTenants(service tenant.UseCase) http.Handler {
 		errorMessage := "Error reading tenants"
 		var data []*entity.Tenant
 		var err error
-		page, _ := strconv.Atoi(r.URL.Query().Get(httpParamPage))
-		limit, _ := strconv.Atoi(r.URL.Query().Get(httpParamLimit))
+
+		_, page, limit, err := common.HttpGetPathParams(w, r)
+		if err != nil {
+			return
+		}
+
 		data, err = service.ListTenants(page, limit)
 		w.Header().Set("Content-Type", "application/json")
 		if err != nil && err != entity.ErrNotFound {
@@ -40,7 +45,7 @@ func listTenants(service tenant.UseCase) http.Handler {
 		}
 
 		total := service.GetCount()
-		w.Header().Set(httpHeaderTotalCount, strconv.Itoa(total))
+		w.Header().Set(common.HttpHeaderTotalCount, strconv.Itoa(total))
 
 		if data == nil {
 			w.WriteHeader(http.StatusNotFound)
