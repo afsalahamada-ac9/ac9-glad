@@ -50,7 +50,7 @@ func (s *Service) CreateCourse(
 
 	for i, ct := range courseTiming {
 		ct.CourseID = courseID
-		courseTiming[i], err = ct.New()
+		courseTiming[i], err = ct.Clone()
 		if err != nil {
 			return id.IDInvalid, nil, err
 		}

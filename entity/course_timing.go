@@ -81,9 +81,8 @@ func NewCourseTiming(
 	return ct, nil
 }
 
-// TODO: This must be renamed to Clone
-// New creates a new course timing from existing course timing and overrides id and created & updated date
-func (ct CourseTiming) New() (*CourseTiming, error) {
+// Clone clones existing course timing to new one and overrides id and created & updated date
+func (ct CourseTiming) Clone() (*CourseTiming, error) {
 	courseTiming := &CourseTiming{}
 	*courseTiming = ct
 
