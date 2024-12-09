@@ -26,21 +26,19 @@ func AccountHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	for _, record := range response {
 		values := record.Value
-		_, err := tapi.WriteToDB(record.NewAccount(values.Ext_Id, values.Tenant_Id, values.Cognito_Id, values.Name, values.First_Name, values.Last_Name, values.Phone, values.Email, values.Type, values.Updated_at, values.Created_at))
+		err := tapi.WriteToDB(record.NewAccount(values.Ext_Id, values.Tenant_Id, values.Cognito_Id, values.Name, values.First_Name, values.Last_Name, values.Phone, values.Email, values.Type, values.Updated_at, values.Created_at))
 		if err == nil {
 			json.NewEncoder(w).Encode(record.Value)
 			log.Println("insertion was successful")
 		} else {
 			json.NewEncoder(w).Encode(err)
 			json.NewEncoder(w).Encode("failed")
-		}
-
-		result, err := collection.InsertOne(context.Background(), record)
-		if err != nil {
-			log.Println("there was an error in the operation", err)
-			collection.InsertOne(context.Background(), err)
-		} else {
-			log.Println("operation successful", result)
+			_, insertErr := collection.InsertOne(context.Background(), err)
+			if insertErr != nil {
+				log.Println("there was an error in the log storage", insertErr)
+			} else {
+				log.Println("the log was stored successfully")
+			}
 		}
 	}
 

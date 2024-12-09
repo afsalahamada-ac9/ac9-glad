@@ -19,7 +19,7 @@ type Center_value struct {
 	Is_national_center bool        `json:"Is_National_Center__c" gorm:"column:is_national_center"`
 	Is_enabled         bool        `json:"Is_enable__c" gorm:"column:is_enabled"`
 	Created_at         string      `json:"CreatedDate" gorm:"column:created_at"`
-	Updated_at         string      `json:"UpdatedDate" gorm:"column:updated_at"`
+	Updated_at         string      `json:"LastModifiedDate" gorm:"column:updated_at"`
 }
 
 func (*Center_value) TableName() string {

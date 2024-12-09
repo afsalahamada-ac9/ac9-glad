@@ -30,7 +30,7 @@ package rds_export
 
 import (
 	pkgentity "ac9/glad/pkg/id"
-	service "ac9/glad/usecase/sf_export"
+	service "ac9/glad/services/sf_export"
 	"log"
 	"net/http"
 	"strconv"

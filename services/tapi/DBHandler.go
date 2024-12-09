@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func WriteToDB(record any) (string, error) {
+func WriteToDB(record any) error {
 	db, err := ops.GetDB()
 	if err != nil {
 		log.Println("there is an error fetching the db", err)
@@ -16,10 +16,10 @@ func WriteToDB(record any) (string, error) {
 		log.Println("db is nil")
 	}
 	log.Println("inserting record now:", record)
-	result := db.Create(record)
+	result := db.Create(record) // todo: check if upsert or insert
 	if result.Error != nil {
 		log.Println("error occurred in the write process", result.Error)
-		return "", result.Error
+		return result.Error
 	}
-	return "success", nil
+	return nil
 }
