@@ -9,10 +9,14 @@ package repository
 import (
 	"database/sql"
 
+	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	l "ac9/glad/pkg/logger"
 	"ac9/glad/pkg/util"
 	"ac9/glad/services/pushd/entity"
+
+	"github.com/lib/pq"
 )
 
 // DevicePGSQL mysql repo
@@ -55,6 +59,12 @@ func (r *DevicePGSQL) Create(d *entity.Device) (id.ID, error) {
 		util.DBTimeNow(),
 	)
 	if err != nil {
+		// Check for duplicate key error
+		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == common.DBPGDuplicateKeyCode {
+			l.Log.Warnf("Duplicate key constraint: %v", pqErr.Message)
+			return d.ID, glad.ErrAlreadyExists
+		}
+
 		l.Log.Errorf("err=%#v", err)
 		return d.ID, err
 	}

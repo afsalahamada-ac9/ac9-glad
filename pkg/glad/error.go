@@ -31,3 +31,6 @@ var ErrLabelAlreadySet = errors.New("label already set")
 
 // ErrInvalidValue value is not value
 var ErrInvalidValue = errors.New("invalid value")
+
+// ErrAlreadyExists already exists
+var ErrAlreadyExists = errors.New("already exists")

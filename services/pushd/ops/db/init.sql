@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS device (
     platform_info JSONB,
 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 );
 CREATE INDEX idx_device_tenant_id ON device(tenant_id);
 CREATE INDEX idx_device_account_id ON device(account_id);

@@ -18,11 +18,6 @@ const (
 	HttpHeaderAccountID  = "X-GLAD-AccountID"
 	HttpHeaderTotalCount = "X-Total-Count"
 
-	DBFormatDateTimeMS   = "2006-01-02 15:04:05.000"
-	DBFormatDate         = "2006-01-02"
-	DBFormatTimeHH_MM    = "15:04:00"
-	DBFormatTimeHH_MM_SS = "15:04:05"
-
 	DefaultHttpPageNumber = 1
 	DefaultHttpPageLimit  = 20
 

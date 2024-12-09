@@ -54,7 +54,14 @@ func register(service device.UseCase) http.Handler {
 		}
 
 		deviceID, err := service.Create(device)
-		if err != nil {
+		switch err {
+		case nil:
+			break
+		case glad.ErrAlreadyExists:
+			w.WriteHeader(http.StatusConflict)
+			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
+			return
+		default:
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
