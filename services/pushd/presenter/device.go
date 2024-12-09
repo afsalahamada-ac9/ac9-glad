@@ -34,6 +34,21 @@ type Device struct {
 	AppVersion string  `json:"appVersion"`
 }
 
+type NotificationMessage struct {
+	Header  string `json:"header"`
+	Content string `json:"content"`
+}
+type Notify struct {
+	NotificationMessage
+	TenantID  id.ID   `json:"tenantID"`
+	AccountID []id.ID `json:"accountID"`
+}
+
+type NotifyStatus struct {
+	AccountID id.ID `json:"accountID"`
+	Status    bool  `json:"status"`
+}
+
 // ToDevice creates device entity from device register request
 func (drr DeviceRegisterRequest) ToDevice(tenantID id.ID, accountID id.ID) (entity.Device, error) {
 

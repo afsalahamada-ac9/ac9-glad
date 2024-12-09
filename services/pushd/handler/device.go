@@ -13,9 +13,11 @@ import (
 	l "ac9/glad/pkg/logger"
 	"ac9/glad/services/pushd/presenter"
 	"ac9/glad/services/pushd/usecase/device"
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
@@ -135,6 +137,64 @@ func getByAccount(service device.UseCase) http.Handler {
 	})
 }
 
+func notify(service device.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var req presenter.Notify
+		errorMessage := "Unable to notify device"
+
+		err := json.NewDecoder(r.Body).Decode(&req)
+		if err != nil {
+			l.Log.Warnf("Unable to decode the request. err=%v", err.Error())
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Unable to decode the request. " + err.Error()))
+			return
+		}
+
+		var jsonResponse []*presenter.NotifyStatus
+
+		fcm := GetGoogleFCM()
+		for _, accountID := range req.AccountID {
+			notifyStatus := &presenter.NotifyStatus{AccountID: accountID}
+			data, err := service.GetByAccount(req.TenantID, accountID)
+			if err != nil && err != glad.ErrNotFound {
+				notifyStatus.Status = false
+				jsonResponse = append(jsonResponse, notifyStatus)
+				l.Log.Warnf("Account=%v not found or internal error. err=%v", accountID, err)
+				continue
+			}
+
+			if data == nil {
+				notifyStatus.Status = false
+				jsonResponse = append(jsonResponse, notifyStatus)
+				l.Log.Warnf("No devices registered for %v", accountID)
+				continue
+			}
+			for _, d := range data {
+				notifyStatus.Status = true
+				err = fcm.Send(context.Background(), d.PushToken, req.NotificationMessage)
+				if err != nil {
+					// in case of 404, delete the token; no need to check for error
+					if strings.Contains(err.Error(), "registration-token-not-registered") {
+						service.Delete(d.ID)
+					}
+					l.Log.Warnf("Unable to send notification to %v, err=%v", accountID, err)
+					notifyStatus.Status = false
+				}
+			}
+			jsonResponse = append(jsonResponse, notifyStatus)
+		}
+
+		w.Header().Set(common.HttpHeaderTenantID, r.Header.Get(common.HttpHeaderTenantID))
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(jsonResponse); err != nil {
+			l.Log.Warnf("%v, err=%v", jsonResponse, err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage))
+			return
+		}
+	})
+}
+
 func delete(service device.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Unable to delete device"
@@ -166,9 +226,18 @@ func delete(service device.UseCase) http.Handler {
 
 // MakeDeviceHandlers make push handlers
 func MakeDeviceHandlers(r *mux.Router, n negroni.Negroni, service device.UseCase) {
+	// Note: We should deprecate this in the upcoming release
 	r.Handle("/v1/push-notify/register", n.With(
 		negroni.Wrap(register(service)),
 	)).Methods("POST", "OPTIONS").Name("register")
+
+	r.Handle("/v1/device/register", n.With(
+		negroni.Wrap(register(service)),
+	)).Methods("POST", "OPTIONS").Name("register")
+
+	r.Handle("/v1/device/notify", n.With(
+		negroni.Wrap(notify(service)),
+	)).Methods("POST", "OPTIONS").Name("notify")
 
 	r.Handle("/v1/device/account/{accountID}", n.With(
 		negroni.Wrap(getByAccount(service)),
