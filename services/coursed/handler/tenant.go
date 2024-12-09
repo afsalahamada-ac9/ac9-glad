@@ -32,7 +32,7 @@ func listTenants(service tenant.UseCase) http.Handler {
 		var data []*entity.Tenant
 		var err error
 
-		_, page, limit, err := common.HttpGetPathParams(w, r)
+		page, limit, err := common.HttpGetPageParams(w, r)
 		if err != nil {
 			return
 		}

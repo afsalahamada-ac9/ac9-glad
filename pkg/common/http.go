@@ -8,6 +8,7 @@ package common
 
 import (
 	"ac9/glad/pkg/glad"
+	"ac9/glad/pkg/id"
 	"net/http"
 	"strconv"
 )
@@ -33,16 +34,15 @@ const (
 	MaxHttpPaginationLimit = 50
 )
 
-func HttpGetPathParams(
+// HttpGetPageParams retrieves the page params such as page and limit from the path
+func HttpGetPageParams(
 	w http.ResponseWriter,
 	r *http.Request,
 ) (
-	search string,
 	page int,
 	limit int,
 	err error,
 ) {
-	search = r.URL.Query().Get(HttpParamQuery)
 	page, _ = strconv.Atoi(r.URL.Query().Get(HttpParamPage))
 	limit, _ = strconv.Atoi(r.URL.Query().Get(HttpParamLimit))
 
@@ -59,5 +59,33 @@ func HttpGetPathParams(
 		return
 	}
 
+	return
+}
+
+// HttpGetTenantID retrieves tenant id from the header
+func HttpGetTenantID(
+	w http.ResponseWriter, r *http.Request,
+) (tenantID id.ID, err error) {
+	tenant := r.Header.Get(HttpHeaderTenantID)
+	tenantID, err = id.FromString(tenant)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte("Missing tenant ID"))
+		return
+	}
+	return
+}
+
+// HttpGetAccountID retrieves account id from the header
+func HttpGetAccountID(
+	w http.ResponseWriter, r *http.Request,
+) (accountID id.ID, err error) {
+	account := r.Header.Get(HttpHeaderAccountID)
+	accountID, err = id.FromString(account)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte("Missing account ID"))
+		return
+	}
 	return
 }

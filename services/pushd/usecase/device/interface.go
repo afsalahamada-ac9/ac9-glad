@@ -31,10 +31,8 @@ type DeviceRepository interface {
 
 // UseCase interface
 type UseCase interface {
-	CreateDevice(
-		device entity.Device,
-	) (id.ID, []id.ID, error)
-	GetDeviceByAccount(tenantID id.ID, accountID id.ID) ([]*entity.Device, error)
-	DeleteDevice(id id.ID) error
+	Create(device entity.Device) (id.ID, error)
+	GetByAccount(tenantID id.ID, accountID id.ID) ([]*entity.Device, error)
+	Delete(id id.ID) error
 	GetCount(id id.ID) int
 }

@@ -15,6 +15,7 @@ import (
 	"ac9/glad/pkg/common"
 	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
 	"ac9/glad/usecase/course"
 
 	"ac9/glad/services/coursed/presenter"
@@ -38,7 +39,8 @@ func listCourses(service course.UseCase) http.Handler {
 			return
 		}
 
-		search, page, limit, err := common.HttpGetPathParams(w, r)
+		search := r.URL.Query().Get(common.HttpParamQuery)
+		page, limit, err := common.HttpGetPageParams(w, r)
 		if err != nil {
 			return
 		}
@@ -156,7 +158,7 @@ func createCourse(service course.UseCase) http.Handler {
 		w.Header().Set(common.HttpHeaderTenantID, tenant)
 		w.WriteHeader(http.StatusCreated)
 		if err := json.NewEncoder(w).Encode(toJ); err != nil {
-			log.Println(err.Error())
+			l.Log.Errorf(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage))
 			return

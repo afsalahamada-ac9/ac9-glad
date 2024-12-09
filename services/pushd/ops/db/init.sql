@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS device (
     tenant_id BIGINT NOT NULL,
     account_id BIGINT NOT NULL,
 
-    token VARCHAR(1024) NOT NULL UNIQUE,
+    push_token VARCHAR(1024) NOT NULL UNIQUE,
     revoke_id VARCHAR(1024) UNIQUE,
     app_version VARCHAR(16) NOT NULL,
 

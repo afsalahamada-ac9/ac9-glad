@@ -37,7 +37,8 @@ func listProducts(service product.UseCase) http.Handler {
 			return
 		}
 
-		search, page, limit, err := common.HttpGetPathParams(w, r)
+		search := r.URL.Query().Get(common.HttpParamQuery)
+		page, limit, err := common.HttpGetPageParams(w, r)
 		if err != nil {
 			return
 		}

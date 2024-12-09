@@ -222,34 +222,48 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 	return m.recorder
 }
 
-// CreateDevice mocks base method.
-func (m *MockUseCase) CreateDevice(device entity.Device) (id.ID, []id.ID, error) {
+// Create mocks base method.
+func (m *MockUseCase) Create(device entity.Device) (id.ID, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateDevice", device)
+	ret := m.ctrl.Call(m, "Create", device)
 	ret0, _ := ret[0].(id.ID)
-	ret1, _ := ret[1].([]id.ID)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// CreateDevice indicates an expected call of CreateDevice.
-func (mr *MockUseCaseMockRecorder) CreateDevice(device interface{}) *gomock.Call {
+// Create indicates an expected call of Create.
+func (mr *MockUseCaseMockRecorder) Create(device interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDevice", reflect.TypeOf((*MockUseCase)(nil).CreateDevice), device)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUseCase)(nil).Create), device)
 }
 
-// DeleteDevice mocks base method.
-func (m *MockUseCase) DeleteDevice(id id.ID) error {
+// Delete mocks base method.
+func (m *MockUseCase) Delete(id id.ID) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteDevice", id)
+	ret := m.ctrl.Call(m, "Delete", id)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// DeleteDevice indicates an expected call of DeleteDevice.
-func (mr *MockUseCaseMockRecorder) DeleteDevice(id interface{}) *gomock.Call {
+// Delete indicates an expected call of Delete.
+func (mr *MockUseCaseMockRecorder) Delete(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDevice", reflect.TypeOf((*MockUseCase)(nil).DeleteDevice), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockUseCase)(nil).Delete), id)
+}
+
+// GetByAccount mocks base method.
+func (m *MockUseCase) GetByAccount(tenantID, accountID id.ID) ([]*entity.Device, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByAccount", tenantID, accountID)
+	ret0, _ := ret[0].([]*entity.Device)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByAccount indicates an expected call of GetByAccount.
+func (mr *MockUseCaseMockRecorder) GetByAccount(tenantID, accountID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByAccount", reflect.TypeOf((*MockUseCase)(nil).GetByAccount), tenantID, accountID)
 }
 
 // GetCount mocks base method.
@@ -264,19 +278,4 @@ func (m *MockUseCase) GetCount(id id.ID) int {
 func (mr *MockUseCaseMockRecorder) GetCount(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCount", reflect.TypeOf((*MockUseCase)(nil).GetCount), id)
-}
-
-// GetDeviceByAccount mocks base method.
-func (m *MockUseCase) GetDeviceByAccount(tenantID, accountID id.ID) ([]*entity.Device, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetDeviceByAccount", tenantID, accountID)
-	ret0, _ := ret[0].([]*entity.Device)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetDeviceByAccount indicates an expected call of GetDeviceByAccount.
-func (mr *MockUseCaseMockRecorder) GetDeviceByAccount(tenantID, accountID interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDeviceByAccount", reflect.TypeOf((*MockUseCase)(nil).GetDeviceByAccount), tenantID, accountID)
 }

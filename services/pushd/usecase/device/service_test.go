@@ -34,7 +34,7 @@ func newFixtureDevice() *entity.Device {
 		ID:           deviceDefault,
 		TenantID:     tenantAlice,
 		AccountID:    aliceAccountID,
-		Token:        "AliceToken",
+		PushToken:    "AliceToken",
 		RevokeID:     nil,
 		AppVersion:   "v2024.12.3",
 		DeviceInfo:   nil,
@@ -48,7 +48,7 @@ func Test_Create(t *testing.T) {
 	repo := newInmemDevice()
 	s := NewService(repo)
 	device := newFixtureDevice()
-	_, err := s.CreateDevice(*device)
+	_, err := s.Create(*device)
 
 	assert.Nil(t, err)
 	assert.False(t, device.CreatedAt.IsZero())
@@ -59,11 +59,11 @@ func Test_GetByAccount(t *testing.T) {
 	s := NewService(repo)
 	device1 := newFixtureDevice()
 	device2 := newFixtureDevice()
-	device2.Token = "BobToken"
+	device2.PushToken = "BobToken"
 	device2.ID = deviceIDBob
 
-	_, _ = s.CreateDevice(*device1)
-	_, _ = s.CreateDevice(*device2)
+	_, _ = s.Create(*device1)
+	_, _ = s.Create(*device2)
 
 	t.Run("list all", func(t *testing.T) {
 		all, err := s.GetByAccount(device1.TenantID, device1.AccountID)
@@ -78,8 +78,8 @@ func TestDelete(t *testing.T) {
 
 	_ = newFixtureDevice()
 	device2 := newFixtureDevice()
-	bID, _ := s.CreateDevice(*device2)
+	bID, _ := s.Create(*device2)
 
-	err := s.DeleteDevice(bID)
+	err := s.Delete(bID)
 	assert.Nil(t, err)
 }

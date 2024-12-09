@@ -43,7 +43,8 @@ func listAccounts(service account.UseCase) http.Handler {
 
 		l.Log.Debugf("Test")
 
-		search, page, limit, err := common.HttpGetPathParams(w, r)
+		search := r.URL.Query().Get(common.HttpParamQuery)
+		page, limit, err := common.HttpGetPageParams(w, r)
 		if err != nil {
 			return
 		}

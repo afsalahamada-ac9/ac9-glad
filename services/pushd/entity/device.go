@@ -9,6 +9,7 @@ package entity
 import (
 	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
 	"time"
 )
 
@@ -18,7 +19,7 @@ type Device struct {
 	TenantID  id.ID
 	AccountID id.ID
 
-	Token      string
+	PushToken  string
 	RevokeID   *string
 	AppVersion string
 
@@ -34,7 +35,7 @@ type Device struct {
 func NewDevice(
 	tenantID id.ID,
 	accountID id.ID,
-	token string,
+	pushToken string,
 	revokeID *string,
 	appVersion string,
 	deviceInfo *string,
@@ -44,7 +45,7 @@ func NewDevice(
 		ID:           id.IDInvalid,
 		TenantID:     tenantID,
 		AccountID:    accountID,
-		Token:        token,
+		PushToken:    pushToken,
 		RevokeID:     revokeID,
 		AppVersion:   appVersion,
 		DeviceInfo:   deviceInfo,
@@ -75,10 +76,12 @@ func (c Device) New() (*Device, error) {
 // Validate validates device
 func (d *Device) Validate(isID bool) error {
 	if isID && d.ID == id.IDInvalid {
+		l.Log.Errorf("device=%#v, id is invalid", d)
 		return glad.ErrInvalidEntity
 	}
 
-	if d.Token == "" || d.AccountID == id.IDInvalid || d.TenantID == id.IDInvalid || d.AppVersion == "" {
+	if d.PushToken == "" || d.AccountID == id.IDInvalid || d.TenantID == id.IDInvalid || d.AppVersion == "" {
+		l.Log.Errorf("device=%#v, invalid values for mandatory fields", d)
 		return glad.ErrInvalidEntity
 	}
 

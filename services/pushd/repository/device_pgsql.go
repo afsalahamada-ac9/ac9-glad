@@ -32,7 +32,7 @@ func (r *DevicePGSQL) Create(d *entity.Device) (id.ID, error) {
 	stmt, err := r.db.Prepare(`
 		INSERT INTO device
 			(
-				id, tenant_id, account_id, token, revoke_id, app_version,
+				id, tenant_id, account_id, push_token, revoke_id, app_version,
 				device_info, platform_info,
 			 	created_at, updated_at
 			)
@@ -44,7 +44,7 @@ func (r *DevicePGSQL) Create(d *entity.Device) (id.ID, error) {
 		d.ID,
 		d.TenantID,
 		d.AccountID,
-		d.Token,
+		d.PushToken,
 		d.RevokeID,
 		d.AppVersion,
 		d.DeviceInfo,
@@ -66,7 +66,7 @@ func (r *DevicePGSQL) Create(d *entity.Device) (id.ID, error) {
 func (r *DevicePGSQL) GetByAccount(tenantID id.ID, accountID id.ID) ([]*entity.Device, error) {
 	stmt, err := r.db.Prepare(`
 		SELECT
-			id, tenant_id, account_id, token, revoke_id,
+			id, tenant_id, account_id, push_token, revoke_id,
 			app_version, device_info, platform_info
 			created_at, updated_at
 		FROM device
@@ -139,12 +139,12 @@ func (r *DevicePGSQL) scanRows(rows *sql.Rows) ([]*entity.Device, error) {
 
 	for rows.Next() {
 		var device entity.Device
-		var token, revokeID, appVersion, deviceInfo, platformInfo sql.NullString
+		var pushToken, revokeID, appVersion, deviceInfo, platformInfo sql.NullString
 		err := rows.Scan(
 			&device.ID,
 			&device.TenantID,
 			&device.AccountID,
-			&token,
+			&pushToken,
 			&revokeID,
 			&appVersion,
 			&deviceInfo,
@@ -156,7 +156,7 @@ func (r *DevicePGSQL) scanRows(rows *sql.Rows) ([]*entity.Device, error) {
 			return nil, err
 		}
 
-		device.Token = token.String
+		device.PushToken = pushToken.String
 		device.RevokeID = &revokeID.String
 		device.AppVersion = appVersion.String
 		device.DeviceInfo = &deviceInfo.String

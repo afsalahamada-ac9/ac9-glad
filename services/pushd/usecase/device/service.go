@@ -25,7 +25,7 @@ func NewService(r DeviceRepository) *Service {
 }
 
 // CreateDevice creates a device
-func (s *Service) CreateDevice(
+func (s *Service) Create(
 	device entity.Device,
 ) (id.ID, error) {
 	d, err := device.New()
@@ -55,7 +55,7 @@ func (s *Service) GetByAccount(tenantID id.ID, accountID id.ID) ([]*entity.Devic
 
 // DeleteDevice deletes a device
 // Note: Since delete is cascaded to dependent tables, no need to call those functions explicitly
-func (s *Service) DeleteDevice(id id.ID) error {
+func (s *Service) Delete(id id.ID) error {
 	return s.repo.Delete(id)
 }
 
