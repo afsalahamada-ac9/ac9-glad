@@ -10,6 +10,7 @@ import (
 	"database/sql"
 
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
 	"ac9/glad/pkg/util"
 	"ac9/glad/services/pushd/entity"
 )
@@ -38,6 +39,7 @@ func (r *DevicePGSQL) Create(d *entity.Device) (id.ID, error) {
 			)
 		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`)
 	if err != nil {
+		l.Log.Errorf("err=%#v", err)
 		return d.ID, err
 	}
 	_, err = stmt.Exec(
@@ -53,10 +55,12 @@ func (r *DevicePGSQL) Create(d *entity.Device) (id.ID, error) {
 		util.DBTimeNow(),
 	)
 	if err != nil {
+		l.Log.Errorf("err=%#v", err)
 		return d.ID, err
 	}
 	err = stmt.Close()
 	if err != nil {
+		l.Log.Errorf("err=%#v", err)
 		return d.ID, err
 	}
 	return d.ID, nil
@@ -67,16 +71,18 @@ func (r *DevicePGSQL) GetByAccount(tenantID id.ID, accountID id.ID) ([]*entity.D
 	stmt, err := r.db.Prepare(`
 		SELECT
 			id, tenant_id, account_id, push_token, revoke_id,
-			app_version, device_info, platform_info
+			app_version, device_info, platform_info,
 			created_at, updated_at
 		FROM device
 		WHERE tenant_id = $1 AND account_id = $2;`)
 	if err != nil {
+		l.Log.Errorf("err=%#v", err)
 		return nil, err
 	}
 
 	rows, err := stmt.Query(tenantID, accountID)
 	if err != nil {
+		l.Log.Errorf("err=%#v", err)
 		return nil, err
 	}
 
@@ -108,6 +114,7 @@ func (r *DevicePGSQL) GetByAccount(tenantID id.ID, accountID id.ID) ([]*entity.D
 func (r *DevicePGSQL) Delete(id id.ID) error {
 	res, err := r.db.Exec(`DELETE FROM device WHERE id = $1;`, id)
 	if err != nil {
+		l.Log.Errorf("err=%#v", err)
 		return err
 	}
 
@@ -122,12 +129,14 @@ func (r *DevicePGSQL) Delete(id id.ID) error {
 func (r *DevicePGSQL) GetCount(tenantID id.ID) (int, error) {
 	stmt, err := r.db.Prepare(`SELECT count(*) FROM device WHERE tenant_id = $1;`)
 	if err != nil {
+		l.Log.Errorf("err=%#v", err)
 		return 0, err
 	}
 
 	var count int
 	err = stmt.QueryRow(tenantID).Scan(&count)
 	if err != nil {
+		l.Log.Errorf("err=%#v", err)
 		return 0, err
 	}
 
@@ -140,6 +149,7 @@ func (r *DevicePGSQL) scanRows(rows *sql.Rows) ([]*entity.Device, error) {
 	for rows.Next() {
 		var device entity.Device
 		var pushToken, revokeID, appVersion, deviceInfo, platformInfo sql.NullString
+
 		err := rows.Scan(
 			&device.ID,
 			&device.TenantID,
@@ -153,8 +163,11 @@ func (r *DevicePGSQL) scanRows(rows *sql.Rows) ([]*entity.Device, error) {
 			&device.UpdatedAt,
 		)
 		if err != nil {
+			l.Log.Errorf("err=%#v", err)
 			return nil, err
 		}
+
+		l.Log.Debugf("device id=%v, pushToken=%v appVersion=%v", device.ID, device.PushToken, device.AppVersion)
 
 		device.PushToken = pushToken.String
 		device.RevokeID = &revokeID.String

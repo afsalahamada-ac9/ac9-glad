@@ -25,6 +25,15 @@ type DeviceRegisterResponse struct {
 	ID id.ID `json:"id"`
 }
 
+type Device struct {
+	ID         id.ID   `json:"id"`
+	AccountID  id.ID   `json:"accountID"`
+	TenantID   id.ID   `json:"tenantID"`
+	PushToken  string  `json:"pushToken"`
+	RevokeID   *string `json:"revokeID,omitempty"`
+	AppVersion string  `json:"appVersion"`
+}
+
 // ToDevice creates device entity from device register request
 func (drr DeviceRegisterRequest) ToDevice(tenantID id.ID, accountID id.ID) (entity.Device, error) {
 

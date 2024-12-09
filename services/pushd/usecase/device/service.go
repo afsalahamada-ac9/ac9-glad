@@ -10,6 +10,7 @@ import (
 	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	"ac9/glad/services/pushd/entity"
+	"database/sql"
 )
 
 // Service device usecase
@@ -56,7 +57,13 @@ func (s *Service) GetByAccount(tenantID id.ID, accountID id.ID) ([]*entity.Devic
 // DeleteDevice deletes a device
 // Note: Since delete is cascaded to dependent tables, no need to call those functions explicitly
 func (s *Service) Delete(id id.ID) error {
-	return s.repo.Delete(id)
+	err := s.repo.Delete(id)
+	switch err {
+	case sql.ErrNoRows:
+		return glad.ErrNotFound
+	default:
+		return err
+	}
 }
 
 // GetCount gets total device count

@@ -8,6 +8,8 @@ package handler
 
 import (
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/glad"
+	"ac9/glad/pkg/id"
 	l "ac9/glad/pkg/logger"
 	"ac9/glad/services/pushd/presenter"
 	"ac9/glad/services/pushd/usecase/device"
@@ -73,9 +75,99 @@ func register(service device.UseCase) http.Handler {
 	})
 }
 
+func getByAccount(service device.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		errorMessage := "Error reading device"
+		vars := mux.Vars(r)
+		accountID, err := id.FromString(vars["accountID"])
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte(err.Error()))
+			return
+		}
+
+		tenantID, err := common.HttpGetTenantID(w, r)
+		if err != nil {
+			l.Log.Debugf("Tenant id is missing")
+			return
+		}
+
+		l.Log.Debugf("Tenant id=%v, Account id=%v", tenantID, accountID)
+		data, err := service.GetByAccount(tenantID, accountID)
+		if err != nil && err != glad.ErrNotFound {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
+			return
+		}
+
+		if data == nil {
+			w.WriteHeader(http.StatusNotFound)
+			_, _ = w.Write([]byte("Empty data returned"))
+			return
+		}
+
+		var jsonDevices []*presenter.Device
+		for _, d := range data {
+			pc := &presenter.Device{
+				ID:         d.ID,
+				AccountID:  d.AccountID,
+				TenantID:   d.TenantID,
+				PushToken:  d.PushToken,
+				RevokeID:   d.RevokeID,
+				AppVersion: d.AppVersion,
+			}
+
+			jsonDevices = append(jsonDevices, pc)
+		}
+
+		w.Header().Set(common.HttpHeaderTenantID, tenantID.String())
+		if err := json.NewEncoder(w).Encode(jsonDevices); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte("Unable to encode devices"))
+		}
+	})
+}
+
+func delete(service device.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		errorMessage := "Unable to delete device"
+		vars := mux.Vars(r)
+		deviceID, err := id.FromString(vars["id"])
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte(err.Error()))
+			return
+		}
+
+		err = service.Delete(deviceID)
+		w.Header().Set(common.HttpHeaderTenantID, r.Header.Get(common.HttpHeaderTenantID))
+		switch err {
+		case nil:
+			w.WriteHeader(http.StatusOK)
+			return
+		case glad.ErrNotFound:
+			w.WriteHeader(http.StatusNotFound)
+			_, _ = w.Write([]byte("Device doesn't exist"))
+			return
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage))
+			return
+		}
+	})
+}
+
 // MakeDeviceHandlers make push handlers
 func MakeDeviceHandlers(r *mux.Router, n negroni.Negroni, service device.UseCase) {
 	r.Handle("/v1/push-notify/register", n.With(
 		negroni.Wrap(register(service)),
-	)).Methods("POST").Name("register")
+	)).Methods("POST", "OPTIONS").Name("register")
+
+	r.Handle("/v1/device/account/{accountID}", n.With(
+		negroni.Wrap(getByAccount(service)),
+	)).Methods("GET", "OPTIONS").Name("getByAccount")
+
+	r.Handle("/v1/device/{id}", n.With(
+		negroni.Wrap(delete(service)),
+	)).Methods("DELETE", "OPTIONS").Name("delete")
 }
