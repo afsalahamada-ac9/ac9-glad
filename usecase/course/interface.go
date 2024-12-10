@@ -114,7 +114,7 @@ type CourseTimingRepository interface {
 
 // UseCase interface
 type UseCase interface {
-	GetCourse(id id.ID) (*entity.Course, error)
+	GetCourse(id id.ID) (*entity.CourseFull, error)
 	SearchCourses(tenantID id.ID, query string, page, limit int) ([]*entity.Course, error)
 	ListCourses(tenantID id.ID, page, limit int) ([]*entity.Course, error)
 	CreateCourse(

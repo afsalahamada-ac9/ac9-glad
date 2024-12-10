@@ -1352,10 +1352,10 @@ func (mr *MockUseCaseMockRecorder) GetCount(id interface{}) *gomock.Call {
 }
 
 // GetCourse mocks base method.
-func (m *MockUseCase) GetCourse(id id.ID) (*entity.Course, error) {
+func (m *MockUseCase) GetCourse(id id.ID) (*entity.CourseFull, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCourse", id)
-	ret0, _ := ret[0].(*entity.Course)
+	ret0, _ := ret[0].(*entity.CourseFull)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

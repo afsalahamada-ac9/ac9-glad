@@ -7,12 +7,14 @@
 package course
 
 import (
+	"database/sql"
 	"strings"
 	"time"
 
 	"ac9/glad/entity"
 	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
 )
 
 // Service course usecase
@@ -89,21 +91,52 @@ func (s *Service) CreateCourse(
 	return courseID, courseTimingID, err
 }
 
-// GetCourse retrieves a course
-// TODO: Retrieve organizer, teacher, contact, notify and timing and return it
-func (s *Service) GetCourse(id id.ID) (*entity.Course, error) {
-	t, err := s.cRepo.Get(id)
-	if t == nil {
-		return nil, glad.ErrNotFound
+// GetCourse retrieves a course and related information
+func (s *Service) GetCourse(courseID id.ID) (*entity.CourseFull, error) {
+	course, err := s.cRepo.Get(courseID)
+	if course == nil {
+		err = glad.ErrNotFound
+		return nil, err
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	return t, nil
+	cos, err := s.cRepo.GetCourseOrganizer(courseID)
+	if err != nil {
+		l.Log.Warnf("Unable to fetch organizers for course id=%v", courseID)
+		return nil, err
+	}
+
+	cts, err := s.cRepo.GetCourseTeacher(courseID)
+	if err != nil {
+		l.Log.Warnf("Unable to fetch teachers for course id=%v", courseID)
+		return nil, err
+	}
+
+	ccs, err := s.cRepo.GetCourseContact(courseID)
+	if err != nil {
+		l.Log.Warnf("Unable to fetch contact for course id=%v", courseID)
+		return nil, err
+	}
+
+	cns, err := s.cRepo.GetCourseNotify(courseID)
+	if err != nil {
+		l.Log.Warnf("Unable to fetch notify for course id=%v", courseID)
+		return nil, err
+	}
+
+	courseTiming, err := s.ctRepo.GetByCourse(courseID)
+	if err != nil {
+		l.Log.Warnf("Unable to fetch course timings for course id=%v", courseID)
+		return nil, err
+	}
+
+	return entity.NewCourseFull(*course, cos, cts, ccs, cns, courseTiming), err
 }
 
 // SearchCourses searches course
+// TODO: Return full information
 func (s *Service) SearchCourses(tenantID id.ID,
 	query string, page, limit int,
 ) ([]*entity.Course, error) {
@@ -118,6 +151,7 @@ func (s *Service) SearchCourses(tenantID id.ID,
 }
 
 // ListCourses lists course
+// TODO: Return full information
 func (s *Service) ListCourses(tenantID id.ID, page, limit int) ([]*entity.Course, error) {
 	courses, err := s.cRepo.List(tenantID, page, limit)
 	if err != nil {
@@ -132,15 +166,12 @@ func (s *Service) ListCourses(tenantID id.ID, page, limit int) ([]*entity.Course
 // DeleteCourse deletes a course
 // Note: Since delete is cascaded to dependent tables, no need to call those functions explicitly
 func (s *Service) DeleteCourse(id id.ID) error {
-	t, err := s.GetCourse(id)
-	if t == nil {
+	err := s.cRepo.Delete(id)
+	if err == sql.ErrNoRows {
 		return glad.ErrNotFound
 	}
-	if err != nil {
-		return err
-	}
 
-	return s.cRepo.Delete(id)
+	return err
 }
 
 // GetCount gets total course count

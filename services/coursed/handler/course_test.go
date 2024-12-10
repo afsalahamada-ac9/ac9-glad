@@ -184,9 +184,12 @@ func Test_getCourse(t *testing.T) {
 		Name:     "default-0",
 		Mode:     entity.CourseInPerson,
 	}
+	courseFull := &entity.CourseFull{
+		Course: course,
+	}
 	service.EXPECT().
 		GetCourse(course.ID).
-		Return(course, nil)
+		Return(courseFull, nil)
 	handler := getCourse(service)
 	r.Handle("/v1/courses/{id}", handler)
 	ts := httptest.NewServer(r)
@@ -201,8 +204,8 @@ func Test_getCourse(t *testing.T) {
 	assert.NotNil(t, d)
 
 	assert.Equal(t, course.ID, d.ID)
-	assert.Equal(t, course.Name, *d.Name)
-	assert.Equal(t, course.Mode, *d.Mode)
+	assert.Equal(t, course.Name, d.Name)
+	assert.Equal(t, course.Mode, d.Mode)
 	assert.Equal(t, tenantAlice.String(), res.Header.Get(common.HttpHeaderTenantID))
 }
 

@@ -198,8 +198,9 @@ func Test_SearchAndFind(t *testing.T) {
 	})
 
 	t.Run("get", func(t *testing.T) {
-		saved, err := m.GetCourse(tID)
+		savedFull, err := m.GetCourse(tID)
 		assert.Nil(t, err)
+		saved := savedFull.Course
 		assert.Equal(t, tmpl1.TenantID, saved.TenantID)
 		assert.Equal(t, tmpl1.ExtID, saved.ExtID)
 		assert.Equal(t, tmpl1.CenterID, saved.CenterID)
@@ -225,7 +226,8 @@ func Test_Update(t *testing.T) {
 	)
 	assert.Nil(t, err)
 
-	saved, _ := m.GetCourse(id)
+	savedFull, _ := m.GetCourse(id)
+	saved := savedFull.Course
 	saved.Mode = entity.CourseOnline
 	// Update the course timing ids as it is generated afresh
 	for i := range courseTiming {
@@ -241,7 +243,8 @@ func Test_Update(t *testing.T) {
 		courseTiming,
 	))
 
-	updated, err := m.GetCourse(id)
+	updatedFull, err := m.GetCourse(id)
+	updated := updatedFull.Course
 	assert.Nil(t, err)
 	assert.Equal(t, entity.CourseOnline, updated.Mode)
 }

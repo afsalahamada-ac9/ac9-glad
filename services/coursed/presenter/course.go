@@ -15,19 +15,20 @@ import (
 
 // Course data - TenantID is returned in the HTTP header
 // X-GLAD-TenantID
-type Course struct {
-	ID           id.ID                `json:"id"`
-	ExtID        *string              `json:"extID,omitempty"`
-	CenterID     *id.ID               `json:"centerID,omitempty"`
-	Name         *string              `json:"name,omitempty"`
-	Notes        *string              `json:"notes,omitempty"`
-	Timezone     *string              `json:"timezone,omitempty"`
-	Address      *Address             `json:"address,omitempty"`
-	Status       *entity.CourseStatus `json:"status,omitempty"`
-	Mode         *entity.CourseMode   `json:"mode,omitempty"`
-	MaxAttendees *int32               `json:"maxAttendees,omitempty"`
-	NumAttendees *int32               `json:"numAttendees,omitempty"`
-}
+// type Course struct {
+// 	ID           id.ID                `json:"id"`
+// 	ExtID        *string              `json:"extID,omitempty"`
+// 	Name         *string              `json:"name,omitempty"`
+// 	CenterID     *id.ID               `json:"centerID,omitempty"`
+// 	ProductID    *id.ID               `json:"productID,omitempty"`
+// 	Notes        *string              `json:"notes,omitempty"`
+// 	Timezone     *string              `json:"timezone,omitempty"`
+// 	Address      *Address             `json:"address,omitempty"`
+// 	Mode         *entity.CourseMode   `json:"mode,omitempty"`
+// 	Status       *entity.CourseStatus `json:"status,omitempty"`
+// 	MaxAttendees *int32               `json:"maxAttendees,omitempty"`
+// 	NumAttendees *int32               `json:"numAttendees,omitempty"`
+// }
 
 // Course teacher
 type CourseTeacher struct {
@@ -41,23 +42,23 @@ type CourseReq struct {
 	Name         string               `json:"name"`
 	CenterID     id.ID                `json:"centerID"`
 	ProductID    id.ID                `json:"productID"`
-	Mode         entity.CourseMode    `json:"mode"`
+	Notes        *string              `json:"notes,omitempty"`
 	Timezone     string               `json:"timezone"`
-	Organizer    []id.ID              `json:"organizer"`
-	Contact      []id.ID              `json:"contact"`
-	Teacher      []CourseTeacher      `json:"teacher"`
-	Notes        *string              `json:"notes"`
-	Status       *entity.CourseStatus `json:"status"`
-	MaxAttendees *int32               `json:"maxAttendees"`
-	DateTime     []DateTime           `json:"date"`
-	Address      *Address             `json:"address"`
-	Notify       []id.ID              `json:"notify"`
+	Address      *Address             `json:"address,omitempty"`
+	Mode         entity.CourseMode    `json:"mode"`
+	Status       *entity.CourseStatus `json:"status,omitempty"`
+	MaxAttendees *int32               `json:"maxAttendees,omitempty"`
+	Organizer    []id.ID              `json:"organizer,omitempty"`
+	Contact      []id.ID              `json:"contact,omitempty"`
+	Teacher      []CourseTeacher      `json:"teacher,omitempty"`
+	Notify       []id.ID              `json:"notify,omitempty"`
+	DateTime     []DateTime           `json:"date,omitempty"`
 }
 
 // CourseResponse struct used as response to the create course request (REST API)
 type CourseResponse struct {
 	ID         id.ID   `json:"id"`
-	DateTimeID []id.ID `json:"dateID"`
+	DateTimeID []id.ID `json:"dateID,omitempty"`
 	ShortURL   *string `json:"shortURL,omitempty"`
 }
 
@@ -150,21 +151,96 @@ func (cr CourseReq) ToCourseTiming() ([]*entity.CourseTiming, error) {
 	return cts, nil
 }
 
-// FromCourseEntity creates course response from course entity
-func (c *Course) FromCourseEntity(e *entity.Course) error {
+// Course data - TenantID is returned in the HTTP header
+type Course struct {
+	CourseResponse
+	CourseReq
+	NumAttendees *int32 `json:"numAttendees,omitempty"`
+}
 
+// FromEntityCourse creates course response from course entity
+func (c *Course) FromEntityCourse(e *entity.Course) error {
 	c.ID = e.ID
-	c.Name = &e.Name
-	c.Mode = &e.Mode
-	c.CenterID = &e.CenterID
+	c.Name = e.Name
+	c.CenterID = e.CenterID
+	c.ProductID = e.ProductID
 	c.Notes = &e.Notes
-	c.Timezone = &e.Timezone
+	c.Timezone = e.Timezone
+	c.Address = &Address{}
+	c.Mode = e.Mode
 	c.Status = &e.Status
 	c.MaxAttendees = &e.MaxAttendees
 	c.NumAttendees = &e.NumAttendees
 
-	c.Address = &Address{}
 	c.Address.CopyFrom(e.Address)
+
+	return nil
+}
+
+// DateTime     []DateTime           `json:"date,omitempty"`
+
+// FromEntityCourseFull creates course response from course entity
+func (c *Course) FromEntityCourseFull(cf *entity.CourseFull) error {
+	c.FromEntityCourse(cf.Course)
+	c.FromCourseOrganizer(cf.Cos)
+	c.FromCourseTeacher(cf.Cts)
+	c.FromCourseContact(cf.Ccs)
+	c.FromCourseNotify(cf.Cns)
+	c.FromCourseTiming(cf.CourseTiming)
+
+	return nil
+}
+
+// FromCourseOrganizer creates course from course organizer
+func (c *Course) FromCourseOrganizer(cos []*entity.CourseOrganizer) error {
+	for _, co := range cos {
+		c.Organizer = append(c.Organizer, co.ID)
+	}
+
+	return nil
+}
+
+// FromCourseTeacher creates course from course teacher
+func (c *Course) FromCourseTeacher(cts []*entity.CourseTeacher) error {
+	for _, ct := range cts {
+		c.Teacher = append(c.Teacher, CourseTeacher{
+			ID:        ct.ID,
+			IsPrimary: ct.IsPrimary,
+		})
+	}
+
+	return nil
+}
+
+// FromCourseContact creates course from course contact
+func (c *Course) FromCourseContact(ccs []*entity.CourseContact) error {
+	for _, cc := range ccs {
+		c.Contact = append(c.Contact, cc.ID)
+	}
+
+	return nil
+}
+
+// FromCourseNotify creates course from course notify
+func (c *Course) FromCourseNotify(cns []*entity.CourseNotify) error {
+	for _, cn := range cns {
+		c.Notify = append(c.Notify, cn.ID)
+	}
+
+	return nil
+}
+
+// FromCourseTiming creates course from course timing
+func (c *Course) FromCourseTiming(cts []*entity.CourseTiming) error {
+	for _, ct := range cts {
+		c.DateTimeID = append(c.DateTimeID, ct.ID)
+		c.DateTime = append(c.DateTime,
+			DateTime{
+				Date:      ct.DateTime.Date,
+				StartTime: ct.DateTime.StartTime,
+				EndTime:   ct.DateTime.EndTime,
+			})
+	}
 
 	return nil
 }

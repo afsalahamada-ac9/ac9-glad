@@ -71,17 +71,19 @@ func listCourses(service course.UseCase) http.Handler {
 		}
 		var toJ []*presenter.Course
 		for _, d := range data {
-			pc := &presenter.Course{
-				ID:           d.ID,
-				Name:         &d.Name,
-				Mode:         &d.Mode,
-				CenterID:     &d.CenterID,
-				Notes:        &d.Notes,
-				Timezone:     &d.Timezone,
-				Status:       &d.Status,
-				MaxAttendees: &d.MaxAttendees,
-				NumAttendees: &d.NumAttendees,
-			}
+			pc := &presenter.Course{}
+			pc.FromEntityCourse(d)
+			// pc := &presenter.Course{
+			// 	ID:           d.ID,
+			// 	Name:         &d.Name,
+			// 	Mode:         &d.Mode,
+			// 	CenterID:     &d.CenterID,
+			// 	Notes:        &d.Notes,
+			// 	Timezone:     &d.Timezone,
+			// 	Status:       &d.Status,
+			// 	MaxAttendees: &d.MaxAttendees,
+			// 	NumAttendees: &d.NumAttendees,
+			// }
 			pc.Address = &presenter.Address{}
 			pc.Address.CopyFrom(d.Address)
 
@@ -176,23 +178,23 @@ func getCourse(service course.UseCase) http.Handler {
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
-		data, err := service.GetCourse(id)
+		courseFull, err := service.GetCourse(id)
 		if err != nil && err != glad.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
 		}
 
-		if data == nil {
+		if courseFull == nil {
 			w.WriteHeader(http.StatusNotFound)
 			_, _ = w.Write([]byte("Empty data returned"))
 			return
 		}
 
 		toJ := &presenter.Course{}
-		toJ.FromCourseEntity(data)
+		toJ.FromEntityCourseFull(courseFull)
 
-		w.Header().Set(common.HttpHeaderTenantID, data.TenantID.String())
+		w.Header().Set(common.HttpHeaderTenantID, courseFull.Course.TenantID.String())
 		if err := json.NewEncoder(w).Encode(toJ); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte("Unable to encode course"))
@@ -206,25 +208,25 @@ func getCourseMe(service course.UseCase) http.Handler {
 		errorMessage := "Error reading course"
 
 		// hard-coded value
-		data, err := service.GetCourse(5312925492834409472)
+		courseFull, err := service.GetCourse(5312925492834409472)
 		if err != nil && err != glad.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
 		}
 
-		if data == nil {
+		if courseFull == nil {
 			w.WriteHeader(http.StatusNotFound)
 			_, _ = w.Write([]byte("Empty data returned"))
 			return
 		}
 
 		c := &presenter.Course{}
-		c.FromCourseEntity(data)
+		c.FromEntityCourseFull(courseFull)
 
 		toJ := []*presenter.Course{c}
 
-		w.Header().Set(common.HttpHeaderTenantID, data.TenantID.String())
+		w.Header().Set(common.HttpHeaderTenantID, courseFull.Course.TenantID.String())
 		if err := json.NewEncoder(w).Encode(toJ); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte("Unable to encode course"))
@@ -331,7 +333,9 @@ func updateCourse(service course.UseCase) http.Handler {
 		}
 
 		toJ := &presenter.Course{
-			ID: course.ID,
+			CourseResponse: presenter.CourseResponse{
+				ID: course.ID,
+			},
 		}
 
 		w.Header().Set(common.HttpHeaderTenantID, tenant)
