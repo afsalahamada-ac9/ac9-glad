@@ -11,7 +11,6 @@ type Metadata struct {
 	LastUpdated string `json:"lastUpdated"`
 	Total       int    `json:"total"`
 	URL         string `json:"url"`
-	CreatedAt   string `json:"createdAt"`
 }
 
 type MetadataResponse struct {

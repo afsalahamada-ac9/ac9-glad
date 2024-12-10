@@ -6,22 +6,22 @@
 
 package metadata
 
-import (
-	entity "ac9/glad/services/mediad/entity"
-)
+import "ac9/glad/services/mediad/entity"
 
-// Writer interface
 type Writer interface {
-	CreateQuote(e *entity.Quote) error
-	CreateMedia(e *entity.Media) error
+	Create(s *entity.Metadata) error
 }
 
-// Repository interface
+type Reader interface {
+	Get(contentType entity.ContentType) (*entity.Metadata, error)
+}
+
 type Repository interface {
 	Writer
+	Reader
 }
 
-// UseCase interface
-type UseCase interface {
-	CreateMetadata(version int64, url string, total string, metadataType string) error
+type Usecase interface {
+	CreateMetadata(url string, total int, contentType string) (*entity.Metadata, error)
+	GetMetadata(contentType string) (*entity.Metadata, error)
 }

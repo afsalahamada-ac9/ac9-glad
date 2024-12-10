@@ -6,34 +6,38 @@
 
 package metadata
 
-import entity "ac9/glad/services/mediad/entity"
+import (
+	"ac9/glad/services/mediad/entity"
+)
 
-// Service metadata usecase
 type Service struct {
 	repo Repository
 }
 
-// NewService create new service
 func NewService(r Repository) *Service {
 	return &Service{
 		repo: r,
 	}
 }
 
-func (s *Service) CreateMetadata(version int64, url string, total int, metadataType string) error {
-	switch metadataType {
-	case "quote":
-		q, err := entity.NewQuote(version, url, total)
-		if err != nil {
-			return err
-		}
-		s.repo.CreateQuote(q)
-	case "media":
-		m, err := entity.NewMedia(version, url, total)
-		if err != nil {
-			return err
-		}
-		s.repo.CreateMedia(m)
+func (s *Service) CreateMetadata(url string, total int, contentType entity.ContentType) (*entity.Metadata, error) {
+	m, err := entity.NewMetadata(url, total, contentType)
+	if err != nil {
+		return nil, err
 	}
-	return nil
+
+	if err := s.repo.Create(m); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+func (s *Service) GetMetadata(contentType entity.ContentType) (*entity.Metadata, error) {
+	m, err := s.repo.Get(contentType)
+	if err != nil {
+		return nil, err
+	}
+
+	return m, nil
 }
