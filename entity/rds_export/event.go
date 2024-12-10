@@ -1,16 +1,16 @@
 package entity
 
-type SFPayload struct {
-	Object string     `json:"object"`
-	Items  []SFRecord `json:"items"`
+type Event_item struct {
+	Operation string `json:"operation"`
+	Items     []Data `json:"items"`
 }
 
-type SFRecord struct {
-	Operation string      `json:"operation"`
-	Value     SFEventData `json:"value"`
+type Data struct {
+	Operation string `json:"operation"`
+	Value     Value  `json:"value"`
 }
 
-type SFEventData struct {
+type Value struct {
 	Cloud_Db_ID__c        string  `json:"Cloud_Db_ID__c"`
 	Number_Of_Students__c int     `json:"Number_Of_Students__c"`
 	CType_Id__c           string  `json:"CType_Id__c"`
@@ -28,13 +28,4 @@ type SFEventData struct {
 	Workshop_Type__c      string  `json:"Workshop_Type__c"`
 	Event_Start_Date__c   string  `json:"Event_Start_Date__c"`
 	Event_End_Date__c     string  `json:"Event_End_Date__c"`
-}
-
-type SFTimingData struct {
-	EndTime   string `json:"End_Time__c"`
-	StartTime string `json:"Start_Time__c"`
-	EndDate   string `json:"End_Date__c"`
-	StartDate string `json:"Start_Date__c"`
-	EventId   string `json:"Event__c"`
-	Id        string `json:"Id,omitempty"`
 }

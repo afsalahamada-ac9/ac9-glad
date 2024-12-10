@@ -9,6 +9,7 @@ package repository
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"ac9/glad/entity"
@@ -30,6 +31,24 @@ func NewCoursePGSQL(db *sql.DB) *CoursePGSQL {
 
 // Insert creates a course
 func (r *CoursePGSQL) Create(e *entity.Course) (id.ID, error) {
+	stmt1, err := r.db.Prepare(`
+        SELECT id 
+        FROM product 
+        WHERE id = $1 
+        AND tenant_id = $2
+        AND visibility IS NOT NULL`) // Optional: add any other conditions you need
+	if err != nil {
+		return e.ID, err
+	}
+
+	var productID id.ID
+	err = stmt1.QueryRow(e.ProductID, e.TenantID).Scan(&productID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return e.ID, fmt.Errorf("product with ID %v not found for tenant %v", e.ProductID, e.TenantID)
+		}
+		return e.ID, err
+	}
 	addressJSON, err := json.Marshal(e.Address)
 	if err != nil {
 		return e.ID, err
