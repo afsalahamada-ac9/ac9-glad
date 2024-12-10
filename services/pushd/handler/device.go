@@ -149,7 +149,7 @@ func notify(service device.UseCase) http.Handler {
 		}
 
 		var jsonResponse []*presenter.NotifyStatus
-		statuses, err := service.Notify(req.TenantID,
+		statuses, _ := service.Notify(req.TenantID,
 			req.AccountID,
 			req.NotificationMessage.Header,
 			req.NotificationMessage.Content,
@@ -207,19 +207,19 @@ func MakeDeviceHandlers(r *mux.Router, n negroni.Negroni, service device.UseCase
 		negroni.Wrap(register(service)),
 	)).Methods("POST", "OPTIONS").Name("register")
 
-	r.Handle("/v1/device/register", n.With(
+	r.Handle("/v1/devices/register", n.With(
 		negroni.Wrap(register(service)),
 	)).Methods("POST", "OPTIONS").Name("register")
 
-	r.Handle("/v1/device/notify", n.With(
+	r.Handle("/v1/devices/notify", n.With(
 		negroni.Wrap(notify(service)),
 	)).Methods("POST", "OPTIONS").Name("notify")
 
-	r.Handle("/v1/device/account/{accountID}", n.With(
+	r.Handle("/v1/devices/account/{accountID}", n.With(
 		negroni.Wrap(getByAccount(service)),
 	)).Methods("GET", "OPTIONS").Name("getByAccount")
 
-	r.Handle("/v1/device/{id}", n.With(
+	r.Handle("/v1/devices/{id}", n.With(
 		negroni.Wrap(delete(service)),
 	)).Methods("DELETE", "OPTIONS").Name("delete")
 }

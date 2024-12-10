@@ -107,8 +107,13 @@ func (s *Service) Notify(tenantID id.ID, accountID []id.ID, header, content stri
 			if err != nil {
 				// in case of 404, delete the token; no need to check for error
 				if strings.Contains(err.Error(), "registration-token-not-registered") {
+					l.Log.Warnf("Token=%v is not registered or invalid. Removing", d.PushToken)
 					rmDeviceList = append(rmDeviceList, d.ID)
 					status = min(status, http.StatusNotFound)
+				} else if strings.Contains(err.Error(), "401") {
+					l.Log.Warnf("Token=%v is not authorized. Removing", d.PushToken)
+					rmDeviceList = append(rmDeviceList, d.ID)
+					status = min(status, http.StatusUnauthorized)
 				}
 				l.Log.Warnf("Unable to send notification to %v, err=%v", accountID, err)
 				status = min(status, http.StatusInternalServerError)

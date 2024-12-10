@@ -28,16 +28,14 @@ func NewFirebase(ctx context.Context, jsonCfg string, isDryRun bool) (*Firebase,
 	return &Firebase{app: app, isDryRun: isDryRun}, err
 }
 
-func initializeFCMApp(ctx context.Context, jsonCfg string) (*firebase.App, error) {
-	// ctx := context.Background()
-
-	json, err := base64.StdEncoding.DecodeString(jsonCfg)
+func initializeFCMApp(ctx context.Context, b64Cfg string) (*firebase.App, error) {
+	jsonCfg, err := base64.StdEncoding.DecodeString(b64Cfg)
 	if err != nil {
 		l.Log.Fatalf("Unable to decode FCM configuration. err=%v", err)
 		return nil, err
 	}
 
-	opt := option.WithCredentialsJSON(json)
+	opt := option.WithCredentialsJSON(jsonCfg)
 	app, err := firebase.NewApp(ctx, nil, opt)
 	if err != nil {
 		l.Log.Fatalf("Error initializing firebase app. err=%v", err)
