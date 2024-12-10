@@ -8,7 +8,11 @@ package presenter
 
 import (
 	"ac9/glad/pkg/id"
+	"ac9/glad/pkg/util"
 	"ac9/glad/services/pushd/entity"
+	"encoding/json"
+
+	l "ac9/glad/pkg/logger"
 
 	"github.com/ulule/deepcopier"
 )
@@ -58,5 +62,20 @@ func (drr DeviceRegisterRequest) ToDevice(tenantID id.ID, accountID id.ID) (enti
 	device.TenantID = tenantID
 	device.AccountID = accountID
 
+	deviceInfo, err := json.Marshal(drr.DeviceInfo)
+	if err != nil {
+		l.Log.Warnf("Unable to marshal DeviceInfo=%#v", drr.DeviceInfo)
+		return device, err
+	}
+	platformInfo, err := json.Marshal(drr.PlatformInfo)
+	if err != nil {
+		l.Log.Warnf("Unable to marshal PlatformInfo=%#v", drr.PlatformInfo)
+		return device, err
+	}
+
+	device.DeviceInfo = util.NewString(string(deviceInfo))
+	device.PlatformInfo = util.NewString(string(platformInfo))
+
+	l.Log.Warnf("drr=%#v, device=%#v", drr, device)
 	return device, nil
 }
