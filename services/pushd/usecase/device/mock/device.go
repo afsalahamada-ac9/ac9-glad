@@ -7,6 +7,7 @@ package mock_device
 import (
 	id "ac9/glad/pkg/id"
 	entity "ac9/glad/services/pushd/entity"
+	context "context"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -199,6 +200,43 @@ func (mr *MockDeviceRepositoryMockRecorder) GetCount(tenantID interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCount", reflect.TypeOf((*MockDeviceRepository)(nil).GetCount), tenantID)
 }
 
+// MockPushNS is a mock of PushNS interface.
+type MockPushNS struct {
+	ctrl     *gomock.Controller
+	recorder *MockPushNSMockRecorder
+}
+
+// MockPushNSMockRecorder is the mock recorder for MockPushNS.
+type MockPushNSMockRecorder struct {
+	mock *MockPushNS
+}
+
+// NewMockPushNS creates a new mock instance.
+func NewMockPushNS(ctrl *gomock.Controller) *MockPushNS {
+	mock := &MockPushNS{ctrl: ctrl}
+	mock.recorder = &MockPushNSMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockPushNS) EXPECT() *MockPushNSMockRecorder {
+	return m.recorder
+}
+
+// Send mocks base method.
+func (m *MockPushNS) Send(ctx context.Context, token, header, content string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Send", ctx, token, header, content)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Send indicates an expected call of Send.
+func (mr *MockPushNSMockRecorder) Send(ctx, token, header, content interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockPushNS)(nil).Send), ctx, token, header, content)
+}
+
 // MockUseCase is a mock of UseCase interface.
 type MockUseCase struct {
 	ctrl     *gomock.Controller
@@ -278,4 +316,19 @@ func (m *MockUseCase) GetCount(id id.ID) int {
 func (mr *MockUseCaseMockRecorder) GetCount(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCount", reflect.TypeOf((*MockUseCase)(nil).GetCount), id)
+}
+
+// Notify mocks base method.
+func (m *MockUseCase) Notify(tenantID id.ID, accountID []id.ID, header, content string) ([]int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Notify", tenantID, accountID, header, content)
+	ret0, _ := ret[0].([]int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Notify indicates an expected call of Notify.
+func (mr *MockUseCaseMockRecorder) Notify(tenantID, accountID, header, content interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Notify", reflect.TypeOf((*MockUseCase)(nil).Notify), tenantID, accountID, header, content)
 }

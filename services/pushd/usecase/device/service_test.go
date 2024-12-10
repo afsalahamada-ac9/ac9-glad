@@ -46,7 +46,8 @@ func newFixtureDevice() *entity.Device {
 
 func Test_Create(t *testing.T) {
 	repo := newInmemDevice()
-	s := NewService(repo)
+	pns := newFakePNS(false)
+	s := NewService(repo, pns)
 	device := newFixtureDevice()
 	_, err := s.Create(*device)
 
@@ -56,7 +57,8 @@ func Test_Create(t *testing.T) {
 
 func Test_GetByAccount(t *testing.T) {
 	repo := newInmemDevice()
-	s := NewService(repo)
+	pns := newFakePNS(false)
+	s := NewService(repo, pns)
 	device1 := newFixtureDevice()
 	device2 := newFixtureDevice()
 	device2.PushToken = "BobToken"
@@ -74,7 +76,8 @@ func Test_GetByAccount(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	repo := newInmemDevice()
-	s := NewService(repo)
+	pns := newFakePNS(false)
+	s := NewService(repo, pns)
 
 	_ = newFixtureDevice()
 	device2 := newFixtureDevice()

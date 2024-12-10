@@ -46,7 +46,7 @@ type Notify struct {
 
 type NotifyStatus struct {
 	AccountID id.ID `json:"accountID"`
-	Status    bool  `json:"status"`
+	Status    int   `json:"status"`
 }
 
 // ToDevice creates device entity from device register request

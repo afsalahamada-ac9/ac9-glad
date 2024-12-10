@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -16,6 +17,7 @@ import (
 	"time"
 
 	// Uber zap logging
+	"ac9/glad/infrastructure/fcm"
 	"ac9/glad/pkg/logger"
 	"ac9/glad/services/pushd/handler"
 	"ac9/glad/services/pushd/repository"
@@ -28,7 +30,7 @@ import (
 	"ac9/glad/pkg/middleware"
 	"ac9/glad/pkg/util"
 
-	"github.com/gorilla/context"
+	gorillaContext "github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 	"github.com/urfave/negroni"
@@ -61,8 +63,10 @@ func main() {
 	}
 	defer db.Close()
 
+	pushService, err := fcm.NewFirebase(context.Background(), config.FCM_JSON, config.PUSH_DRY_RUN)
+
 	deviceRepo := repository.NewDevicePGSQL(db)
-	deviceService := device.NewService(deviceRepo)
+	deviceService := device.NewService(deviceRepo, pushService)
 
 	metricService, err := metric.NewPrometheusService()
 	if err != nil {
@@ -103,7 +107,7 @@ func main() {
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		Addr:         ":" + strconv.Itoa(util.GetIntEnvOrConfig("API_PORT", config.API_PORT)),
-		Handler:      context.ClearHandler(http.DefaultServeMux),
+		Handler:      gorillaContext.ClearHandler(http.DefaultServeMux),
 		ErrorLog:     logger,
 	}
 	Log.Infof("Starting server at %v ...", srv.Addr)

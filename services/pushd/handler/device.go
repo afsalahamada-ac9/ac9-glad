@@ -13,11 +13,9 @@ import (
 	l "ac9/glad/pkg/logger"
 	"ac9/glad/services/pushd/presenter"
 	"ac9/glad/services/pushd/usecase/device"
-	"context"
 	"encoding/json"
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
@@ -151,36 +149,14 @@ func notify(service device.UseCase) http.Handler {
 		}
 
 		var jsonResponse []*presenter.NotifyStatus
+		statuses, err := service.Notify(req.TenantID,
+			req.AccountID,
+			req.NotificationMessage.Header,
+			req.NotificationMessage.Content,
+		)
 
-		fcm := GetGoogleFCM()
-		for _, accountID := range req.AccountID {
-			notifyStatus := &presenter.NotifyStatus{AccountID: accountID}
-			data, err := service.GetByAccount(req.TenantID, accountID)
-			if err != nil && err != glad.ErrNotFound {
-				notifyStatus.Status = false
-				jsonResponse = append(jsonResponse, notifyStatus)
-				l.Log.Warnf("Account=%v not found or internal error. err=%v", accountID, err)
-				continue
-			}
-
-			if data == nil {
-				notifyStatus.Status = false
-				jsonResponse = append(jsonResponse, notifyStatus)
-				l.Log.Warnf("No devices registered for %v", accountID)
-				continue
-			}
-			for _, d := range data {
-				notifyStatus.Status = true
-				err = fcm.Send(context.Background(), d.PushToken, req.NotificationMessage)
-				if err != nil {
-					// in case of 404, delete the token; no need to check for error
-					if strings.Contains(err.Error(), "registration-token-not-registered") {
-						service.Delete(d.ID)
-					}
-					l.Log.Warnf("Unable to send notification to %v, err=%v", accountID, err)
-					notifyStatus.Status = false
-				}
-			}
+		for idx, status := range statuses {
+			notifyStatus := &presenter.NotifyStatus{AccountID: req.AccountID[idx], Status: status}
 			jsonResponse = append(jsonResponse, notifyStatus)
 		}
 

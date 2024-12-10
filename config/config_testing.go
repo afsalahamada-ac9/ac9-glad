@@ -18,7 +18,8 @@ const (
 	DB_SSLMODE  = "require"
 
 	// Defaults
-	DEFAULT_TENANT = ""
+	DEFAULT_TENANT  = "5306526529902621696"
+	DEFAULT_ACCOUNT = "100016472"
 
 	// API port
 	API_PORT = 8080
@@ -28,4 +29,8 @@ const (
 
 	// SFSYNCD specific consts
 	COURSED_ADDR = "localhost:8080"
+
+	// Firebase
+	FCM_JSON     = ""
+	PUSH_DRY_RUN = true
 )

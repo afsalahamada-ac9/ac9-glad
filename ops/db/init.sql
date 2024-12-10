@@ -208,7 +208,7 @@ CREATE TABLE IF NOT EXISTS account (
     tenant_id BIGINT NOT NULL REFERENCES tenant(id),
 
     -- Authentication id: for US, it's AWS Cognito id
-    cognito_id VARCHAR(255),
+    cognito_id VARCHAR(255) UNIQUE,
 
     -- Note: username is to link the account with the logged in user
     username VARCHAR(128) NOT NULL,
@@ -227,7 +227,6 @@ CREATE TABLE IF NOT EXISTS account (
 CREATE INDEX idx_account_tenant_id ON account(tenant_id);
 CREATE INDEX idx_account_username ON account(username);
 CREATE INDEX idx_account_type ON account(type);
-CREATE INDEX idx_account_cognito_id ON account(cognito_id);
 CREATE INDEX idx_account_email ON account(email);
 
 -- COURSE ELIGIBLITY: Courses teacher can teach
