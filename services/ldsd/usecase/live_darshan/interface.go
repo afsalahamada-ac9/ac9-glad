@@ -15,10 +15,18 @@ type Writer interface {
 	Create(*entity.LiveDarshan) error
 }
 
+type Reader interface {
+	Get(id int64) (*entity.LiveDarshan, error)
+	GetAll() ([]*entity.LiveDarshan, error)
+}
+
 type Repository interface {
 	Writer
+	Reader
 }
 
 type Usecase interface {
 	CreateLiveDarshan(id, date string, startTime time.Time, meetingUrl, createdBy string) (*entity.LiveDarshan, error)
+	GetLiveDarshan(id int64) (*entity.LiveDarshan, error)
+	GetAllLiveDarshan() ([]*entity.LiveDarshan, error)
 }

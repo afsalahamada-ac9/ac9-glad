@@ -34,3 +34,19 @@ func (s *Service) CreateLiveDarshan(id int64, date string, startTime time.Time, 
 
 	return ld, nil
 }
+
+func (s *Service) GetLiveDarshan(id int64) (*entity.LiveDarshan, error) {
+	ld, err := s.repo.Get(id)
+	if err != nil {
+		return nil, err
+	}
+	return ld, nil
+}
+
+func (s *Service) GetAllLiveDarshan() ([]*entity.LiveDarshan, error) {
+	ld, err := s.repo.GetAll()
+	if err != nil {
+		return nil, err
+	}
+	return ld, nil
+}

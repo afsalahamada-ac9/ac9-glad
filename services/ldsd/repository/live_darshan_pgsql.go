@@ -44,7 +44,7 @@ func (r *LiveDarshanPGSQL) Create(ld *entity.LiveDarshan) error {
 	return err
 }
 
-func (r *LiveDarshanPGSQL) Get(id string) (*entity.LiveDarshan, error) {
+func (r *LiveDarshanPGSQL) Get(id int64) (*entity.LiveDarshan, error) {
 	query := `
 		SELECT id, date, start_time, meeting_url, created_by
 		FROM live_darshan
@@ -64,4 +64,35 @@ func (r *LiveDarshanPGSQL) Get(id string) (*entity.LiveDarshan, error) {
 	}
 
 	return ld, nil
+}
+
+func (r *LiveDarshanPGSQL) GetAll() ([]*entity.LiveDarshan, error) {
+	query := `
+		SELECT id, date, start_time, meeting_url, created_by
+		FROM live_darshan
+	`
+
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var lds []*entity.LiveDarshan
+	for rows.Next() {
+		ld := &entity.LiveDarshan{}
+		err := rows.Scan(
+			&ld.ID,
+			&ld.Date,
+			&ld.StartTime,
+			&ld.MeetingURL,
+			&ld.CreatedBy,
+		)
+		if err != nil {
+			return nil, err
+		}
+		lds = append(lds, ld)
+	}
+
+	return lds, nil
 }
