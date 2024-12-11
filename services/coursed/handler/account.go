@@ -161,6 +161,88 @@ func getAccount(service account.UseCase) http.Handler {
 
 		errorMessage := "Error reading account"
 		vars := mux.Vars(r)
+		accountID, err := id.FromString(vars["id"])
+		if err != nil {
+			l.Log.Warnf("Unable to convert id=%v to internal format", vars["id"])
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte(err.Error()))
+			return
+		}
+		data, err := service.GetAccount(tenantID, accountID)
+		if err != nil && err != glad.ErrNotFound {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
+			return
+		}
+
+		if data == nil {
+			w.WriteHeader(http.StatusNotFound)
+			_, _ = w.Write([]byte("Empty data returned"))
+			return
+		}
+
+		toJ := &presenter.Account{}
+		toJ.FromAccountEntity(data)
+
+		w.Header().Set(common.HttpHeaderTenantID, r.Header.Get(common.HttpHeaderTenantID))
+		if err := json.NewEncoder(w).Encode(toJ); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte("Unable to encode account"))
+		}
+	})
+}
+
+func deleteAccount(service account.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		tenant := r.Header.Get(common.HttpHeaderTenantID)
+
+		tenantID, err := id.FromString(tenant)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Unable to parse tenant id"))
+			return
+		}
+
+		errorMessage := "Error removing account"
+		vars := mux.Vars(r)
+		accountID, err := id.FromString(vars["id"])
+		if err != nil {
+			l.Log.Warnf("Unable to convert id=%v to internal format", vars["id"])
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte(err.Error()))
+			return
+		}
+
+		err = service.DeleteAccount(tenantID, accountID)
+		switch err {
+		case nil:
+			w.WriteHeader(http.StatusOK)
+			return
+		case glad.ErrNotFound:
+			w.WriteHeader(http.StatusNotFound)
+			_, _ = w.Write([]byte("Account doesn't exist"))
+			return
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage))
+			return
+		}
+	})
+}
+
+func getAccountByUsername(service account.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		tenant := r.Header.Get(common.HttpHeaderTenantID)
+
+		tenantID, err := id.FromString(tenant)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Unable to parse tenant id"))
+			return
+		}
+
+		errorMessage := "Error reading account"
+		vars := mux.Vars(r)
 		username := vars["username"]
 		data, err := service.GetAccountByName(tenantID, username)
 		if err != nil && err != glad.ErrNotFound {
@@ -186,7 +268,7 @@ func getAccount(service account.UseCase) http.Handler {
 	})
 }
 
-func deleteAccount(service account.UseCase) http.Handler {
+func deleteAccountByUsername(service account.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
 
@@ -280,15 +362,23 @@ func MakeAccountHandlers(r *mux.Router, n negroni.Negroni, service account.UseCa
 	// 	negroni.Wrap(createAccount(service)),
 	// )).Methods("POST", "OPTIONS").Name("createAccount")
 
-	r.Handle("/v1/accounts/{username}", n.With(
+	r.Handle("/v1/accounts/{id}", n.With(
 		negroni.Wrap(getAccount(service)),
 	)).Methods("GET", "OPTIONS").Name("getAccount")
 
-	r.Handle("/v1/accounts/{username}", n.With(
+	r.Handle("/v1/accounts/{id}", n.With(
 		negroni.Wrap(deleteAccount(service)),
 	)).Methods("DELETE", "OPTIONS").Name("deleteAccount")
 
-	r.Handle("/v1/accounts/{username}", n.With(
+	r.Handle("/v1/accounts/username/{username}", n.With(
+		negroni.Wrap(getAccountByUsername(service)),
+	)).Methods("GET", "OPTIONS").Name("getAccountByUsername")
+
+	r.Handle("/v1/accounts/username/{username}", n.With(
+		negroni.Wrap(deleteAccountByUsername(service)),
+	)).Methods("DELETE", "OPTIONS").Name("deleteAccountByUsername")
+
+	r.Handle("/v1/accounts/{id}", n.With(
 		negroni.Wrap(updateAccount(service)),
 	)).Methods("PUT", "OPTIONS").Name("updateAccount")
 }

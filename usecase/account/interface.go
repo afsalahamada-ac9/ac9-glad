@@ -48,11 +48,11 @@ type UseCase interface {
 		at entity.AccountType,
 		as entity.AccountStatus,
 	) error
-	GetAccount(id id.ID) (*entity.Account, error)
+	GetAccount(tenantID id.ID, accountID id.ID) (*entity.Account, error)
 	GetAccountByName(tenantID id.ID, username string) (*entity.Account, error)
 	ListAccounts(tenantID id.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error)
 	UpdateAccount(e *entity.Account) error
-	DeleteAccount(id id.ID) error
+	DeleteAccount(tenantID id.ID, accountID id.ID) error
 	DeleteAccountByName(tenantID id.ID, username string) error
 	GetCount(tenantId id.ID) int
 	SearchAccounts(tenantID id.ID, query string, page, limit int, at entity.AccountType) ([]*entity.Account, error)

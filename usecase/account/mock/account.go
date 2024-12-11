@@ -381,17 +381,17 @@ func (mr *MockUseCaseMockRecorder) CreateAccount(tenantID, extID, cognitoID, use
 }
 
 // DeleteAccount mocks base method.
-func (m *MockUseCase) DeleteAccount(id id.ID) error {
+func (m *MockUseCase) DeleteAccount(tenantID, accountID id.ID) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteAccount", id)
+	ret := m.ctrl.Call(m, "DeleteAccount", tenantID, accountID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteAccount indicates an expected call of DeleteAccount.
-func (mr *MockUseCaseMockRecorder) DeleteAccount(id interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) DeleteAccount(tenantID, accountID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAccount", reflect.TypeOf((*MockUseCase)(nil).DeleteAccount), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAccount", reflect.TypeOf((*MockUseCase)(nil).DeleteAccount), tenantID, accountID)
 }
 
 // DeleteAccountByName mocks base method.
@@ -409,18 +409,18 @@ func (mr *MockUseCaseMockRecorder) DeleteAccountByName(tenantID, username interf
 }
 
 // GetAccount mocks base method.
-func (m *MockUseCase) GetAccount(id id.ID) (*entity.Account, error) {
+func (m *MockUseCase) GetAccount(tenantID, accountID id.ID) (*entity.Account, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAccount", id)
+	ret := m.ctrl.Call(m, "GetAccount", tenantID, accountID)
 	ret0, _ := ret[0].(*entity.Account)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetAccount indicates an expected call of GetAccount.
-func (mr *MockUseCaseMockRecorder) GetAccount(id interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) GetAccount(tenantID, accountID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccount", reflect.TypeOf((*MockUseCase)(nil).GetAccount), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccount", reflect.TypeOf((*MockUseCase)(nil).GetAccount), tenantID, accountID)
 }
 
 // GetAccountByName mocks base method.

@@ -57,8 +57,8 @@ func (s *Service) CreateAccount(
 }
 
 // GetAccount retrieves an account
-func (s *Service) GetAccount(id id.ID) (*entity.Account, error) {
-	account, err := s.repo.Get(id)
+func (s *Service) GetAccount(tenantID id.ID, accountID id.ID) (*entity.Account, error) {
+	account, err := s.repo.Get(accountID)
 	if account == nil {
 		return nil, glad.ErrNotFound
 	}
@@ -105,8 +105,8 @@ func (s *Service) UpdateAccount(t *entity.Account) error {
 }
 
 // DeleteAccount Deletes an account
-func (s *Service) DeleteAccount(id id.ID) error {
-	account, err := s.GetAccount(id)
+func (s *Service) DeleteAccount(tenantID id.ID, accountID id.ID) error {
+	account, err := s.GetAccount(tenantID, accountID)
 	if account == nil {
 		return glad.ErrNotFound
 	}
@@ -114,7 +114,7 @@ func (s *Service) DeleteAccount(id id.ID) error {
 		return err
 	}
 
-	return s.repo.Delete(id)
+	return s.repo.Delete(accountID)
 }
 
 // DeleteAccount Deletes an account using username

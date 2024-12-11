@@ -146,7 +146,7 @@ func Test_getAccount(t *testing.T) {
 	MakeAccountHandlers(r, *n, service)
 	path, err := r.GetRoute("getAccount").GetPathTemplate()
 	assert.Nil(t, err)
-	assert.Equal(t, "/v1/accounts/{username}", path)
+	assert.Equal(t, "/v1/accounts/{id}", path)
 	account := &entity.Account{
 		ID:       accountIDPrimary,
 		TenantID: tenantAlice,
@@ -155,7 +155,7 @@ func Test_getAccount(t *testing.T) {
 		Type:     entity.AccountTeacher,
 	}
 	service.EXPECT().
-		GetAccountByName(account.TenantID, account.Username).
+		GetAccount(account.TenantID, account.ID).
 		Return(account, nil)
 
 	handler := getAccount(service)
@@ -164,7 +164,7 @@ func Test_getAccount(t *testing.T) {
 	defer ts.Close()
 
 	client := &http.Client{}
-	req, _ := http.NewRequest(http.MethodGet, ts.URL+"/v1/accounts/"+account.Username, nil)
+	req, _ := http.NewRequest(http.MethodGet, ts.URL+"/v1/accounts/"+account.ID.String(), nil)
 	req.Header.Set(common.HttpHeaderTenantID, tenantAlice.String())
 	res, err := client.Do(req)
 	assert.Nil(t, err)
@@ -190,14 +190,80 @@ func Test_deleteAccount(t *testing.T) {
 	MakeAccountHandlers(r, *n, service)
 	path, err := r.GetRoute("deleteAccount").GetPathTemplate()
 	assert.Nil(t, err)
-	assert.Equal(t, "/v1/accounts/{username}", path)
+	assert.Equal(t, "/v1/accounts/{id}", path)
+
+	accountID := accountIDPrimary
+	service.EXPECT().DeleteAccount(tenantAlice, accountID).Return(nil)
+	handler := deleteAccount(service)
+	req, _ := http.NewRequest("DELETE", "/v1/accounts/"+accountID.String(), nil)
+	req.Header.Set(common.HttpHeaderTenantID, tenantAlice.String())
+	r.Handle("/v1/accounts/{username}", handler).Methods("DELETE", "OPTIONS")
+	rr := httptest.NewRecorder()
+	r.ServeHTTP(rr, req)
+	assert.Equal(t, http.StatusOK, rr.Code)
+}
+
+func Test_getAccountByUsername(t *testing.T) {
+	controller := gomock.NewController(t)
+	defer controller.Finish()
+	service := mock.NewMockUseCase(controller)
+	r := mux.NewRouter()
+	n := negroni.New()
+	MakeAccountHandlers(r, *n, service)
+	path, err := r.GetRoute("getAccountByUsername").GetPathTemplate()
+	assert.Nil(t, err)
+	assert.Equal(t, "/v1/accounts/username/{username}", path)
+	account := &entity.Account{
+		ID:       accountIDPrimary,
+		TenantID: tenantAlice,
+		ExtID:    aliceExtID,
+		Username: accountUsernamePrimary,
+		Type:     entity.AccountTeacher,
+	}
+	service.EXPECT().
+		GetAccountByName(account.TenantID, account.Username).
+		Return(account, nil)
+
+	handler := getAccount(service)
+	r.Handle("/v1/accounts/username/{username}", handler)
+	ts := httptest.NewServer(r)
+	defer ts.Close()
+
+	client := &http.Client{}
+	req, _ := http.NewRequest(http.MethodGet, ts.URL+"/v1/accounts/username/"+account.Username, nil)
+	req.Header.Set(common.HttpHeaderTenantID, tenantAlice.String())
+	res, err := client.Do(req)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+
+	// presenter.Account is returned by the api (http) server
+	var d *presenter.Account
+	json.NewDecoder(res.Body).Decode(&d)
+	assert.NotNil(t, d)
+
+	assert.Equal(t, account.ID, d.ID)
+	assert.Equal(t, account.Username, d.Username)
+	assert.Equal(t, account.Type, d.Type)
+	assert.Equal(t, tenantAlice.String(), res.Header.Get(common.HttpHeaderTenantID))
+}
+
+func Test_deleteAccountByUsername(t *testing.T) {
+	controller := gomock.NewController(t)
+	defer controller.Finish()
+	service := mock.NewMockUseCase(controller)
+	r := mux.NewRouter()
+	n := negroni.New()
+	MakeAccountHandlers(r, *n, service)
+	path, err := r.GetRoute("deleteAccountByUsername").GetPathTemplate()
+	assert.Nil(t, err)
+	assert.Equal(t, "/v1/accounts/username/{username}", path)
 
 	username := accountUsernamePrimary
 	service.EXPECT().DeleteAccountByName(tenantAlice, username).Return(nil)
 	handler := deleteAccount(service)
-	req, _ := http.NewRequest("DELETE", "/v1/accounts/"+username, nil)
+	req, _ := http.NewRequest("DELETE", "/v1/accounts/username/"+username, nil)
 	req.Header.Set(common.HttpHeaderTenantID, tenantAlice.String())
-	r.Handle("/v1/accounts/{username}", handler).Methods("DELETE", "OPTIONS")
+	r.Handle("/v1/accounts/username/{username}", handler).Methods("DELETE", "OPTIONS")
 	rr := httptest.NewRecorder()
 	r.ServeHTTP(rr, req)
 	assert.Equal(t, http.StatusOK, rr.Code)
@@ -210,16 +276,16 @@ func Test_deleteAccountNonExistent(t *testing.T) {
 	r := mux.NewRouter()
 	n := negroni.New()
 	MakeAccountHandlers(r, *n, service)
-	path, err := r.GetRoute("deleteAccount").GetPathTemplate()
+	path, err := r.GetRoute("deleteAccountByUsername").GetPathTemplate()
 	assert.Nil(t, err)
-	assert.Equal(t, "/v1/accounts/{username}", path)
+	assert.Equal(t, "/v1/accounts/username/{username}", path)
 
 	username := accountUsernamePrimary
 	service.EXPECT().DeleteAccountByName(tenantAlice, username).Return(glad.ErrNotFound)
 	handler := deleteAccount(service)
-	req, _ := http.NewRequest("DELETE", "/v1/accounts/"+username, nil)
+	req, _ := http.NewRequest("DELETE", "/v1/accounts/username/"+username, nil)
 	req.Header.Set(common.HttpHeaderTenantID, tenantAlice.String())
-	r.Handle("/v1/accounts/{username}", handler).Methods("DELETE", "OPTIONS")
+	r.Handle("/v1/accounts/username/{username}", handler).Methods("DELETE", "OPTIONS")
 	rr := httptest.NewRecorder()
 	r.ServeHTTP(rr, req)
 	assert.Equal(t, http.StatusNotFound, rr.Code)
