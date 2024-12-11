@@ -10,15 +10,40 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/glad"
 	l "ac9/glad/pkg/logger"
+	"ac9/glad/services/ldsd/entity"
 	"ac9/glad/services/ldsd/presenter"
 	"ac9/glad/services/ldsd/usecase/live_darshan"
 
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
 )
+
+// TODO: integrate with zoom library to retrieve the information
+func getLiveDarshanConfig() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		zoomInfo := presenter.ZoomInfo{
+			Signature:   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZGtLZXkiOiJhYmMxMjMiLCJtbiI6IjEyMzQ1Njc4OSIsInJvbGUiOjAsImlhdCI6MTY0NjkzNzU1MywiZXhwIjoxNjQ2OTQ0NzUzLCJhcHBLZXkiOiJhYmMxMjMiLCJ0b2tlbkV4cCI6MTY0Njk0NDc1M30.UcWxbWY-y22wFarBBc9i3lGQuZAsuUpl8GRR8wUah2M",
+			DisplayName: "AboveCloud9 AI",
+		}
+
+		config := presenter.LiveDarshanConfig{
+			Zoom: zoomInfo,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(config); err != nil {
+			http.Error(w, "Unable to encode live darshan config", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+	})
+}
 
 func createLiveDarshan(service live_darshan.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -79,42 +104,48 @@ func createLiveDarshan(service live_darshan.UseCase) http.Handler {
 	})
 }
 
-// TODO: integrate with zoom library to retrieve the information
-func getLiveDarshanConfig() http.Handler {
+func listLiveDarshan(service live_darshan.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		zoomInfo := presenter.ZoomInfo{
-			Signature:   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZGtLZXkiOiJhYmMxMjMiLCJtbiI6IjEyMzQ1Njc4OSIsInJvbGUiOjAsImlhdCI6MTY0NjkzNzU1MywiZXhwIjoxNjQ2OTQ0NzUzLCJhcHBLZXkiOiJhYmMxMjMiLCJ0b2tlbkV4cCI6MTY0Njk0NDc1M30.UcWxbWY-y22wFarBBc9i3lGQuZAsuUpl8GRR8wUah2M",
-			DisplayName: "AboveCloud9 AI",
-		}
+		errorMessage := "Error retrieving live darshan"
+		var lds []*entity.LiveDarshan
+		var err error
 
-		config := presenter.LiveDarshanConfig{
-			Zoom: zoomInfo,
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(config); err != nil {
-			http.Error(w, "Unable to encode live darshan config", http.StatusInternalServerError)
+		tenantID, err := common.HttpGetTenantID(w, r)
+		if err != nil {
+			l.Log.Debugf("Tenant id is missing")
 			return
 		}
 
-		w.WriteHeader(http.StatusOK)
-	})
-}
-
-func listLiveDarshan() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ld := presenter.LiveDarshan{
-			// ID:         10000000,
-			// Date:       "2024-12-04",
-			// StartTime:  "15:04:00",
-			// MeetingID:  "1234567890",
-			// Password:   "test-password",
-			// MeetingURL: "https://zoom.us/j/5551112222",
+		page, limit, err := common.HttpGetPageParams(w, r)
+		if err != nil {
+			return
 		}
 
-		var ldList []presenter.LiveDarshan
-		ldList = append(ldList, ld)
+		lds, err = service.ListLiveDarshan(tenantID, page, limit)
+		w.Header().Set("Content-Type", "application/json")
+		if err != nil && err != glad.ErrNotFound {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
+			return
+		}
 
+		total := service.GetCount(tenantID)
+		w.Header().Set(common.HttpHeaderTotalCount, strconv.Itoa(total))
+
+		if lds == nil {
+			w.WriteHeader(http.StatusNotFound)
+			_, _ = w.Write([]byte(errorMessage))
+			return
+		}
+
+		var ldList []*presenter.LiveDarshan
+		for _, ld := range lds {
+			liveDarshan := &presenter.LiveDarshan{}
+			liveDarshan.FromEntityLiveDarshan(ld)
+			ldList = append(ldList, liveDarshan)
+		}
+
+		w.Header().Set(common.HttpHeaderTenantID, tenantID.String())
 		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(ldList); err != nil {
 			http.Error(w, "Unable to encode live darshan details", http.StatusInternalServerError)
@@ -144,17 +175,17 @@ func deleteLiveDarshan() http.Handler {
 
 // MakeLiveDarshanHandlers sets up live darshan handlers
 func MakeLiveDarshanHandlers(r *mux.Router, n negroni.Negroni, service live_darshan.UseCase) {
+	r.Handle("/v1/live-darshan/config", n.With(
+		negroni.Wrap(getLiveDarshanConfig()),
+	)).Methods(http.MethodGet, http.MethodOptions).Name("getLiveDarshanConfig")
+
 	r.Handle("/v1/live-darshan", n.With(
 		negroni.Wrap(createLiveDarshan(service)),
 	)).Methods(http.MethodPost, http.MethodOptions).Name("createLiveDarshan")
 
 	r.Handle("/v1/live-darshan", n.With(
-		negroni.Wrap(listLiveDarshan()),
+		negroni.Wrap(listLiveDarshan(service)),
 	)).Methods(http.MethodGet, http.MethodOptions).Name("listLiveDarshan")
-
-	r.Handle("/v1/live-darshan/config", n.With(
-		negroni.Wrap(getLiveDarshanConfig()),
-	)).Methods(http.MethodGet, http.MethodOptions).Name("getLiveDarshanConfig")
 
 	r.Handle("/v1/live-darshan/{id}", n.With(
 		negroni.Wrap(updateLiveDarshan()),

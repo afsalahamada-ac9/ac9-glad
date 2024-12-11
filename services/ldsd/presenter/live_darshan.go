@@ -7,7 +7,12 @@
 // Package presenter defines data structures for the API responses
 package presenter
 
-import "ac9/glad/pkg/id"
+import (
+	"ac9/glad/pkg/id"
+	"ac9/glad/services/ldsd/entity"
+	"net/url"
+	"strings"
+)
 
 // LiveDarshanConfig contains the zoom service configuration for live darshan
 type LiveDarshanConfig struct {
@@ -47,4 +52,24 @@ type LiveDarshanResponse struct {
 type LiveDarshan struct {
 	LiveDarshanReq
 	LiveDarshanResponse
+}
+
+// FromEntityLiveDarshan creates live darshan response from entity
+func (ld *LiveDarshan) FromEntityLiveDarshan(e *entity.LiveDarshan) error {
+	ld.ID = e.ID
+	ld.MeetingURL = e.MeetingURL
+	ld.Date = e.Date.Format("2006-01-02")
+	ld.StartTime = e.StartTime.Format("15:04:00")
+
+	u, _ := url.Parse(e.MeetingURL)
+
+	// Get zoom meeting id via last path segment
+	segments := strings.Split(strings.Trim(u.Path, "/"), "/")
+	ld.MeetingID = segments[len(segments)-1]
+
+	// Get (encrypted) password from query parameter
+	// Note: There is no way to decrypt the zoom password
+	ld.Password = u.Query().Get("pwd")
+
+	return nil
 }

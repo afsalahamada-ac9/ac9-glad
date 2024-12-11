@@ -177,8 +177,6 @@ func (c *Course) FromEntityCourse(e *entity.Course) error {
 	return nil
 }
 
-// DateTime     []DateTime           `json:"date,omitempty"`
-
 // FromEntityCourseFull creates course response from course entity
 func (c *Course) FromEntityCourseFull(cf *entity.CourseFull) error {
 	c.FromEntityCourse(cf.Course)
