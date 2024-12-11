@@ -8,14 +8,78 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
+	"ac9/glad/pkg/common"
+	l "ac9/glad/pkg/logger"
 	"ac9/glad/services/ldsd/presenter"
+	"ac9/glad/services/ldsd/usecase/live_darshan"
 
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
 )
 
+func createLiveDarshan(service live_darshan.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		errorMessage := "Error adding live darshan"
+		var req presenter.LiveDarshanReq
+
+		tenantID, err := common.HttpGetTenantID(w, r)
+		if err != nil {
+			l.Log.Debugf("Tenant id is missing")
+			return
+		}
+
+		accountID, err := common.HttpGetAccountID(w, r)
+		if err != nil {
+			l.Log.Debugf("Account id is missing")
+			return
+		}
+
+		err = json.NewDecoder(r.Body).Decode(&req)
+		if err != nil {
+			log.Println(err.Error())
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Unable to decode the data. " + err.Error()))
+			return
+		}
+
+		// validation checks
+		if req.Date == "" || req.StartTime == "" || req.MeetingID == "" || req.MeetingURL == "" {
+			l.Log.Warnf("[%v] Mandatory fields are missing. %#v", tenantID, req)
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Mandatory fields missing"))
+			return
+		}
+
+		ld, err := service.CreateLiveDarshan(
+			tenantID,
+			req.Date,
+			req.StartTime,
+			req.MeetingURL,
+			accountID)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
+			return
+		}
+		toJ := &presenter.LiveDarshanResponse{
+			ID: ld.ID,
+		}
+
+		w.Header().Set(common.HttpHeaderTenantID, tenantID.String())
+		w.WriteHeader(http.StatusCreated)
+		if err := json.NewEncoder(w).Encode(toJ); err != nil {
+			l.Log.Errorf(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage))
+			return
+		}
+	})
+}
+
+// TODO: integrate with zoom library to retrieve the information
 func getLiveDarshanConfig() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		zoomInfo := presenter.ZoomInfo{
@@ -40,12 +104,12 @@ func getLiveDarshanConfig() http.Handler {
 func listLiveDarshan() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ld := presenter.LiveDarshan{
-			ID:        10000000,
-			Date:      "2024-12-04",
-			StartTime: "15:04:00",
+			// ID:         10000000,
+			// Date:       "2024-12-04",
+			// StartTime:  "15:04:00",
 			// MeetingID:  "1234567890",
 			// Password:   "test-password",
-			MeetingURL: "https://zoom.us/j/5551112222",
+			// MeetingURL: "https://zoom.us/j/5551112222",
 		}
 
 		var ldList []presenter.LiveDarshan
@@ -78,8 +142,12 @@ func deleteLiveDarshan() http.Handler {
 	})
 }
 
-// MakeTestHandlers sets up live darshan handlers
-func MakeTestHandlers(r *mux.Router, n negroni.Negroni) {
+// MakeLiveDarshanHandlers sets up live darshan handlers
+func MakeLiveDarshanHandlers(r *mux.Router, n negroni.Negroni, service live_darshan.UseCase) {
+	r.Handle("/v1/live-darshan", n.With(
+		negroni.Wrap(createLiveDarshan(service)),
+	)).Methods(http.MethodPost, http.MethodOptions).Name("createLiveDarshan")
+
 	r.Handle("/v1/live-darshan", n.With(
 		negroni.Wrap(listLiveDarshan()),
 	)).Methods(http.MethodGet, http.MethodOptions).Name("listLiveDarshan")

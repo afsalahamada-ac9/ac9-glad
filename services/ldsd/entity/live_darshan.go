@@ -7,39 +7,64 @@
 package entity
 
 import (
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
-	"fmt"
+	l "ac9/glad/pkg/logger"
+
 	"time"
 )
 
+// LiveDarshan contains live darshan information
 type LiveDarshan struct {
-	ID         int64
-	Date       string
-	StartTime  time.Time
+	ID         id.ID
+	TenantID   id.ID
+	Date       time.Time // YYYY-MM-DD format
+	StartTime  time.Time // HH:mm:ss format
 	MeetingURL string
 	CreatedBy  id.ID
 }
 
-func NewLiveDarshan(id int64, date string, startTime time.Time, meetingUrl string, createdBy id.ID) (*LiveDarshan, error) {
+// NewLiveDarshan creates a new live darhsan entity
+func NewLiveDarshan(
+	tenantID id.ID,
+	date string,
+	startTime string,
+	meetingUrl string,
+	createdBy id.ID,
+) (*LiveDarshan, error) {
+
 	ld := &LiveDarshan{
-		ID:         id,
-		Date:       date,
-		StartTime:  startTime,
+		ID:         id.New(),
+		TenantID:   tenantID,
 		MeetingURL: meetingUrl,
 		CreatedBy:  createdBy,
 	}
 
-	return ld, nil
-}
-
-func (ld *LiveDarshan) Validate() error {
-	_, err := time.Parse("2006-01-02", ld.Date) // Using "YYYY-MM-DD" format
+	tDate, err := time.Parse("2006-01-02", date) // Using "YYYY-MM-DD" format
 	if err != nil {
-		return fmt.Errorf("date format is invalid: %w", err)
+		l.Log.Warnf("Date value=%v is not valid", ld.Date)
+		return nil, glad.ErrInvalidValue
 	}
 
+	tTime, err := time.Parse("15:04:00", startTime)
+	if err != nil {
+		l.Log.Warnf("Start time value=%v is not valid", ld.StartTime)
+		return nil, glad.ErrInvalidValue
+	}
+
+	ld.Date = tDate
+	ld.StartTime = tTime
+
+	err = ld.Validate()
+	return ld, err
+}
+
+// Validate validates the live darshan parameters
+func (ld *LiveDarshan) Validate() error {
+
 	if ld.MeetingURL == "" {
-		return fmt.Errorf("meeting URL is required")
+		l.Log.Warnf("Meeting URL is required")
+		return glad.ErrMissingParam
 	}
 
 	return nil

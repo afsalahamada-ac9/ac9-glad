@@ -7,6 +7,8 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -16,6 +18,8 @@ import (
 	// Uber zap logging
 	"ac9/glad/pkg/logger"
 	"ac9/glad/services/ldsd/handler"
+	"ac9/glad/services/ldsd/repository"
+	"ac9/glad/services/ldsd/usecase/live_darshan"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
@@ -44,6 +48,22 @@ func main() {
 		}
 	}()
 
+	dataSourceName := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s",
+		util.GetStrEnvOrConfig("DB_USER", config.DB_USER),
+		util.GetStrEnvOrConfig("DB_PASSWORD", config.DB_PASSWORD),
+		util.GetStrEnvOrConfig("DB_HOST", config.DB_HOST),
+		util.GetIntEnvOrConfig("DB_PORT", config.DB_PORT),
+		util.GetStrEnvOrConfig("DB_DATABASE", config.DB_DATABASE),
+		util.GetStrEnvOrConfig("DB_SSLMODE", config.DB_SSLMODE))
+	db, err := sql.Open("postgres", dataSourceName)
+	if err != nil {
+		Log.Fatalf("Unable to initialize database: %v", err.Error())
+	}
+	defer db.Close()
+
+	liveDarshanRepo := repository.NewLiveDarshanPGSQL(db)
+	liveDarshanService := live_darshan.NewService(liveDarshanRepo)
+
 	metricService, err := metric.NewPrometheusService()
 	if err != nil {
 		Log.Fatalf("%v", err.Error())
@@ -54,6 +74,7 @@ func main() {
 		negroni.HandlerFunc(middleware.Metrics(metricService)),
 		negroni.HandlerFunc(middleware.Cors),
 		negroni.HandlerFunc(middleware.AddDefaultTenant),
+		negroni.HandlerFunc(middleware.AddDefaultAccount),
 		negroni.NewLogger(),
 	)
 	n.Use(&middleware.APILogging{Log: Log})
@@ -74,8 +95,8 @@ func main() {
 	// log handler
 	logger.MakeLogHandlers(r, *n, "ldsd", Log)
 
-	// test
-	handler.MakeTestHandlers(r, *n)
+	// live darshan
+	handler.MakeLiveDarshanHandlers(r, *n, liveDarshanService)
 
 	logger := log.New(os.Stderr, "logger: ", log.Lshortfile)
 	srv := &http.Server{

@@ -17,6 +17,7 @@ CREATE DATABASE glad_ldsd
 
 CREATE TABLE live_darshan (
     id BIGINT PRIMARY KEY,
+    tenant_id BIGINT,
     date DATE,
     start_time TIMESTAMP,
     meeting_url TEXT,

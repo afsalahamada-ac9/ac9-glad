@@ -19,7 +19,7 @@ import (
 	"github.com/lib/pq"
 )
 
-// DevicePGSQL mysql repo
+// DevicePGSQL pgsql repo
 type DevicePGSQL struct {
 	db *sql.DB
 }

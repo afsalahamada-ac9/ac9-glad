@@ -34,3 +34,6 @@ var ErrInvalidValue = errors.New("invalid value")
 
 // ErrAlreadyExists already exists
 var ErrAlreadyExists = errors.New("already exists")
+
+// ErrMissingParam missing parameter
+var ErrMissingParam = errors.New("missing parameter")

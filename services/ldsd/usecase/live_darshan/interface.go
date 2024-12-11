@@ -4,20 +4,22 @@
  * This code may not be used, copied, modified, or distributed without explicit permission.
  */
 
-package livedarshan
+package live_darshan
 
 import (
+	"ac9/glad/pkg/id"
 	"ac9/glad/services/ldsd/entity"
-	"time"
 )
 
 type Writer interface {
 	Create(*entity.LiveDarshan) error
+	Delete(ldID int64) error
 }
 
 type Reader interface {
-	Get(id int64) (*entity.LiveDarshan, error)
-	GetAll() ([]*entity.LiveDarshan, error)
+	Get(ldID int64) (*entity.LiveDarshan, error)
+	List(tenantID id.ID, page, limit int) ([]*entity.LiveDarshan, error)
+	GetCount(tenantID id.ID) (int, error)
 }
 
 type Repository interface {
@@ -25,8 +27,16 @@ type Repository interface {
 	Reader
 }
 
-type Usecase interface {
-	CreateLiveDarshan(id, date string, startTime time.Time, meetingUrl, createdBy string) (*entity.LiveDarshan, error)
-	GetLiveDarshan(id int64) (*entity.LiveDarshan, error)
-	GetAllLiveDarshan() ([]*entity.LiveDarshan, error)
+type UseCase interface {
+	CreateLiveDarshan(
+		tenantID id.ID,
+		date string,
+		startTime string,
+		meetingURL string,
+		createdBy id.ID,
+	) (*entity.LiveDarshan, error)
+	GetLiveDarshan(ldID int64) (*entity.LiveDarshan, error)
+	ListLiveDarshan(tenantID id.ID, page, limit int) ([]*entity.LiveDarshan, error)
+	DeleteLiveDarshan(ldID int64) error
+	GetCount(tenantID id.ID) int
 }
