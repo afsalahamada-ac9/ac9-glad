@@ -65,6 +65,15 @@ func (s *Service) ListLiveDarshan(tenantID id.ID, page, limit int) ([]*entity.Li
 	return ld, nil
 }
 
+// UpdateLiveDarshan Update a live darshan
+func (s *Service) UpdateLiveDarshan(ld *entity.LiveDarshan) error {
+	err := ld.Validate()
+	if err != nil {
+		return err
+	}
+	return s.repo.Update(ld)
+}
+
 // DeleteLiveDarshan deletes a live darshan
 func (s *Service) DeleteLiveDarshan(ldID id.ID) error {
 	err := s.repo.Delete(ldID)

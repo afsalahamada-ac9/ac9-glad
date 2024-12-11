@@ -9,6 +9,7 @@ package repository
 import (
 	"ac9/glad/pkg/id"
 	l "ac9/glad/pkg/logger"
+	"ac9/glad/pkg/util"
 	"ac9/glad/services/ldsd/entity"
 	"database/sql"
 
@@ -36,7 +37,7 @@ func (r *LiveDarshanPGSQL) Create(ld *entity.LiveDarshan) error {
 	`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		l.Log.Errorf("err=%#v", err)
+		l.Log.Errorf("err=%v", err)
 		return err
 	}
 
@@ -50,7 +51,7 @@ func (r *LiveDarshanPGSQL) Create(ld *entity.LiveDarshan) error {
 		ld.CreatedBy,
 	)
 	if err != nil {
-		l.Log.Errorf("err=%#v", err)
+		l.Log.Errorf("err=%v", err)
 	}
 
 	return err
@@ -74,7 +75,7 @@ func (r *LiveDarshanPGSQL) Get(ldID id.ID) (*entity.LiveDarshan, error) {
 		&ld.CreatedBy,
 	)
 	if err != nil {
-		l.Log.Errorf("err=%#v", err)
+		l.Log.Errorf("err=%v", err)
 		return nil, err
 	}
 
@@ -98,12 +99,12 @@ func (r *LiveDarshanPGSQL) List(
 		query += ` LIMIT $2 OFFSET $3;`
 		stmt, err := r.db.Prepare(query)
 		if err != nil {
-			l.Log.Errorf("err=%#v", err)
+			l.Log.Errorf("err=%v", err)
 			return nil, err
 		}
 		rows, err := stmt.Query(tenantID, limit, offset)
 		if err != nil {
-			l.Log.Errorf("err=%#v", err)
+			l.Log.Errorf("err=%v", err)
 			return nil, err
 		}
 		defer rows.Close()
@@ -112,13 +113,13 @@ func (r *LiveDarshanPGSQL) List(
 
 	stmt, err := r.db.Prepare(query + ";")
 	if err != nil {
-		l.Log.Errorf("err=%#v", err)
+		l.Log.Errorf("err=%v", err)
 		return nil, err
 	}
 
 	rows, err := stmt.Query(tenantID)
 	if err != nil {
-		l.Log.Errorf("err=%#v", err)
+		l.Log.Errorf("err=%v", err)
 		return nil, err
 	}
 
@@ -126,11 +127,32 @@ func (r *LiveDarshanPGSQL) List(
 	return r.scanRows(rows)
 }
 
+// Update updates a live darshan
+func (r *LiveDarshanPGSQL) Update(ld *entity.LiveDarshan) error {
+	_, err := r.db.Exec(`
+		UPDATE live_darshan
+		SET date = $1, start_time = $2, meeting_url = $3, updated_by = $4,
+			updated_at = $5
+		WHERE id = $6;`,
+		ld.Date,
+		ld.StartTime,
+		ld.MeetingURL,
+		ld.UpdatedBy,
+		util.DBTimeNow(),
+		ld.ID,
+	)
+	if err != nil {
+		l.Log.Errorf("err=%v", err)
+		return err
+	}
+	return nil
+}
+
 // Delete deletes a live darshan event
 func (r *LiveDarshanPGSQL) Delete(ldID id.ID) error {
 	res, err := r.db.Exec(`DELETE FROM live_darshan WHERE id = $1;`, ldID)
 	if err != nil {
-		l.Log.Errorf("err=%#v", err)
+		l.Log.Errorf("err=%v", err)
 		return err
 	}
 
@@ -172,7 +194,7 @@ func (r *LiveDarshanPGSQL) scanRows(rows *sql.Rows) ([]*entity.LiveDarshan, erro
 			&ld.CreatedBy,
 		)
 		if err != nil {
-			l.Log.Errorf("err=%#v", err)
+			l.Log.Errorf("err=%v", err)
 			return nil, err
 		}
 		lds = append(lds, ld)

@@ -22,6 +22,10 @@ type LiveDarshan struct {
 	StartTime  time.Time // HH:mm:ss format
 	MeetingURL string
 	CreatedBy  id.ID
+	UpdatedBy  id.ID // last updated
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 // NewLiveDarshan creates a new live darhsan entity
@@ -38,6 +42,7 @@ func NewLiveDarshan(
 		TenantID:   tenantID,
 		MeetingURL: meetingUrl,
 		CreatedBy:  createdBy,
+		UpdatedBy:  createdBy,
 	}
 
 	tDate, err := time.Parse("2006-01-02", date) // Using "YYYY-MM-DD" format

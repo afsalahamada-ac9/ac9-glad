@@ -14,6 +14,7 @@ import (
 type Writer interface {
 	Create(*entity.LiveDarshan) error
 	Delete(ldID id.ID) error
+	Update(*entity.LiveDarshan) error
 }
 
 type Reader interface {
@@ -37,6 +38,7 @@ type UseCase interface {
 	) (*entity.LiveDarshan, error)
 	GetLiveDarshan(ldID id.ID) (*entity.LiveDarshan, error)
 	ListLiveDarshan(tenantID id.ID, page, limit int) ([]*entity.LiveDarshan, error)
+	UpdateLiveDarshan(e *entity.LiveDarshan) error
 	DeleteLiveDarshan(ldID id.ID) error
 	GetCount(tenantID id.ID) int
 }

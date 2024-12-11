@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"ac9/glad/pkg/common"
 	"ac9/glad/pkg/glad"
@@ -159,11 +160,82 @@ func listLiveDarshan(service live_darshan.UseCase) http.Handler {
 	})
 }
 
-func updateLiveDarshan() http.Handler {
+func updateLiveDarshan(service live_darshan.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// vars := mux.Vars(r)
-		// ldId := vars["id"]
+		errorMessage := "Error updating live darshan"
+		var req presenter.LiveDarshanReq
 
+		vars := mux.Vars(r)
+		ldID, err := id.FromString(vars["id"])
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte(err.Error()))
+			return
+		}
+
+		tenantID, err := common.HttpGetTenantID(w, r)
+		if err != nil {
+			l.Log.Debugf("Tenant id is missing")
+			return
+		}
+
+		accountID, err := common.HttpGetAccountID(w, r)
+		if err != nil {
+			l.Log.Debugf("Account id is missing")
+			return
+		}
+
+		err = json.NewDecoder(r.Body).Decode(&req)
+		if err != nil {
+			log.Println(err.Error())
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Unable to decode the data. " + err.Error()))
+			return
+		}
+
+		var ld entity.LiveDarshan
+
+		// validation checks
+		// Note: If both meeting id and meeting URL are sent, then meeting id will be
+		// overwritten by the meeting id in the URL
+		if req.MeetingID == "" && req.MeetingURL == "" {
+			l.Log.Warnf("[%v] Mandatory fields are missing. %v", tenantID, req)
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Mandatory fields missing"))
+			return
+		}
+
+		ld.Date, err = time.Parse("2006-01-02", req.Date)
+		if err != nil {
+			l.Log.Warnf("Invalid date %v", req.Date)
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Bad format: date"))
+			return
+		}
+
+		ld.StartTime, err = time.Parse("15:04:00", req.StartTime)
+		if err != nil {
+			l.Log.Warnf("Invalid start time %v", req.StartTime)
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Bad format: startTime"))
+			return
+		}
+
+		ld.ID = ldID
+		ld.TenantID = tenantID
+		ld.MeetingURL = req.MeetingURL
+		ld.UpdatedBy = accountID
+
+		l.Log.Debugf("Live darshan: %v", ld)
+
+		err = service.UpdateLiveDarshan(&ld)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
+			return
+		}
+
+		w.Header().Set(common.HttpHeaderTenantID, tenantID.String())
 		w.WriteHeader(http.StatusOK)
 	})
 }
@@ -211,7 +283,7 @@ func MakeLiveDarshanHandlers(r *mux.Router, n negroni.Negroni, service live_dars
 	)).Methods(http.MethodGet, http.MethodOptions).Name("listLiveDarshan")
 
 	r.Handle("/v1/live-darshan/{id}", n.With(
-		negroni.Wrap(updateLiveDarshan()),
+		negroni.Wrap(updateLiveDarshan(service)),
 	)).Methods(http.MethodPut, http.MethodOptions).Name("updateLiveDarshan")
 
 	r.Handle("/v1/live-darshan/{id}", n.With(

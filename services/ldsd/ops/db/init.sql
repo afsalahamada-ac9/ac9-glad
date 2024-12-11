@@ -22,7 +22,12 @@ CREATE TABLE live_darshan (
     start_time TIMESTAMP,
     meeting_url TEXT,
     created_by BIGINT,
+    updated_by BIGINT,
 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+-- Create indexes
+CREATE INDEX idx_live_darshan_date ON live_darshan(date);
+CREATE INDEX idx_live_darshan_tenant_id ON live_darshan(tenant_id);
+CREATE INDEX idx_live_darshan_created_by ON live_darshan(created_by);
