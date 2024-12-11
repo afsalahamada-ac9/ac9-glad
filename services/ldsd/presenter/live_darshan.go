@@ -27,7 +27,7 @@ type LiveDarshan struct {
 	ID         int64  `json:"id"`
 	Date       string `json:"date"`
 	StartTime  string `json:"startTime"`
-	MeetingID  string `json:"meetingID"`
-	Password   string `json:"password"`
+	// MeetingID  string `json:"meetingID"`
+	// Password   string `json:"password"`
 	MeetingURL string `json:"meetingURL"`
 }

@@ -40,11 +40,11 @@ func getLiveDarshanConfig() http.Handler {
 func listLiveDarshan() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ld := presenter.LiveDarshan{
-			ID:         10000000,
-			Date:       "2024-12-04",
-			StartTime:  "15:04:00",
-			MeetingID:  "1234567890",
-			Password:   "test-password",
+			ID:        10000000,
+			Date:      "2024-12-04",
+			StartTime: "15:04:00",
+			// MeetingID:  "1234567890",
+			// Password:   "test-password",
 			MeetingURL: "https://zoom.us/j/5551112222",
 		}
 
@@ -61,13 +61,38 @@ func listLiveDarshan() http.Handler {
 	})
 }
 
+func updateLiveDarshan() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// vars := mux.Vars(r)
+		// ldId := vars["id"]
+
+		w.WriteHeader(http.StatusOK)
+	})
+}
+
+func deleteLiveDarshan() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// vars := mux.Vars(r)
+
+		w.WriteHeader(http.StatusOK)
+	})
+}
+
 // MakeTestHandlers sets up live darshan handlers
 func MakeTestHandlers(r *mux.Router, n negroni.Negroni) {
 	r.Handle("/v1/live-darshan", n.With(
 		negroni.Wrap(listLiveDarshan()),
-	)).Methods(http.MethodGet).Name("listLiveDarshan")
+	)).Methods(http.MethodGet, http.MethodOptions).Name("listLiveDarshan")
 
 	r.Handle("/v1/live-darshan/config", n.With(
 		negroni.Wrap(getLiveDarshanConfig()),
-	)).Methods(http.MethodGet).Name("getLiveDarshanConfig")
+	)).Methods(http.MethodGet, http.MethodOptions).Name("getLiveDarshanConfig")
+
+	r.Handle("/v1/live-darshan/{id}", n.With(
+		negroni.Wrap(updateLiveDarshan()),
+	)).Methods(http.MethodPut, http.MethodOptions).Name("updateLiveDarshan")
+
+	r.Handle("/v1/live-darshan/{id}", n.With(
+		negroni.Wrap(deleteLiveDarshan()),
+	)).Methods(http.MethodDelete, http.MethodOptions).Name("deleteLiveDarshan")
 }
