@@ -13,11 +13,11 @@ import (
 
 type Writer interface {
 	Create(*entity.LiveDarshan) error
-	Delete(ldID int64) error
+	Delete(ldID id.ID) error
 }
 
 type Reader interface {
-	Get(ldID int64) (*entity.LiveDarshan, error)
+	Get(ldID id.ID) (*entity.LiveDarshan, error)
 	List(tenantID id.ID, page, limit int) ([]*entity.LiveDarshan, error)
 	GetCount(tenantID id.ID) (int, error)
 }
@@ -35,8 +35,8 @@ type UseCase interface {
 		meetingURL string,
 		createdBy id.ID,
 	) (*entity.LiveDarshan, error)
-	GetLiveDarshan(ldID int64) (*entity.LiveDarshan, error)
+	GetLiveDarshan(ldID id.ID) (*entity.LiveDarshan, error)
 	ListLiveDarshan(tenantID id.ID, page, limit int) ([]*entity.LiveDarshan, error)
-	DeleteLiveDarshan(ldID int64) error
+	DeleteLiveDarshan(ldID id.ID) error
 	GetCount(tenantID id.ID) int
 }

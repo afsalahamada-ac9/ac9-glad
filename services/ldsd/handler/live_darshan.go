@@ -14,6 +14,7 @@ import (
 
 	"ac9/glad/pkg/common"
 	"ac9/glad/pkg/glad"
+	"ac9/glad/pkg/id"
 	l "ac9/glad/pkg/logger"
 	"ac9/glad/services/ldsd/entity"
 	"ac9/glad/services/ldsd/presenter"
@@ -71,7 +72,9 @@ func createLiveDarshan(service live_darshan.UseCase) http.Handler {
 		}
 
 		// validation checks
-		if req.Date == "" || req.StartTime == "" || req.MeetingID == "" || req.MeetingURL == "" {
+		// Note: If both meeting id and meeting URL are sent, then meeting id will be
+		// overwritten by the meeting id in the URL
+		if req.Date == "" || req.StartTime == "" || (req.MeetingID == "" && req.MeetingURL == "") {
 			l.Log.Warnf("[%v] Mandatory fields are missing. %#v", tenantID, req)
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("Mandatory fields missing"))
@@ -165,11 +168,31 @@ func updateLiveDarshan() http.Handler {
 	})
 }
 
-func deleteLiveDarshan() http.Handler {
+func deleteLiveDarshan(service live_darshan.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// vars := mux.Vars(r)
+		errorMessage := "Error removing live darshan"
+		vars := mux.Vars(r)
+		ldID, err := id.FromString(vars["id"])
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage))
+			return
+		}
 
-		w.WriteHeader(http.StatusOK)
+		err = service.DeleteLiveDarshan(ldID)
+		switch err {
+		case nil:
+			w.WriteHeader(http.StatusOK)
+			return
+		case glad.ErrNotFound:
+			w.WriteHeader(http.StatusNotFound)
+			_, _ = w.Write([]byte("Live darshan doesn't exist"))
+			return
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage))
+			return
+		}
 	})
 }
 
@@ -192,6 +215,6 @@ func MakeLiveDarshanHandlers(r *mux.Router, n negroni.Negroni, service live_dars
 	)).Methods(http.MethodPut, http.MethodOptions).Name("updateLiveDarshan")
 
 	r.Handle("/v1/live-darshan/{id}", n.With(
-		negroni.Wrap(deleteLiveDarshan()),
+		negroni.Wrap(deleteLiveDarshan(service)),
 	)).Methods(http.MethodDelete, http.MethodOptions).Name("deleteLiveDarshan")
 }

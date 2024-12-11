@@ -46,8 +46,8 @@ func (s *Service) CreateLiveDarshan(
 }
 
 // GetLiveDarshan retrieves a live darshan
-func (s *Service) GetLiveDarshan(id int64) (*entity.LiveDarshan, error) {
-	ld, err := s.repo.Get(id)
+func (s *Service) GetLiveDarshan(ldID id.ID) (*entity.LiveDarshan, error) {
+	ld, err := s.repo.Get(ldID)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (s *Service) ListLiveDarshan(tenantID id.ID, page, limit int) ([]*entity.Li
 }
 
 // DeleteLiveDarshan deletes a live darshan
-func (s *Service) DeleteLiveDarshan(ldID int64) error {
+func (s *Service) DeleteLiveDarshan(ldID id.ID) error {
 	err := s.repo.Delete(ldID)
 	if err == sql.ErrNoRows {
 		return glad.ErrNotFound

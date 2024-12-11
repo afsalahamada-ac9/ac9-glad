@@ -57,7 +57,7 @@ func (r *LiveDarshanPGSQL) Create(ld *entity.LiveDarshan) error {
 }
 
 // Get retrieves live darshan event using id
-func (r *LiveDarshanPGSQL) Get(ldID int64) (*entity.LiveDarshan, error) {
+func (r *LiveDarshanPGSQL) Get(ldID id.ID) (*entity.LiveDarshan, error) {
 	query := `
 		SELECT id, tenant_id, date, start_time, meeting_url, created_by
 		FROM live_darshan
@@ -127,7 +127,7 @@ func (r *LiveDarshanPGSQL) List(
 }
 
 // Delete deletes a live darshan event
-func (r *LiveDarshanPGSQL) Delete(ldID int64) error {
+func (r *LiveDarshanPGSQL) Delete(ldID id.ID) error {
 	res, err := r.db.Exec(`DELETE FROM live_darshan WHERE id = $1;`, ldID)
 	if err != nil {
 		l.Log.Errorf("err=%#v", err)
