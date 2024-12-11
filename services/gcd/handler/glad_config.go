@@ -43,8 +43,8 @@ func getConfig() http.Handler {
 	})
 }
 
-// MakeTestHandlers make glad handlers
-func MakeTestHandlers(r *mux.Router, n negroni.Negroni) {
+// MakeGladConfigHandlers make glad handlers
+func MakeGladConfigHandlers(r *mux.Router, n negroni.Negroni) {
 	// Note: Deprecated. This path was mentioned in the MSC that's frozen.
 	// To avoid work at client, adding this duplicate path support that should be
 	// removed once client supports config.

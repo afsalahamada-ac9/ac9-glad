@@ -74,8 +74,8 @@ func main() {
 	// log handler
 	logger.MakeLogHandlers(r, *n, "mediad", Log)
 
-	// test
-	handler.MakeTestHandlers(r, *n)
+	// metadata handler
+	handler.MakeMetadataHandlers(r, *n)
 
 	logger := log.New(os.Stderr, "logger: ", log.Lshortfile)
 	srv := &http.Server{

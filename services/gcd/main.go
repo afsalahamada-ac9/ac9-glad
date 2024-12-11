@@ -74,8 +74,8 @@ func main() {
 	// log handler
 	logger.MakeLogHandlers(r, *n, "gcd", Log)
 
-	// test
-	handler.MakeTestHandlers(r, *n)
+	// glad config handler
+	handler.MakeGladConfigHandlers(r, *n)
 
 	logger := log.New(os.Stderr, "logger: ", log.Lshortfile)
 	srv := &http.Server{
