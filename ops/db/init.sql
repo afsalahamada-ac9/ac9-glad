@@ -23,14 +23,13 @@ CREATE TYPE product_format AS ENUM ('In Person'
     , 'Destination Retreats'
     );
 CREATE TYPE course_status AS ENUM ('draft'
-    , 'archived'
     , 'open' 
     , 'expense-submitted'
     , 'expense-declined'
     , 'closed'
     , 'active'
     , 'declined'
-    , 'submitted'
+    , 'pending-activation'  -- Salesforce: Submitted for activation approval
     , 'canceled'
     , 'inactive'
     );
@@ -40,6 +39,8 @@ CREATE TYPE timezone_type AS ENUM ('EST'
     , 'CST'
     , 'MST'
     , 'PST'
+    , 'HST'
+    , 'AKST'
     );
 CREATE TYPE account_type AS ENUM ('assistant-teacher'
     , 'coordinator' -- Note: Unclear what this type is. TBD
@@ -222,6 +223,9 @@ CREATE TABLE IF NOT EXISTS account (
     email VARCHAR(80),
     type account_type,
     status account_status,
+
+    -- Note: This photo is stored in Salesforce and accessible via token
+    full_photo_url VARCHAR(1024),
 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
