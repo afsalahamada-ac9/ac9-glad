@@ -21,7 +21,7 @@ CREATE TABLE live_darshan (
     date DATE,
     start_time TIMESTAMP,
     meeting_url TEXT,
-    created_by BIGINT
+    created_by BIGINT,
 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP

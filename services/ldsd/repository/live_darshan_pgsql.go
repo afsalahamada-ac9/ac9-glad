@@ -31,8 +31,8 @@ func NewLiveDarshanPGSQL(db *sql.DB) *LiveDarshanPGSQL {
 func (r *LiveDarshanPGSQL) Create(ld *entity.LiveDarshan) error {
 	query := `
 		INSERT INTO live_darshan
-			(id, date, start_time, meeting_url, created_by)
-		VALUES ($1, $2, $3, $4, $5)
+			(id, tenant_id, date, start_time, meeting_url, created_by)
+		VALUES ($1, $2, $3, $4, $5, $6)
 	`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -43,6 +43,7 @@ func (r *LiveDarshanPGSQL) Create(ld *entity.LiveDarshan) error {
 	defer stmt.Close()
 	_, err = stmt.Exec(
 		ld.ID,
+		ld.TenantID,
 		ld.Date,
 		ld.StartTime,
 		ld.MeetingURL,
@@ -58,7 +59,7 @@ func (r *LiveDarshanPGSQL) Create(ld *entity.LiveDarshan) error {
 // Get retrieves live darshan event using id
 func (r *LiveDarshanPGSQL) Get(ldID int64) (*entity.LiveDarshan, error) {
 	query := `
-		SELECT id, date, start_time, meeting_url, created_by
+		SELECT id, tenant_id, date, start_time, meeting_url, created_by
 		FROM live_darshan
 		WHERE id = $1
 	`
@@ -66,6 +67,7 @@ func (r *LiveDarshanPGSQL) Get(ldID int64) (*entity.LiveDarshan, error) {
 	ld := &entity.LiveDarshan{}
 	err := r.db.QueryRow(query, ldID).Scan(
 		&ld.ID,
+		&ld.TenantID,
 		&ld.Date,
 		&ld.StartTime,
 		&ld.MeetingURL,
@@ -85,7 +87,7 @@ func (r *LiveDarshanPGSQL) List(
 	page, limit int,
 ) ([]*entity.LiveDarshan, error) {
 	query := `
-		SELECT id, date, start_time, meeting_url, created_by
+		SELECT id, tenant_id, date, start_time, meeting_url, created_by
 		FROM live_darshan
 		WHERE tenant_id = $1
 	`
@@ -163,6 +165,7 @@ func (r *LiveDarshanPGSQL) scanRows(rows *sql.Rows) ([]*entity.LiveDarshan, erro
 		ld := &entity.LiveDarshan{}
 		err := rows.Scan(
 			&ld.ID,
+			&ld.TenantID,
 			&ld.Date,
 			&ld.StartTime,
 			&ld.MeetingURL,

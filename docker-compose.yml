@@ -40,6 +40,25 @@ services:
       timeout: 5s
       retries: 5
 
+  ldsd-db-pg:
+    image: postgres:15.8
+    environment:
+      POSTGRES_USER: glad_user
+      POSTGRES_PASSWORD: glad1234
+    ports:
+      - "5452:5432"
+    volumes:
+      - ./services/ldsd/ops/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ldsd_db_pg_data:/var/lib/postgresql/data
+    container_name: glad-ldsd-pg
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U glad_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   coursed:
     image: coursed:dev
     environment:
@@ -96,6 +115,7 @@ services:
     image: ldsd:dev
     environment:
       # ME: ldsd
+      DB_PORT: 5452
       API_PORT: 8080
       COURSED_ADDR: coursed:8080
     expose:
@@ -105,6 +125,9 @@ services:
     container_name: glad-ldsd
     networks:
       - default
+    depends_on:
+      ldsd-db-pg:
+        condition: service_healthy
 
   gcd:
     image: gcd:dev
@@ -124,6 +147,7 @@ services:
     image: pushd:dev
     environment:
       # ME: pushd
+      DB_PORT: 5442
       API_PORT: 8080
       COURSED_ADDR: coursed:8080
     expose:
@@ -177,6 +201,7 @@ services:
 volumes:
   postgres_data:
   pushd_db_pg_data:
+  ldsd_db_pg_data:
 
 networks:
   default:
