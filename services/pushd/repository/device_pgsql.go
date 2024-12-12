@@ -32,7 +32,7 @@ func NewDevicePGSQL(db *sql.DB) *DevicePGSQL {
 
 }
 
-// Insert creates a device
+// Create creates a device
 func (r *DevicePGSQL) Create(d *entity.Device) (id.ID, error) {
 	stmt, err := r.db.Prepare(`
 		INSERT INTO device
