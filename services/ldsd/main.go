@@ -82,6 +82,9 @@ func main() {
 	// log handler
 	logger.MakeLogHandlers(r, *n, "ldsd", Log)
 
+	// info handler
+	util.MakeInfoHandlers(r, *n, "ldsd")
+
 	http.Handle("/", r)
 	http.Handle("/metrics", promhttp.Handler())
 	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {

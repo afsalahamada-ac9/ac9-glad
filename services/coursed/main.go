@@ -101,6 +101,9 @@ func main() {
 	// log handler
 	logger.MakeLogHandlers(r, *n, "coursed", Log)
 
+	// info handler
+	util.MakeInfoHandlers(r, *n, "coursed")
+
 	// account
 	handler.MakeAccountHandlers(r, *n, accountService)
 

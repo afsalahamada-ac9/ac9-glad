@@ -74,6 +74,9 @@ func main() {
 	// log handler
 	logger.MakeLogHandlers(r, *n, "gcd", Log)
 
+	// info handler
+	util.MakeInfoHandlers(r, *n, "gcd")
+
 	// glad config handler
 	handler.MakeGladConfigHandlers(r, *n)
 

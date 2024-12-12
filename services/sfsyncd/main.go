@@ -74,6 +74,9 @@ func main() {
 	// log handler
 	logger.MakeLogHandlers(r, *n, "sfsyncd", Log)
 
+	// info handler
+	util.MakeInfoHandlers(r, *n, "sfsyncd")
+
 	// test
 	handler.MakeTestHandlers(r, *n)
 

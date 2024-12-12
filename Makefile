@@ -11,7 +11,16 @@ TAG ?= dev
 DOCKERFILE_DIR = ops/docker
 SERVICES_DIR = services
 
+GIT_HASH := $(shell git rev-parse --short HEAD)
+BUILD_TIME := $(shell date +%Y-%m-%d_%H:%M:%S)
+VERSION := $(shell cat .version)
+
 BIN_DIR = $(PWD)/bin
+LD_FLAGS = -ldflags="-w -s -X 'ac9/glad/pkg/util.gitHash=$(GIT_HASH)' \
+	-X 'ac9/glad/pkg/util.buildTime=$(BUILD_TIME)' \
+	-X 'ac9/glad/pkg/util.version=$(VERSION)'"
+GO_BUILD_LINUX = CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo 
+GO_BUILD = go build -tags $(TAG)
 
 .PHONY: build
 
@@ -24,41 +33,42 @@ dependencies:
 build: dependencies build-coursed build-sfsyncd build-mediad build-ldsd build-gcd build-pushd
 
 build-coursed: 
-	go build -tags $(TAG) -o ./bin/coursed $(SERVICES_DIR)/coursed/main.go
+	$(GO_BUILD) $(LD_FLAGS) -o ./bin/coursed $(SERVICES_DIR)/coursed/main.go
 
 build-sfsyncd: 
-	go build -tags $(TAG) -o ./bin/sfsyncd $(SERVICES_DIR)/sfsyncd/main.go
+	$(GO_BUILD) $(LD_FLAGS) -o ./bin/sfsyncd $(SERVICES_DIR)/sfsyncd/main.go
 
 build-mediad:
-	go build -tags $(TAG) -o ./bin/mediad $(SERVICES_DIR)/mediad/main.go
+	$(GO_BUILD) $(LD_FLAGS) -o ./bin/mediad $(SERVICES_DIR)/mediad/main.go
 
 build-ldsd:
-	go build -tags $(TAG) -o ./bin/ldsd $(SERVICES_DIR)/ldsd/main.go
+	$(GO_BUILD) $(LD_FLAGS) -o ./bin/ldsd $(SERVICES_DIR)/ldsd/main.go
 
 build-gcd:
-	go build -tags $(TAG) -o ./bin/gcd $(SERVICES_DIR)/gcd/main.go
+	$(GO_BUILD) $(LD_FLAGS) -o ./bin/gcd $(SERVICES_DIR)/gcd/main.go
 
 build-pushd:
-	go build -tags $(TAG) -o ./bin/pushd $(SERVICES_DIR)/pushd/main.go
+	$(GO_BUILD) $(LD_FLAGS) -o ./bin/pushd $(SERVICES_DIR)/pushd/main.go
 
 #build-cmd:
-#	go build -tags $(TAG) -o ./bin/search cmd/main.go
+#	$(GO_BUILD) $(LD_FLAGS) -o ./bin/search cmd/main.go
 
 # Adding more flags for complete static linking
 linux-binaries:
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/coursed $(SERVICES_DIR)/coursed/main.go
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/sfsyncd $(SERVICES_DIR)/sfsyncd/main.go
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/mediad $(SERVICES_DIR)/mediad/main.go
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/ldsd $(SERVICES_DIR)/ldsd/main.go
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/gcd $(SERVICES_DIR)/gcd/main.go
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/pushd $(SERVICES_DIR)/pushd/main.go
-#	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags "$(TAG) netgo" -installsuffix netgo -ldflags="-w -s" -o $(BIN_DIR)/search cmd/main.go
+	$(GO_BUILD_LINUX) $(LD_FLAGS) -o $(BIN_DIR)/coursed $(SERVICES_DIR)/coursed/main.go
+	$(GO_BUILD_LINUX) $(LD_FLAGS) -o $(BIN_DIR)/sfsyncd $(SERVICES_DIR)/sfsyncd/main.go
+	$(GO_BUILD_LINUX) $(LD_FLAGS) -o $(BIN_DIR)/mediad $(SERVICES_DIR)/mediad/main.go
+	$(GO_BUILD_LINUX) $(LD_FLAGS) -o $(BIN_DIR)/ldsd $(SERVICES_DIR)/ldsd/main.go
+	$(GO_BUILD_LINUX) $(LD_FLAGS) -o $(BIN_DIR)/gcd $(SERVICES_DIR)/gcd/main.go
+	$(GO_BUILD_LINUX) $(LD_FLAGS) -o $(BIN_DIR)/pushd $(SERVICES_DIR)/pushd/main.go
+#	$(GO_BUILD_LINUX) $(LD_FLAGS) -o $(BIN_DIR)/search cmd/main.go
 
 ci: dependencies test	
 
 # builds one docker image
 # TODO: support easy extension for multiple services
 docker:
+	docker build -f $(DOCKERFILE_DIR)/Dockerfile.coursed -t coursed:$(TAG) .
 	docker build -f $(DOCKERFILE_DIR)/Dockerfile.coursed -t coursed:$(TAG) .
 	docker build -f $(DOCKERFILE_DIR)/Dockerfile.sfsyncd -t sfsyncd:$(TAG) .
 	docker build -f $(DOCKERFILE_DIR)/Dockerfile.mediad -t mediad:$(TAG) .

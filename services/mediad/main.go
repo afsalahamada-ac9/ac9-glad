@@ -74,6 +74,9 @@ func main() {
 	// log handler
 	logger.MakeLogHandlers(r, *n, "mediad", Log)
 
+	// info handler
+	util.MakeInfoHandlers(r, *n, "mediad")
+
 	// metadata handler
 	handler.MakeMetadataHandlers(r, *n)
 

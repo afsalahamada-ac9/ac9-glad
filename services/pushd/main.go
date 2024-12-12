@@ -99,6 +99,9 @@ func main() {
 	// log handler
 	logger.MakeLogHandlers(r, *n, "pushd", Log)
 
+	// info handler
+	util.MakeInfoHandlers(r, *n, "pushd")
+
 	// device
 	handler.MakeDeviceHandlers(r, *n, deviceService)
 

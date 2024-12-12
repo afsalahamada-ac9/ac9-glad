@@ -9,8 +9,8 @@ package logger
 import (
 	"net/http"
 
-	"github.com/urfave/negroni"
 	"github.com/gorilla/mux"
+	"github.com/urfave/negroni"
 )
 
 func setLogLevel(logger Logger) http.Handler {
@@ -28,7 +28,7 @@ func setLogLevel(logger Logger) http.Handler {
 	})
 }
 
-// MakeLogHandlers make url handlers
+// MakeLogHandlers make log handlers
 func MakeLogHandlers(r *mux.Router, n negroni.Negroni, serviceName string, logger Logger) {
 	r.Handle("/v1/"+serviceName+"/log/{level}", n.With(
 		negroni.Wrap(setLogLevel(logger)),
