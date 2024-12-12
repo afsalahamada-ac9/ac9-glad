@@ -16,6 +16,7 @@ import (
 	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	l "ac9/glad/pkg/logger"
+	"ac9/glad/usecase/account"
 	"ac9/glad/usecase/course"
 
 	"ac9/glad/services/coursed/presenter"
@@ -194,14 +195,7 @@ func getCourse(service course.UseCase) http.Handler {
 
 func getCourseByAccount(service course.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		errorMessage := "Error reading course"
 		vars := mux.Vars(r)
-
-		tenantID, err := common.HttpGetTenantID(w, r)
-		if err != nil {
-			l.Log.Warnf("Tenant id is missing")
-			return
-		}
 
 		accountID, err := id.FromString(vars["accountID"])
 		if err != nil {
@@ -211,74 +205,93 @@ func getCourseByAccount(service course.UseCase) http.Handler {
 			return
 		}
 
-		page, limit, err := common.HttpGetPageParams(w, r)
-		if err != nil {
-			l.Log.Warnf("%v", err)
-			return
-		}
-
-		count, cfList, err := service.GetCourseByAccount(tenantID, accountID, page, limit)
-		if err != nil && err != glad.ErrNotFound {
-			l.Log.Warnf("%v", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
-			return
-		}
-
-		if count == 0 || len(cfList) == 0 {
-			l.Log.Warnf("count=%v, len(cfList)=%v, err=%v", count, len(cfList), err)
-			w.WriteHeader(http.StatusNotFound)
-			_, _ = w.Write([]byte("Empty data returned"))
-			return
-		}
-
-		var courseList []*presenter.Course
-		for _, courseFull := range cfList {
-			c := &presenter.Course{}
-			c.FromEntityCourseFull(courseFull)
-			courseList = append(courseList, c)
-		}
-
-		w.Header().Set(common.HttpHeaderTotalCount, strconv.Itoa(count))
-		w.Header().Set(common.HttpHeaderTenantID, tenantID.String())
-		if err := json.NewEncoder(w).Encode(courseList); err != nil {
-			l.Log.Warnf("%v", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte("Unable to encode course"))
-		}
+		getCourseByAccountImpl(w, r, accountID, service)
 	})
 }
 
-// TODO: This is temporary until we implement the correct search
-func getCourseMe(service course.UseCase) http.Handler {
+func getCourseMe(service course.UseCase, accountService account.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		errorMessage := "Error reading course"
-
-		// hard-coded value
-		courseFull, err := service.GetCourse(5312925492834409472)
-		if err != nil && err != glad.ErrNotFound {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
+		tenantID, err := common.HttpGetTenantID(w, r)
+		if err != nil {
+			l.Log.Debugf("Tenant id is missing")
 			return
 		}
 
-		if courseFull == nil {
+		email := r.Header.Get(common.HttpHeaderAccountEmail)
+		if email == "" {
+			l.Log.Warnf("Email id is missing")
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Unable to map to an account"))
+			return
+		}
+
+		account, err := accountService.GetAccountByEmail(tenantID, email)
+		switch err {
+		case nil:
+			break
+		case glad.ErrNotFound:
+			l.Log.Warnf("Account (%v) mapping doesn't exist", email)
 			w.WriteHeader(http.StatusNotFound)
-			_, _ = w.Write([]byte("Empty data returned"))
+			_, _ = w.Write([]byte("Account mapping doesn't exist"))
+			return
+		default:
+			l.Log.Warnf("%v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
+		getCourseByAccountImpl(w, r, account.ID, service)
+	})
+}
+
+func getCourseByAccountImpl(w http.ResponseWriter,
+	r *http.Request,
+	accountID id.ID,
+	service course.UseCase) {
+	errorMessage := "Error reading course"
+
+	tenantID, err := common.HttpGetTenantID(w, r)
+	if err != nil {
+		l.Log.Warnf("Tenant id is missing")
+		return
+	}
+
+	page, limit, err := common.HttpGetPageParams(w, r)
+	if err != nil {
+		l.Log.Warnf("%v", err)
+		return
+	}
+
+	count, cfList, err := service.GetCourseByAccount(tenantID, accountID, page, limit)
+	if err != nil && err != glad.ErrNotFound {
+		l.Log.Warnf("%v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
+		return
+	}
+
+	if count == 0 || len(cfList) == 0 {
+		l.Log.Warnf("count=%v, len(cfList)=%v, err=%v", count, len(cfList), err)
+		w.WriteHeader(http.StatusNotFound)
+		_, _ = w.Write([]byte("Empty data returned"))
+		return
+	}
+
+	var courseList []*presenter.Course
+	for _, courseFull := range cfList {
 		c := &presenter.Course{}
 		c.FromEntityCourseFull(courseFull)
+		courseList = append(courseList, c)
+	}
 
-		toJ := []*presenter.Course{c}
-
-		w.Header().Set(common.HttpHeaderTenantID, courseFull.Course.TenantID.String())
-		if err := json.NewEncoder(w).Encode(toJ); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte("Unable to encode course"))
-		}
-	})
+	w.Header().Set(common.HttpHeaderTotalCount, strconv.Itoa(count))
+	w.Header().Set(common.HttpHeaderTenantID, tenantID.String())
+	if err := json.NewEncoder(w).Encode(courseList); err != nil {
+		l.Log.Warnf("%v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte("Unable to encode course"))
+	}
 }
 
 func deleteCourse(service course.UseCase) http.Handler {
@@ -397,7 +410,10 @@ func updateCourse(service course.UseCase) http.Handler {
 }
 
 // MakeCourseHandlers make url handlers
-func MakeCourseHandlers(r *mux.Router, n negroni.Negroni, service course.UseCase) {
+func MakeCourseHandlers(r *mux.Router,
+	n negroni.Negroni,
+	service course.UseCase,
+	accountService account.UseCase) {
 	r.Handle("/v1/courses", n.With(
 		negroni.Wrap(listCourses(service)),
 	)).Methods("GET", "OPTIONS").Name("listCourses")
@@ -406,13 +422,13 @@ func MakeCourseHandlers(r *mux.Router, n negroni.Negroni, service course.UseCase
 		negroni.Wrap(createCourse(service)),
 	)).Methods("POST", "OPTIONS").Name("createCourse")
 
-	// TODO: implement get courses by account-id
+	// get courses by account-id
 	r.Handle("/v1/courses/account/{accountID}", n.With(
 		negroni.Wrap(getCourseByAccount(service)),
 	)).Methods("GET", "OPTIONS").Name("getCourseByAccount")
 
 	r.Handle("/v1/courses/me", n.With(
-		negroni.Wrap(getCourseMe(service)),
+		negroni.Wrap(getCourseMe(service, accountService)),
 	)).Methods("GET", "OPTIONS").Name("getCourseMe")
 
 	r.Handle("/v1/courses/{id}", n.With(

@@ -19,6 +19,7 @@ import (
 	"ac9/glad/pkg/id"
 	"ac9/glad/services/coursed/presenter"
 
+	amock "ac9/glad/usecase/account/mock"
 	mock "ac9/glad/usecase/course/mock"
 
 	"github.com/golang/mock/gomock"
@@ -31,9 +32,10 @@ func Test_listCourses(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	service := mock.NewMockUseCase(controller)
+	aservice := amock.NewMockUseCase(controller)
 	r := mux.NewRouter()
 	n := negroni.New()
-	MakeCourseHandlers(r, *n, service)
+	MakeCourseHandlers(r, *n, service, aservice)
 	path, err := r.GetRoute("listCourses").GetPathTemplate()
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/courses", path)
@@ -110,9 +112,10 @@ func Test_createCourse(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	service := mock.NewMockUseCase(controller)
+	aservice := amock.NewMockUseCase(controller)
 	r := mux.NewRouter()
 	n := negroni.New()
-	MakeCourseHandlers(r, *n, service)
+	MakeCourseHandlers(r, *n, service, aservice)
 	path, err := r.GetRoute("createCourse").GetPathTemplate()
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/courses", path)
@@ -170,9 +173,10 @@ func Test_getCourse(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	service := mock.NewMockUseCase(controller)
+	aservice := amock.NewMockUseCase(controller)
 	r := mux.NewRouter()
 	n := negroni.New()
-	MakeCourseHandlers(r, *n, service)
+	MakeCourseHandlers(r, *n, service, aservice)
 	path, err := r.GetRoute("getCourse").GetPathTemplate()
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/courses/{id}", path)
@@ -213,9 +217,10 @@ func Test_deleteCourse(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	service := mock.NewMockUseCase(controller)
+	aservice := amock.NewMockUseCase(controller)
 	r := mux.NewRouter()
 	n := negroni.New()
-	MakeCourseHandlers(r, *n, service)
+	MakeCourseHandlers(r, *n, service, aservice)
 	path, err := r.GetRoute("deleteCourse").GetPathTemplate()
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/courses/{id}", path)
@@ -234,9 +239,10 @@ func Test_deleteCourseNonExistent(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	service := mock.NewMockUseCase(controller)
+	aservice := amock.NewMockUseCase(controller)
 	r := mux.NewRouter()
 	n := negroni.New()
-	MakeCourseHandlers(r, *n, service)
+	MakeCourseHandlers(r, *n, service, aservice)
 	path, err := r.GetRoute("deleteCourse").GetPathTemplate()
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/courses/{id}", path)

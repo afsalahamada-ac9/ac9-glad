@@ -108,7 +108,7 @@ func main() {
 	handler.MakeCenterHandlers(r, *n, centerService)
 
 	// course
-	handler.MakeCourseHandlers(r, *n, courseService)
+	handler.MakeCourseHandlers(r, *n, courseService, accountService)
 
 	// participant
 	handler.MakeParticipantHandlers(r, *n, accountService)

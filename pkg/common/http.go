@@ -41,14 +41,23 @@ func HttpGetPageParams(
 	limit int,
 	err error,
 ) {
-	if page, err = strconv.Atoi(r.URL.Query().Get(HttpParamPage)); err != nil {
+	pageParam := r.URL.Query().Get(HttpParamPage)
+	if pageParam == "" {
+		pageParam = "0"
+	}
+	limitParam := r.URL.Query().Get(HttpParamLimit)
+	if limitParam == "" {
+		limitParam = "0"
+	}
+
+	if page, err = strconv.Atoi(pageParam); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_, _ = w.Write([]byte("invalid page value"))
 		err = glad.ErrInvalidValue
 		return
 	}
 
-	if limit, err = strconv.Atoi(r.URL.Query().Get(HttpParamLimit)); err != nil {
+	if limit, err = strconv.Atoi(limitParam); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_, _ = w.Write([]byte("invalid limit value"))
 		err = glad.ErrInvalidValue

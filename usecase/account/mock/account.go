@@ -36,18 +36,33 @@ func (m *MockReader) EXPECT() *MockReaderMockRecorder {
 }
 
 // Get mocks base method.
-func (m *MockReader) Get(id id.ID) (*entity.Account, error) {
+func (m *MockReader) Get(accountID id.ID) (*entity.Account, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Get", id)
+	ret := m.ctrl.Call(m, "Get", accountID)
 	ret0, _ := ret[0].(*entity.Account)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockReaderMockRecorder) Get(id interface{}) *gomock.Call {
+func (mr *MockReaderMockRecorder) Get(accountID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockReader)(nil).Get), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockReader)(nil).Get), accountID)
+}
+
+// GetByEmail mocks base method.
+func (m *MockReader) GetByEmail(tenantID id.ID, email string) (*entity.Account, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByEmail", tenantID, email)
+	ret0, _ := ret[0].(*entity.Account)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByEmail indicates an expected call of GetByEmail.
+func (mr *MockReaderMockRecorder) GetByEmail(tenantID, email interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByEmail", reflect.TypeOf((*MockReader)(nil).GetByEmail), tenantID, email)
 }
 
 // GetByName mocks base method.
@@ -66,18 +81,18 @@ func (mr *MockReaderMockRecorder) GetByName(tenantID, username interface{}) *gom
 }
 
 // GetCount mocks base method.
-func (m *MockReader) GetCount(tenantId id.ID) (int, error) {
+func (m *MockReader) GetCount(tenantID id.ID) (int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetCount", tenantId)
+	ret := m.ctrl.Call(m, "GetCount", tenantID)
 	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetCount indicates an expected call of GetCount.
-func (mr *MockReaderMockRecorder) GetCount(tenantId interface{}) *gomock.Call {
+func (mr *MockReaderMockRecorder) GetCount(tenantID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCount", reflect.TypeOf((*MockReader)(nil).GetCount), tenantId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCount", reflect.TypeOf((*MockReader)(nil).GetCount), tenantID)
 }
 
 // List mocks base method.
@@ -148,17 +163,17 @@ func (mr *MockWriterMockRecorder) Create(e interface{}) *gomock.Call {
 }
 
 // Delete mocks base method.
-func (m *MockWriter) Delete(id id.ID) error {
+func (m *MockWriter) Delete(accountID id.ID) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Delete", id)
+	ret := m.ctrl.Call(m, "Delete", accountID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *MockWriterMockRecorder) Delete(id interface{}) *gomock.Call {
+func (mr *MockWriterMockRecorder) Delete(accountID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockWriter)(nil).Delete), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockWriter)(nil).Delete), accountID)
 }
 
 // DeleteByName mocks base method.
@@ -227,17 +242,17 @@ func (mr *MockRepositoryMockRecorder) Create(e interface{}) *gomock.Call {
 }
 
 // Delete mocks base method.
-func (m *MockRepository) Delete(id id.ID) error {
+func (m *MockRepository) Delete(accountID id.ID) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Delete", id)
+	ret := m.ctrl.Call(m, "Delete", accountID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *MockRepositoryMockRecorder) Delete(id interface{}) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) Delete(accountID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockRepository)(nil).Delete), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockRepository)(nil).Delete), accountID)
 }
 
 // DeleteByName mocks base method.
@@ -255,18 +270,33 @@ func (mr *MockRepositoryMockRecorder) DeleteByName(tenantID, username interface{
 }
 
 // Get mocks base method.
-func (m *MockRepository) Get(id id.ID) (*entity.Account, error) {
+func (m *MockRepository) Get(accountID id.ID) (*entity.Account, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Get", id)
+	ret := m.ctrl.Call(m, "Get", accountID)
 	ret0, _ := ret[0].(*entity.Account)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockRepositoryMockRecorder) Get(id interface{}) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) Get(accountID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockRepository)(nil).Get), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockRepository)(nil).Get), accountID)
+}
+
+// GetByEmail mocks base method.
+func (m *MockRepository) GetByEmail(tenantID id.ID, email string) (*entity.Account, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByEmail", tenantID, email)
+	ret0, _ := ret[0].(*entity.Account)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByEmail indicates an expected call of GetByEmail.
+func (mr *MockRepositoryMockRecorder) GetByEmail(tenantID, email interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByEmail", reflect.TypeOf((*MockRepository)(nil).GetByEmail), tenantID, email)
 }
 
 // GetByName mocks base method.
@@ -285,18 +315,18 @@ func (mr *MockRepositoryMockRecorder) GetByName(tenantID, username interface{}) 
 }
 
 // GetCount mocks base method.
-func (m *MockRepository) GetCount(tenantId id.ID) (int, error) {
+func (m *MockRepository) GetCount(tenantID id.ID) (int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetCount", tenantId)
+	ret := m.ctrl.Call(m, "GetCount", tenantID)
 	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetCount indicates an expected call of GetCount.
-func (mr *MockRepositoryMockRecorder) GetCount(tenantId interface{}) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) GetCount(tenantID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCount", reflect.TypeOf((*MockRepository)(nil).GetCount), tenantId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCount", reflect.TypeOf((*MockRepository)(nil).GetCount), tenantID)
 }
 
 // List mocks base method.
@@ -421,6 +451,21 @@ func (m *MockUseCase) GetAccount(tenantID, accountID id.ID) (*entity.Account, er
 func (mr *MockUseCaseMockRecorder) GetAccount(tenantID, accountID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccount", reflect.TypeOf((*MockUseCase)(nil).GetAccount), tenantID, accountID)
+}
+
+// GetAccountByEmail mocks base method.
+func (m *MockUseCase) GetAccountByEmail(tenantID id.ID, email string) (*entity.Account, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAccountByEmail", tenantID, email)
+	ret0, _ := ret[0].(*entity.Account)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAccountByEmail indicates an expected call of GetAccountByEmail.
+func (mr *MockUseCaseMockRecorder) GetAccountByEmail(tenantID, email interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccountByEmail", reflect.TypeOf((*MockUseCase)(nil).GetAccountByEmail), tenantID, email)
 }
 
 // GetAccountByName mocks base method.

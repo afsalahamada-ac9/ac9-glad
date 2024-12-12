@@ -307,3 +307,26 @@ func (r *AccountPGSQL) scanRows(rows *sql.Rows) ([]*entity.Account, error) {
 
 	return accounts, nil
 }
+
+// GetByEmail retrieves an account using email address
+func (r *AccountPGSQL) GetByEmail(tenantID id.ID, email string) (*entity.Account, error) {
+	stmt, err := r.db.Prepare(`
+		SELECT id, ext_id, username, cognito_id, type, created_at FROM account WHERE tenant_id = $1 AND LOWER(email) = LOWER($2);`)
+	if err != nil {
+		return nil, err
+	}
+	var t entity.Account
+	var username, acct_type, cognito_id sql.NullString
+	err = stmt.QueryRow(tenantID, email).Scan(&t.ID, &t.ExtID, &username, &cognito_id, &acct_type, &t.CreatedAt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	t.Email = email
+	t.Username = username.String
+	t.CognitoID = cognito_id.String
+	t.Type = entity.AccountType(acct_type.String)
+	return &t, nil
+}

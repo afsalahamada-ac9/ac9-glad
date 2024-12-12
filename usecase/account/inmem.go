@@ -43,7 +43,7 @@ func (r *inmem) Get(id id.ID) (*entity.Account, error) {
 	return nil, glad.ErrNotFound
 }
 
-// Get retrieves an account using username
+// GetByName retrieves an account using username
 func (r *inmem) GetByName(tenantID id.ID, username string) (*entity.Account, error) {
 	for _, j := range r.m {
 		if j.Username == username && j.TenantID == tenantID {
@@ -149,4 +149,15 @@ func (r *inmem) Search(tenantID id.ID, query string, page, limit int, at entity.
 		return d[start:end], nil
 	}
 	return d, nil
+}
+
+// GetByEmail retrieves an account using email
+func (r *inmem) GetByEmail(tenantID id.ID, email string) (*entity.Account, error) {
+	for _, j := range r.m {
+		if j.Email == email && j.TenantID == tenantID {
+			return r.m[j.ID], nil
+		}
+	}
+
+	return nil, glad.ErrNotFound
 }

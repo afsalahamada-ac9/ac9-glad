@@ -151,3 +151,16 @@ func (s *Service) SearchAccounts(tenantID id.ID, query string, page, limit int, 
 	}
 	return accounts, nil
 }
+
+// GetAccountByEmail retrieves an account using email
+func (s *Service) GetAccountByEmail(tenantID id.ID, email string) (*entity.Account, error) {
+	account, err := s.repo.GetByEmail(tenantID, email)
+	if account == nil {
+		return nil, glad.ErrNotFound
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return account, nil
+}
