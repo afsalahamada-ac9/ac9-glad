@@ -93,6 +93,7 @@ func main() {
 		negroni.HandlerFunc(middleware.Metrics(metricService)),
 		negroni.HandlerFunc(middleware.Cors),
 		negroni.HandlerFunc(middleware.AddDefaultTenant),
+		negroni.HandlerFunc(middleware.AddDefaultAccount),
 		negroni.NewLogger(),
 	)
 	n.Use(&middleware.APILogging{Log: Log})

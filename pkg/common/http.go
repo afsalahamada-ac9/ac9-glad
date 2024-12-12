@@ -14,9 +14,12 @@ import (
 )
 
 const (
-	HttpHeaderTenantID   = "X-GLAD-TenantID"
-	HttpHeaderAccountID  = "X-GLAD-AccountID"
-	HttpHeaderTotalCount = "X-Total-Count"
+	HttpHeaderTenantID      = "X-GLAD-TenantID"
+	HttpHeaderAccountID     = "X-GLAD-AccountID"
+	HttpHeaderAccountEmail  = "X-GLAD-AccountEmail"
+	HttpHeaderTotalCount    = "X-Total-Count"
+	HttpHeaderAuthorization = "Authorization"
+	HttpHeaderBearer        = "Bearer "
 
 	DefaultHttpPageNumber = 1
 	DefaultHttpPageLimit  = 20
