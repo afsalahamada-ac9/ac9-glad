@@ -26,6 +26,7 @@ func getConfig() http.Handler {
 			Region:       "us-east-2",
 			UserPoolID:   "us-east-2_IVzhX0vMs",
 			URL:          "https://cognito-idp.us-east-2.amazonaws.com/us-east-2_IVzhX0vMs/.well-known/openid-configuration",
+			OAuthScopes:  []string{"email", "openid", "profile"},
 		}
 
 		config := presenter.Config{

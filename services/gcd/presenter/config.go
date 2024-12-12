@@ -13,10 +13,11 @@ type Config struct {
 }
 
 type Auth struct {
-	ClientID     string `json:"clientID"`
-	ClientSecret string `json:"clientSecret"`
-	Domain       string `json:"domain"`
-	Region       string `json:"region"`
-	UserPoolID   string `json:"userPoolID"`
-	URL          string `json:"url"`
+	ClientID     string   `json:"clientID"`
+	ClientSecret string   `json:"clientSecret"`
+	Domain       string   `json:"domain"`
+	Region       string   `json:"region"`
+	UserPoolID   string   `json:"userPoolID"`
+	URL          string   `json:"url"`
+	OAuthScopes  []string `json:"oauthScopes"`
 }
