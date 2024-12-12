@@ -41,8 +41,26 @@ func HttpGetPageParams(
 	limit int,
 	err error,
 ) {
-	page, _ = strconv.Atoi(r.URL.Query().Get(HttpParamPage))
-	limit, _ = strconv.Atoi(r.URL.Query().Get(HttpParamLimit))
+	if page, err = strconv.Atoi(r.URL.Query().Get(HttpParamPage)); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte("invalid page value"))
+		err = glad.ErrInvalidValue
+		return
+	}
+
+	if limit, err = strconv.Atoi(r.URL.Query().Get(HttpParamLimit)); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte("invalid limit value"))
+		err = glad.ErrInvalidValue
+		return
+	}
+
+	if page < 0 || limit < 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte("page or limit value must not be negative"))
+		err = glad.ErrInvalidValue
+		return
+	}
 
 	// Guard rails to limit the items queried from DB and sent
 	if page == 0 && limit == 0 {

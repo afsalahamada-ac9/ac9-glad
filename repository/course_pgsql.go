@@ -336,7 +336,10 @@ func (r *CoursePGSQL) getByAccount(tenantID id.ID,
 					WHERE notify_id = $2
 	`
 
-	offset := (page - 1) * limit
+	offset := 0
+	if page > 0 {
+		offset = (page - 1) * limit
+	}
 	query += ` LIMIT $3 OFFSET $4) ORDER BY updated_at DESC;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
