@@ -34,11 +34,11 @@ func (r *inmemCourse) Create(e *entity.Course) (id.ID, error) {
 }
 
 // Get a course
-func (r *inmemCourse) Get(id id.ID) (*entity.Course, error) {
-	if r.m[id] == nil {
+func (r *inmemCourse) Get(courseID id.ID) (*entity.Course, error) {
+	if r.m[courseID] == nil {
 		return nil, glad.ErrNotFound
 	}
-	return r.m[id], nil
+	return r.m[courseID], nil
 }
 
 // Update a course
@@ -90,12 +90,12 @@ func (r *inmemCourse) List(tenantID id.ID, page, limit int) ([]*entity.Course, e
 }
 
 // Delete a course
-func (r *inmemCourse) Delete(id id.ID) error {
-	if r.m[id] == nil {
+func (r *inmemCourse) Delete(courseID id.ID) error {
+	if r.m[courseID] == nil {
 		return glad.ErrNotFound
 	}
-	r.m[id] = nil
-	delete(r.m, id)
+	r.m[courseID] = nil
+	delete(r.m, courseID)
 	return nil
 }
 
@@ -108,6 +108,13 @@ func (r *inmemCourse) GetCount(tenantID id.ID) (int, error) {
 		}
 	}
 	return count, nil
+}
+
+// GetByAccount a course
+// TODO: implement
+func (r *inmemCourse) GetByAccount(tenantID id.ID, accountID id.ID, page, limit int,
+) (int, []*entity.Course, error) {
+	return 0, nil, nil
 }
 
 // --------------------------------------------------------------------------------
@@ -143,6 +150,13 @@ func (r *inmemCourse) DeleteCourseOrganizerByCourse(courseID id.ID) error {
 	return nil
 }
 
+// MultiGetCourseOrganizer gets course organizer for the given course ids
+func (r *inmemCourse) MultiGetCourseOrganizer(courseIDList []id.ID,
+) ([][]*entity.CourseOrganizer, error) {
+	// TODO
+	return nil, nil
+}
+
 // --------------------------------------------------------------------------------
 // Course Teacher
 // --------------------------------------------------------------------------------
@@ -152,28 +166,35 @@ func (r *inmemCourse) InsertCourseTeacher(courseID id.ID, cts []*entity.CourseTe
 	return nil
 }
 
-// GetCourseTeacher gets course organizer for the given course id
+// GetCourseTeacher gets course teacher for the given course id
 func (r *inmemCourse) GetCourseTeacher(courseID id.ID) ([]*entity.CourseTeacher, error) {
 	// TODO
 	return nil, nil
 }
 
-// UpdateCourseTeacher updates course organizer for the given course id and the organizer
+// UpdateCourseTeacher updates course teacher for the given course id and the teacher
 func (r *inmemCourse) UpdateCourseTeacher(courseID id.ID, cos []*entity.CourseTeacher) error {
 	// TODO
 	return nil
 }
 
-// DeleteCourseTeacher deletes the given course organizers
+// DeleteCourseTeacher deletes the given course teachers
 func (r *inmemCourse) DeleteCourseTeacher(courseID id.ID, cos []*entity.CourseTeacher) error {
 	// TODO
 	return nil
 }
 
-// DeleteCourseTeacherByCourse deletes course organizers using course id
+// DeleteCourseTeacherByCourse deletes course teachers using course id
 func (r *inmemCourse) DeleteCourseTeacherByCourse(courseID id.ID) error {
 	// TODO
 	return nil
+}
+
+// MultiGetCourseTeacher gets course teacher for the given course ids
+func (r *inmemCourse) MultiGetCourseTeacher(courseIDList []id.ID,
+) ([][]*entity.CourseTeacher, error) {
+	// TODO
+	return nil, nil
 }
 
 // --------------------------------------------------------------------------------
@@ -185,28 +206,35 @@ func (r *inmemCourse) InsertCourseContact(courseID id.ID, ccs []*entity.CourseCo
 	return nil
 }
 
-// GetCourseContact gets course organizer for the given course id
+// GetCourseContact gets course contact for the given course id
 func (r *inmemCourse) GetCourseContact(courseID id.ID) ([]*entity.CourseContact, error) {
 	// TODO
 	return nil, nil
 }
 
-// UpdateCourseContact updates course organizer for the given course id and the organizer
+// UpdateCourseContact updates course contact for the given course id and the contact
 func (r *inmemCourse) UpdateCourseContact(courseID id.ID, cos []*entity.CourseContact) error {
 	// TODO
 	return nil
 }
 
-// DeleteCourseContact deletes the given course organizers
+// DeleteCourseContact deletes the given course contacts
 func (r *inmemCourse) DeleteCourseContact(courseID id.ID, cos []*entity.CourseContact) error {
 	// TODO
 	return nil
 }
 
-// DeleteCourseContactByCourse deletes course organizers using course id
+// DeleteCourseContactByCourse deletes course contacts using course id
 func (r *inmemCourse) DeleteCourseContactByCourse(courseID id.ID) error {
 	// TODO
 	return nil
+}
+
+// MultiGetCourseContact gets course contact for the given course ids
+func (r *inmemCourse) MultiGetCourseContact(courseIDList []id.ID,
+) ([][]*entity.CourseContact, error) {
+	// TODO
+	return nil, nil
 }
 
 // --------------------------------------------------------------------------------
@@ -218,26 +246,33 @@ func (r *inmemCourse) InsertCourseNotify(courseID id.ID, cns []*entity.CourseNot
 	return nil
 }
 
-// GetCourseNotify gets course organizer for the given course id
+// GetCourseNotify gets course notify for the given course id
 func (r *inmemCourse) GetCourseNotify(courseID id.ID) ([]*entity.CourseNotify, error) {
 	// TODO
 	return nil, nil
 }
 
-// UpdateCourseNotify updates course organizer for the given course id and the organizer
+// UpdateCourseNotify updates course notify for the given course id and the notify
 func (r *inmemCourse) UpdateCourseNotify(courseID id.ID, cos []*entity.CourseNotify) error {
 	// TODO
 	return nil
 }
 
-// DeleteCourseNotify deletes the given course organizers
+// DeleteCourseNotify deletes the given course notifys
 func (r *inmemCourse) DeleteCourseNotify(courseID id.ID, cos []*entity.CourseNotify) error {
 	// TODO
 	return nil
 }
 
-// DeleteCourseNotifyByCourse deletes course organizers using course id
+// DeleteCourseNotifyByCourse deletes course notifys using course id
 func (r *inmemCourse) DeleteCourseNotifyByCourse(courseID id.ID) error {
 	// TODO
 	return nil
+}
+
+// MultiGetCourseNotify gets course notify for the given course ids
+func (r *inmemCourse) MultiGetCourseNotify(courseIDList []id.ID,
+) ([][]*entity.CourseNotify, error) {
+	// TODO
+	return nil, nil
 }

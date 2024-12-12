@@ -7,9 +7,9 @@
 package util
 
 import (
+	"ac9/glad/pkg/common"
 	"strconv"
 	"strings"
-	"ac9/glad/pkg/common"
 	"time"
 )
 
@@ -95,5 +95,31 @@ func GenBulkDeletePGSQL(
 		}
 		valueArgs = append(valueArgs, valueExtractor(rowIndex)...)
 	}
+	return queryBuilder.String(), valueArgs
+}
+
+// BuildQueryWhereClauseIn builds WHERE clause IN query part of a SQL statement
+func BuildQueryWhereClauseIn(
+	fieldName string,
+	numValues int,
+	valueExtractor ValueExtractor,
+) (string, []interface{}) {
+	var queryBuilder strings.Builder
+	queryBuilder.WriteString(" WHERE ")
+	queryBuilder.WriteString(fieldName)
+	queryBuilder.WriteString(" IN (")
+
+	var valueArgs []interface{}
+	valueArgs = make([]interface{}, 0, numValues)
+	for index := 0; index < numValues; index++ {
+		if index > 0 {
+			queryBuilder.WriteString(",")
+		}
+		queryBuilder.WriteString("$")
+		queryBuilder.WriteString(strconv.Itoa(index + 1))
+		valueArgs = append(valueArgs, valueExtractor(index)...)
+	}
+	queryBuilder.WriteString(")")
+	queryBuilder.WriteString(";")
 	return queryBuilder.String(), valueArgs
 }

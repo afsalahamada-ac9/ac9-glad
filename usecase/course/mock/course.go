@@ -50,6 +50,22 @@ func (mr *MockCourseReaderMockRecorder) Get(id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockCourseReader)(nil).Get), id)
 }
 
+// GetByAccount mocks base method.
+func (m *MockCourseReader) GetByAccount(tenantID, accountID id.ID, page, limit int) (int, []*entity.Course, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByAccount", tenantID, accountID, page, limit)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].([]*entity.Course)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GetByAccount indicates an expected call of GetByAccount.
+func (mr *MockCourseReaderMockRecorder) GetByAccount(tenantID, accountID, page, limit interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByAccount", reflect.TypeOf((*MockCourseReader)(nil).GetByAccount), tenantID, accountID, page, limit)
+}
+
 // GetCount mocks base method.
 func (m *MockCourseReader) GetCount(id id.ID) (int, error) {
 	m.ctrl.T.Helper()
@@ -278,6 +294,21 @@ func (mr *MockCourseOrganizerReaderMockRecorder) GetCourseOrganizer(arg0 interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCourseOrganizer", reflect.TypeOf((*MockCourseOrganizerReader)(nil).GetCourseOrganizer), arg0)
 }
 
+// MultiGetCourseOrganizer mocks base method.
+func (m *MockCourseOrganizerReader) MultiGetCourseOrganizer(arg0 []id.ID) ([][]*entity.CourseOrganizer, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MultiGetCourseOrganizer", arg0)
+	ret0, _ := ret[0].([][]*entity.CourseOrganizer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// MultiGetCourseOrganizer indicates an expected call of MultiGetCourseOrganizer.
+func (mr *MockCourseOrganizerReaderMockRecorder) MultiGetCourseOrganizer(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MultiGetCourseOrganizer", reflect.TypeOf((*MockCourseOrganizerReader)(nil).MultiGetCourseOrganizer), arg0)
+}
+
 // MockCourseTeacherWriter is a mock of CourseTeacherWriter interface.
 type MockCourseTeacherWriter struct {
 	ctrl     *gomock.Controller
@@ -393,6 +424,21 @@ func (m *MockCourseTeacherReader) GetCourseTeacher(arg0 id.ID) ([]*entity.Course
 func (mr *MockCourseTeacherReaderMockRecorder) GetCourseTeacher(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCourseTeacher", reflect.TypeOf((*MockCourseTeacherReader)(nil).GetCourseTeacher), arg0)
+}
+
+// MultiGetCourseTeacher mocks base method.
+func (m *MockCourseTeacherReader) MultiGetCourseTeacher(arg0 []id.ID) ([][]*entity.CourseTeacher, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MultiGetCourseTeacher", arg0)
+	ret0, _ := ret[0].([][]*entity.CourseTeacher)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// MultiGetCourseTeacher indicates an expected call of MultiGetCourseTeacher.
+func (mr *MockCourseTeacherReaderMockRecorder) MultiGetCourseTeacher(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MultiGetCourseTeacher", reflect.TypeOf((*MockCourseTeacherReader)(nil).MultiGetCourseTeacher), arg0)
 }
 
 // MockCourseContactWriter is a mock of CourseContactWriter interface.
@@ -512,6 +558,21 @@ func (mr *MockCourseContactReaderMockRecorder) GetCourseContact(arg0 interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCourseContact", reflect.TypeOf((*MockCourseContactReader)(nil).GetCourseContact), arg0)
 }
 
+// MultiGetCourseContact mocks base method.
+func (m *MockCourseContactReader) MultiGetCourseContact(arg0 []id.ID) ([][]*entity.CourseContact, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MultiGetCourseContact", arg0)
+	ret0, _ := ret[0].([][]*entity.CourseContact)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// MultiGetCourseContact indicates an expected call of MultiGetCourseContact.
+func (mr *MockCourseContactReaderMockRecorder) MultiGetCourseContact(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MultiGetCourseContact", reflect.TypeOf((*MockCourseContactReader)(nil).MultiGetCourseContact), arg0)
+}
+
 // MockCourseNotifyWriter is a mock of CourseNotifyWriter interface.
 type MockCourseNotifyWriter struct {
 	ctrl     *gomock.Controller
@@ -627,6 +688,21 @@ func (m *MockCourseNotifyReader) GetCourseNotify(arg0 id.ID) ([]*entity.CourseNo
 func (mr *MockCourseNotifyReaderMockRecorder) GetCourseNotify(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCourseNotify", reflect.TypeOf((*MockCourseNotifyReader)(nil).GetCourseNotify), arg0)
+}
+
+// MultiGetCourseNotify mocks base method.
+func (m *MockCourseNotifyReader) MultiGetCourseNotify(arg0 []id.ID) ([][]*entity.CourseNotify, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MultiGetCourseNotify", arg0)
+	ret0, _ := ret[0].([][]*entity.CourseNotify)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// MultiGetCourseNotify indicates an expected call of MultiGetCourseNotify.
+func (mr *MockCourseNotifyReaderMockRecorder) MultiGetCourseNotify(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MultiGetCourseNotify", reflect.TypeOf((*MockCourseNotifyReader)(nil).MultiGetCourseNotify), arg0)
 }
 
 // MockCourseRepository is a mock of CourseRepository interface.
@@ -808,6 +884,22 @@ func (mr *MockCourseRepositoryMockRecorder) Get(id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockCourseRepository)(nil).Get), id)
 }
 
+// GetByAccount mocks base method.
+func (m *MockCourseRepository) GetByAccount(tenantID, accountID id.ID, page, limit int) (int, []*entity.Course, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByAccount", tenantID, accountID, page, limit)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].([]*entity.Course)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GetByAccount indicates an expected call of GetByAccount.
+func (mr *MockCourseRepositoryMockRecorder) GetByAccount(tenantID, accountID, page, limit interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByAccount", reflect.TypeOf((*MockCourseRepository)(nil).GetByAccount), tenantID, accountID, page, limit)
+}
+
 // GetCount mocks base method.
 func (m *MockCourseRepository) GetCount(id id.ID) (int, error) {
 	m.ctrl.T.Helper()
@@ -952,6 +1044,66 @@ func (m *MockCourseRepository) List(tenantID id.ID, page, limit int) ([]*entity.
 func (mr *MockCourseRepositoryMockRecorder) List(tenantID, page, limit interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockCourseRepository)(nil).List), tenantID, page, limit)
+}
+
+// MultiGetCourseContact mocks base method.
+func (m *MockCourseRepository) MultiGetCourseContact(arg0 []id.ID) ([][]*entity.CourseContact, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MultiGetCourseContact", arg0)
+	ret0, _ := ret[0].([][]*entity.CourseContact)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// MultiGetCourseContact indicates an expected call of MultiGetCourseContact.
+func (mr *MockCourseRepositoryMockRecorder) MultiGetCourseContact(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MultiGetCourseContact", reflect.TypeOf((*MockCourseRepository)(nil).MultiGetCourseContact), arg0)
+}
+
+// MultiGetCourseNotify mocks base method.
+func (m *MockCourseRepository) MultiGetCourseNotify(arg0 []id.ID) ([][]*entity.CourseNotify, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MultiGetCourseNotify", arg0)
+	ret0, _ := ret[0].([][]*entity.CourseNotify)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// MultiGetCourseNotify indicates an expected call of MultiGetCourseNotify.
+func (mr *MockCourseRepositoryMockRecorder) MultiGetCourseNotify(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MultiGetCourseNotify", reflect.TypeOf((*MockCourseRepository)(nil).MultiGetCourseNotify), arg0)
+}
+
+// MultiGetCourseOrganizer mocks base method.
+func (m *MockCourseRepository) MultiGetCourseOrganizer(arg0 []id.ID) ([][]*entity.CourseOrganizer, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MultiGetCourseOrganizer", arg0)
+	ret0, _ := ret[0].([][]*entity.CourseOrganizer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// MultiGetCourseOrganizer indicates an expected call of MultiGetCourseOrganizer.
+func (mr *MockCourseRepositoryMockRecorder) MultiGetCourseOrganizer(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MultiGetCourseOrganizer", reflect.TypeOf((*MockCourseRepository)(nil).MultiGetCourseOrganizer), arg0)
+}
+
+// MultiGetCourseTeacher mocks base method.
+func (m *MockCourseRepository) MultiGetCourseTeacher(arg0 []id.ID) ([][]*entity.CourseTeacher, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MultiGetCourseTeacher", arg0)
+	ret0, _ := ret[0].([][]*entity.CourseTeacher)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// MultiGetCourseTeacher indicates an expected call of MultiGetCourseTeacher.
+func (mr *MockCourseRepositoryMockRecorder) MultiGetCourseTeacher(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MultiGetCourseTeacher", reflect.TypeOf((*MockCourseRepository)(nil).MultiGetCourseTeacher), arg0)
 }
 
 // Search mocks base method.
@@ -1105,6 +1257,21 @@ func (m *MockCourseTimingReader) GetCount() (int, error) {
 func (mr *MockCourseTimingReaderMockRecorder) GetCount() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCount", reflect.TypeOf((*MockCourseTimingReader)(nil).GetCount))
+}
+
+// MultiGetCourseTiming mocks base method.
+func (m *MockCourseTimingReader) MultiGetCourseTiming(courseIDList []id.ID) ([][]*entity.CourseTiming, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MultiGetCourseTiming", courseIDList)
+	ret0, _ := ret[0].([][]*entity.CourseTiming)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// MultiGetCourseTiming indicates an expected call of MultiGetCourseTiming.
+func (mr *MockCourseTimingReaderMockRecorder) MultiGetCourseTiming(courseIDList interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MultiGetCourseTiming", reflect.TypeOf((*MockCourseTimingReader)(nil).MultiGetCourseTiming), courseIDList)
 }
 
 // MockCourseTimingWriter is a mock of CourseTimingWriter interface.
@@ -1270,6 +1437,21 @@ func (mr *MockCourseTimingRepositoryMockRecorder) GetCount() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCount", reflect.TypeOf((*MockCourseTimingRepository)(nil).GetCount))
 }
 
+// MultiGetCourseTiming mocks base method.
+func (m *MockCourseTimingRepository) MultiGetCourseTiming(courseIDList []id.ID) ([][]*entity.CourseTiming, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MultiGetCourseTiming", courseIDList)
+	ret0, _ := ret[0].([][]*entity.CourseTiming)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// MultiGetCourseTiming indicates an expected call of MultiGetCourseTiming.
+func (mr *MockCourseTimingRepositoryMockRecorder) MultiGetCourseTiming(courseIDList interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MultiGetCourseTiming", reflect.TypeOf((*MockCourseTimingRepository)(nil).MultiGetCourseTiming), courseIDList)
+}
+
 // Update mocks base method.
 func (m *MockCourseTimingRepository) Update(e *entity.CourseTiming) error {
 	m.ctrl.T.Helper()
@@ -1364,6 +1546,22 @@ func (m *MockUseCase) GetCourse(id id.ID) (*entity.CourseFull, error) {
 func (mr *MockUseCaseMockRecorder) GetCourse(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCourse", reflect.TypeOf((*MockUseCase)(nil).GetCourse), id)
+}
+
+// GetCourseByAccount mocks base method.
+func (m *MockUseCase) GetCourseByAccount(tenantID, accountID id.ID, page, limit int) (int, []*entity.CourseFull, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCourseByAccount", tenantID, accountID, page, limit)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].([]*entity.CourseFull)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GetCourseByAccount indicates an expected call of GetCourseByAccount.
+func (mr *MockUseCaseMockRecorder) GetCourseByAccount(tenantID, accountID, page, limit interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCourseByAccount", reflect.TypeOf((*MockUseCase)(nil).GetCourseByAccount), tenantID, accountID, page, limit)
 }
 
 // ListCourses mocks base method.

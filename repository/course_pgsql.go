@@ -13,6 +13,7 @@ import (
 
 	"ac9/glad/entity"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
 	"ac9/glad/pkg/util"
 )
 
@@ -212,10 +213,34 @@ func (r *CoursePGSQL) List(tenantID id.ID, page, limit int) ([]*entity.Course, e
 	return r.scanRows(rows)
 }
 
+// GetByAccount retrieves courses by account id
+func (r *CoursePGSQL) GetByAccount(tenantID id.ID,
+	accountID id.ID,
+	page, limit int,
+) (int, []*entity.Course, error) {
+
+	// Get total count that matches this query
+	count, err := r.getCountByAccount(tenantID, accountID)
+	if err != nil {
+		l.Log.Warnf("%v", err)
+		return count, nil, err
+	}
+
+	// Get all courses limit X
+	courseList, err := r.getByAccount(tenantID, accountID, page, limit)
+	if err != nil {
+		l.Log.Warnf("%v", err)
+		return count, nil, err
+	}
+
+	return count, courseList, err
+}
+
 // Delete deletes a course
 func (r *CoursePGSQL) Delete(id id.ID) error {
 	res, err := r.db.Exec(`DELETE FROM course WHERE id = $1;`, id)
 	if err != nil {
+		l.Log.Warnf("%v", err)
 		return err
 	}
 
@@ -226,7 +251,7 @@ func (r *CoursePGSQL) Delete(id id.ID) error {
 	return nil
 }
 
-// Get total courses
+// GetCount total courses
 func (r *CoursePGSQL) GetCount(tenantID id.ID) (int, error) {
 	stmt, err := r.db.Prepare(`SELECT count(*) FROM course WHERE tenant_id = $1;`)
 	if err != nil {
@@ -240,6 +265,93 @@ func (r *CoursePGSQL) GetCount(tenantID id.ID) (int, error) {
 	}
 
 	return count, nil
+}
+
+// getCountByAccount total courses
+func (r *CoursePGSQL) getCountByAccount(tenantID id.ID,
+	accountID id.ID,
+) (int, error) {
+	stmt, err := r.db.Prepare(`
+		SELECT count(*)
+		FROM course
+		WHERE
+			tenant_id = $1 AND
+			id IN
+			(
+				SELECT course_id FROM course_organizer
+					WHERE organizer_id = $2
+					UNION
+				SELECT course_id FROM course_teacher
+					WHERE teacher_id = $2
+					UNION
+				SELECT course_id FROM course_contact
+					WHERE contact_id = $2
+					UNION
+				SELECT course_id FROM course_notify
+					WHERE notify_id = $2
+			)
+		;
+	`)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return 0, err
+	}
+
+	var count int
+	err = stmt.QueryRow(tenantID, accountID).Scan(&count)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return 0, err
+	}
+
+	return count, nil
+}
+
+// getByAccount retrieves courses that match account id
+func (r *CoursePGSQL) getByAccount(tenantID id.ID,
+	accountID id.ID,
+	page, limit int,
+) ([]*entity.Course, error) {
+	query := `
+		SELECT
+			id, tenant_id, ext_id, center_id, product_id, name,
+			notes, timezone, address, status, mode, max_attendees,
+			num_attendees, created_at
+		FROM course
+		WHERE
+			tenant_id = $1
+		AND
+			id IN
+			(
+				SELECT course_id FROM course_organizer
+					WHERE organizer_id = $2
+					UNION
+				SELECT course_id FROM course_teacher
+					WHERE teacher_id = $2
+					UNION
+				SELECT course_id FROM course_contact
+					WHERE contact_id = $2
+					UNION
+				SELECT course_id FROM course_notify
+					WHERE notify_id = $2
+	`
+
+	offset := (page - 1) * limit
+	query += ` LIMIT $3 OFFSET $4) ORDER BY updated_at DESC;`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return nil, err
+	}
+
+	rows, err := stmt.Query(tenantID, accountID, limit, offset)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return nil, err
+	}
+
+	defer rows.Close()
+	return r.scanRows(rows)
 }
 
 func (r *CoursePGSQL) scanRows(rows *sql.Rows) ([]*entity.Course, error) {
@@ -264,6 +376,7 @@ func (r *CoursePGSQL) scanRows(rows *sql.Rows) ([]*entity.Course, error) {
 			&course.CreatedAt,
 		)
 		if err != nil {
+			l.Log.Warnf("err=%v", err)
 			return nil, err
 		}
 
@@ -277,6 +390,7 @@ func (r *CoursePGSQL) scanRows(rows *sql.Rows) ([]*entity.Course, error) {
 		if address_json.Valid && address_json.String != "" {
 			err = json.Unmarshal([]byte(address_json.String), &course.Address)
 			if err != nil {
+				l.Log.Warnf("err=%v", err)
 				return nil, err
 			}
 		}
@@ -445,6 +559,58 @@ func (r *CoursePGSQL) DeleteCourseOrganizerByCourse(courseID id.ID) error {
 	return nil
 }
 
+// MultiGetCourseOrganizer gets course organizer for the given course ids
+func (r *CoursePGSQL) MultiGetCourseOrganizer(courseIDList []id.ID,
+) ([][]*entity.CourseOrganizer, error) {
+	values := func(index int) []interface{} {
+		return []interface{}{
+			courseIDList[index],
+		}
+	}
+
+	query := `SELECT course_id, organizer_id FROM course_organizer`
+	whereIn, valueArgs := util.BuildQueryWhereClauseIn(
+		"course_id",
+		len(courseIDList),
+		values,
+	)
+
+	stmt, err := r.db.Prepare(query + whereIn)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return nil, err
+	}
+
+	l.Log.Debugf("courseIDList=%v, query=%v, values=%v", courseIDList, query+whereIn, valueArgs)
+	rows, err := stmt.Query(valueArgs...)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return nil, err
+	}
+
+	m := make(map[id.ID]int)
+	for i, cID := range courseIDList {
+		m[cID] = i
+	}
+
+	cosList := make([][]*entity.CourseOrganizer, len(courseIDList))
+	for rows.Next() {
+		var co entity.CourseOrganizer
+		var courseID id.ID
+
+		err := rows.Scan(&courseID, &co.ID)
+		if err != nil {
+			l.Log.Warnf("err=%v", err)
+			return nil, err
+		}
+
+		cosList[m[courseID]] = append(cosList[m[courseID]], &co)
+	}
+
+	defer rows.Close()
+	return cosList, err
+}
+
 // --------------------------------------------------------------------------------
 // Course Teacher
 // --------------------------------------------------------------------------------
@@ -602,6 +768,58 @@ func (r *CoursePGSQL) DeleteCourseTeacherByCourse(courseID id.ID) error {
 	return nil
 }
 
+// MultiGetCourseTeacher gets course teacher for the given course ids
+func (r *CoursePGSQL) MultiGetCourseTeacher(courseIDList []id.ID,
+) ([][]*entity.CourseTeacher, error) {
+	values := func(index int) []interface{} {
+		return []interface{}{
+			courseIDList[index],
+		}
+	}
+
+	query := `SELECT course_id, teacher_id, is_primary FROM course_teacher`
+	whereIn, valueArgs := util.BuildQueryWhereClauseIn(
+		"course_id",
+		len(courseIDList),
+		values,
+	)
+
+	stmt, err := r.db.Prepare(query + whereIn)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return nil, err
+	}
+
+	l.Log.Debugf("courseIDList=%v, query=%v, values=%v", courseIDList, query+whereIn, valueArgs)
+	rows, err := stmt.Query(valueArgs...)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return nil, err
+	}
+
+	m := make(map[id.ID]int)
+	for i, cID := range courseIDList {
+		m[cID] = i
+	}
+
+	ctsList := make([][]*entity.CourseTeacher, len(courseIDList))
+	for rows.Next() {
+		var ct entity.CourseTeacher
+		var courseID id.ID
+
+		err := rows.Scan(&courseID, &ct.ID, &ct.IsPrimary)
+		if err != nil {
+			l.Log.Warnf("err=%v", err)
+			return nil, err
+		}
+
+		ctsList[m[courseID]] = append(ctsList[m[courseID]], &ct)
+	}
+
+	defer rows.Close()
+	return ctsList, err
+}
+
 // --------------------------------------------------------------------------------
 // Course Contact
 // --------------------------------------------------------------------------------
@@ -756,6 +974,58 @@ func (r *CoursePGSQL) DeleteCourseContactByCourse(courseID id.ID) error {
 	return nil
 }
 
+// MultiGetCourseContact gets course contact for the given course ids
+func (r *CoursePGSQL) MultiGetCourseContact(courseIDList []id.ID,
+) ([][]*entity.CourseContact, error) {
+	values := func(index int) []interface{} {
+		return []interface{}{
+			courseIDList[index],
+		}
+	}
+
+	query := `SELECT course_id, contact_id FROM course_contact`
+	whereIn, valueArgs := util.BuildQueryWhereClauseIn(
+		"course_id",
+		len(courseIDList),
+		values,
+	)
+
+	stmt, err := r.db.Prepare(query + whereIn)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return nil, err
+	}
+
+	l.Log.Debugf("courseIDList=%v, query=%v, values=%v", courseIDList, query+whereIn, valueArgs)
+	rows, err := stmt.Query(valueArgs...)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return nil, err
+	}
+
+	m := make(map[id.ID]int)
+	for i, cID := range courseIDList {
+		m[cID] = i
+	}
+
+	ccsList := make([][]*entity.CourseContact, len(courseIDList))
+	for rows.Next() {
+		var cc entity.CourseContact
+		var courseID id.ID
+
+		err := rows.Scan(&courseID, &cc.ID)
+		if err != nil {
+			l.Log.Warnf("err=%v", err)
+			return nil, err
+		}
+
+		ccsList[m[courseID]] = append(ccsList[m[courseID]], &cc)
+	}
+
+	defer rows.Close()
+	return ccsList, err
+}
+
 // --------------------------------------------------------------------------------
 // Course Notify
 // --------------------------------------------------------------------------------
@@ -908,4 +1178,55 @@ func (r *CoursePGSQL) DeleteCourseNotifyByCourse(courseID id.ID) error {
 		return sql.ErrNoRows
 	}
 	return nil
+}
+
+// MultiGetCourseNotify gets course notify for the given course ids
+func (r *CoursePGSQL) MultiGetCourseNotify(courseIDList []id.ID,
+) ([][]*entity.CourseNotify, error) {
+	values := func(index int) []interface{} {
+		return []interface{}{
+			courseIDList[index],
+		}
+	}
+
+	query := `SELECT course_id, notify_id FROM course_notify`
+	whereIn, valueArgs := util.BuildQueryWhereClauseIn(
+		"course_id",
+		len(courseIDList),
+		values,
+	)
+
+	stmt, err := r.db.Prepare(query + whereIn)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return nil, err
+	}
+
+	rows, err := stmt.Query(valueArgs...)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return nil, err
+	}
+
+	m := make(map[id.ID]int)
+	for i, cID := range courseIDList {
+		m[cID] = i
+	}
+
+	cnsList := make([][]*entity.CourseNotify, len(courseIDList))
+	for rows.Next() {
+		var cn entity.CourseNotify
+		var courseID id.ID
+
+		err := rows.Scan(&courseID, &cn.ID)
+		if err != nil {
+			l.Log.Warnf("err=%v", err)
+			return nil, err
+		}
+
+		cnsList[m[courseID]] = append(cnsList[m[courseID]], &cn)
+	}
+
+	defer rows.Close()
+	return cnsList, err
 }

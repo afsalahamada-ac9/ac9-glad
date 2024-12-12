@@ -6,7 +6,9 @@
 
 package presenter
 
-import "ac9/glad/entity"
+import (
+	"ac9/glad/entity"
+)
 
 // Address
 type Address struct {

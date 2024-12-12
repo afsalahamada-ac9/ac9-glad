@@ -17,6 +17,10 @@ type CourseReader interface {
 	Search(tenantID id.ID, query string, page, limit int) ([]*entity.Course, error)
 	List(tenantID id.ID, page, limit int) ([]*entity.Course, error)
 	GetCount(id id.ID) (int, error)
+	GetByAccount(tenantID id.ID,
+		accountID id.ID,
+		page, limit int,
+	) (int, []*entity.Course, error)
 }
 
 // CourseWriter course writer
@@ -37,6 +41,7 @@ type CourseOrganizerWriter interface {
 // CourseOrganizerReader course organizer reader
 type CourseOrganizerReader interface {
 	GetCourseOrganizer(id.ID) ([]*entity.CourseOrganizer, error)
+	MultiGetCourseOrganizer([]id.ID) ([][]*entity.CourseOrganizer, error)
 }
 
 // CourseTeacherWriter course teacher writer
@@ -50,6 +55,7 @@ type CourseTeacherWriter interface {
 // CourseTeacherReader course teacher reader
 type CourseTeacherReader interface {
 	GetCourseTeacher(id.ID) ([]*entity.CourseTeacher, error)
+	MultiGetCourseTeacher([]id.ID) ([][]*entity.CourseTeacher, error)
 }
 
 // CourseContactWriter course contact writer
@@ -63,6 +69,7 @@ type CourseContactWriter interface {
 // CourseContactReader course contact reader
 type CourseContactReader interface {
 	GetCourseContact(id.ID) ([]*entity.CourseContact, error)
+	MultiGetCourseContact([]id.ID) ([][]*entity.CourseContact, error)
 }
 
 // CourseNotifyWriter course notify writer
@@ -76,6 +83,7 @@ type CourseNotifyWriter interface {
 // CourseNotifyReader course notify reader
 type CourseNotifyReader interface {
 	GetCourseNotify(id.ID) ([]*entity.CourseNotify, error)
+	MultiGetCourseNotify([]id.ID) ([][]*entity.CourseNotify, error)
 }
 
 // Course repository interface
@@ -97,6 +105,7 @@ type CourseTimingReader interface {
 	Get(id id.ID) (*entity.CourseTiming, error)
 	GetByCourse(courseID id.ID) ([]*entity.CourseTiming, error)
 	GetCount() (int, error)
+	MultiGetCourseTiming(courseIDList []id.ID) ([][]*entity.CourseTiming, error)
 }
 
 // CourseTimingWriter course timing writer
@@ -133,6 +142,11 @@ type UseCase interface {
 		cns []*entity.CourseNotify,
 		courseTimings []*entity.CourseTiming,
 	) error
+	GetCourseByAccount(
+		tenantID id.ID,
+		accountID id.ID,
+		page, limit int,
+	) (int, []*entity.CourseFull, error)
 	DeleteCourse(id id.ID) error
 	GetCount(id id.ID) int
 }

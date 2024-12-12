@@ -83,3 +83,9 @@ func (r *inmemCourseTiming) GetCount() (int, error) {
 	}
 	return count, nil
 }
+
+// MultiGetCourseTiming gets timings for multiple courses
+func (r *inmemCourseTiming) MultiGetCourseTiming(courseID []id.ID) ([][]*entity.CourseTiming, error) {
+	// TODO: implementation
+	return nil, nil
+}

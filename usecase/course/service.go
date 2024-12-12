@@ -242,3 +242,67 @@ func (s *Service) UpdateCourse(
 
 	return err
 }
+
+// GetCourseByAccount retrieves course and related information using account id
+func (s *Service) GetCourseByAccount(courseID id.ID,
+	accountID id.ID,
+	page, limit int,
+) (int, []*entity.CourseFull, error) {
+	count, courseList, err := s.cRepo.GetByAccount(courseID, accountID, page, limit)
+	if count == 0 {
+		err = glad.ErrNotFound
+		l.Log.Warnf("%v", err)
+		return count, nil, err
+	}
+	if err != nil {
+		l.Log.Warnf("%v", err)
+		return count, nil, err
+	}
+
+	// Generate course ids
+	var courseIDList []id.ID
+	for _, course := range courseList {
+		courseIDList = append(courseIDList, course.ID)
+	}
+
+	// Get all organizers, teachers, contact, notify and timings for N courses
+	cosList, err := s.cRepo.MultiGetCourseOrganizer(courseIDList)
+	if err != nil {
+		l.Log.Warnf("%v", err)
+		return count, nil, err
+	}
+
+	ctsList, err := s.cRepo.MultiGetCourseTeacher(courseIDList)
+	if err != nil {
+		l.Log.Warnf("%v", err)
+		return count, nil, err
+	}
+
+	ccsList, err := s.cRepo.MultiGetCourseContact(courseIDList)
+	if err != nil {
+		l.Log.Warnf("%v", err)
+		return count, nil, err
+	}
+
+	cnsList, err := s.cRepo.MultiGetCourseNotify(courseIDList)
+	if err != nil {
+		l.Log.Warnf("%v", err)
+		return count, nil, err
+	}
+
+	courseTimingList, err := s.ctRepo.MultiGetCourseTiming(courseIDList)
+	if err != nil {
+		l.Log.Warnf("%v", err)
+		return count, nil, err
+	}
+
+	// Merge all these in CourseFull entity and return a list of CourseFull entity & total count
+	var cfList []*entity.CourseFull
+	for i := range courseList {
+		l.Log.Debugf("Course id=%v", courseList[i].ID)
+		cfList = append(cfList,
+			entity.NewCourseFull(*courseList[i], cosList[i], ctsList[i], ccsList[i], cnsList[i], courseTimingList[i]))
+	}
+
+	return count, cfList, err
+}

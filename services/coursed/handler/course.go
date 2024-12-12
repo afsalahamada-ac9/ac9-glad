@@ -73,17 +73,7 @@ func listCourses(service course.UseCase) http.Handler {
 		for _, d := range data {
 			pc := &presenter.Course{}
 			pc.FromEntityCourse(d)
-			// pc := &presenter.Course{
-			// 	ID:           d.ID,
-			// 	Name:         &d.Name,
-			// 	Mode:         &d.Mode,
-			// 	CenterID:     &d.CenterID,
-			// 	Notes:        &d.Notes,
-			// 	Timezone:     &d.Timezone,
-			// 	Status:       &d.Status,
-			// 	MaxAttendees: &d.MaxAttendees,
-			// 	NumAttendees: &d.NumAttendees,
-			// }
+
 			pc.Address = &presenter.Address{}
 			pc.Address.CopyFrom(d.Address)
 
@@ -196,6 +186,63 @@ func getCourse(service course.UseCase) http.Handler {
 
 		w.Header().Set(common.HttpHeaderTenantID, courseFull.Course.TenantID.String())
 		if err := json.NewEncoder(w).Encode(toJ); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte("Unable to encode course"))
+		}
+	})
+}
+
+func getCourseByAccount(service course.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		errorMessage := "Error reading course"
+		vars := mux.Vars(r)
+
+		tenantID, err := common.HttpGetTenantID(w, r)
+		if err != nil {
+			l.Log.Warnf("Tenant id is missing")
+			return
+		}
+
+		accountID, err := id.FromString(vars["accountID"])
+		if err != nil {
+			l.Log.Warnf("%v", err)
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte(err.Error()))
+			return
+		}
+
+		page, limit, err := common.HttpGetPageParams(w, r)
+		if err != nil {
+			l.Log.Warnf("%v", err)
+			return
+		}
+
+		count, cfList, err := service.GetCourseByAccount(tenantID, accountID, page, limit)
+		if err != nil && err != glad.ErrNotFound {
+			l.Log.Warnf("%v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
+			return
+		}
+
+		if count == 0 || len(cfList) == 0 {
+			l.Log.Warnf("count=%v, len(cfList)=%v, err=%v", count, len(cfList), err)
+			w.WriteHeader(http.StatusNotFound)
+			_, _ = w.Write([]byte("Empty data returned"))
+			return
+		}
+
+		var courseList []*presenter.Course
+		for _, courseFull := range cfList {
+			c := &presenter.Course{}
+			c.FromEntityCourseFull(courseFull)
+			courseList = append(courseList, c)
+		}
+
+		w.Header().Set(common.HttpHeaderTotalCount, strconv.Itoa(count))
+		w.Header().Set(common.HttpHeaderTenantID, tenantID.String())
+		if err := json.NewEncoder(w).Encode(courseList); err != nil {
+			l.Log.Warnf("%v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte("Unable to encode course"))
 		}
@@ -360,6 +407,9 @@ func MakeCourseHandlers(r *mux.Router, n negroni.Negroni, service course.UseCase
 	)).Methods("POST", "OPTIONS").Name("createCourse")
 
 	// TODO: implement get courses by account-id
+	r.Handle("/v1/courses/account/{accountID}", n.With(
+		negroni.Wrap(getCourseByAccount(service)),
+	)).Methods("GET", "OPTIONS").Name("getCourseByAccount")
 
 	r.Handle("/v1/courses/me", n.With(
 		negroni.Wrap(getCourseMe(service)),

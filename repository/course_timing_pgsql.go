@@ -13,6 +13,8 @@ import (
 
 	"ac9/glad/entity"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
+	"ac9/glad/pkg/util"
 )
 
 // CourseTimingPGSQL pgsql repo
@@ -161,7 +163,7 @@ func (r *CourseTimingPGSQL) Delete(id id.ID) error {
 
 // GetCount gets total items in course timing table
 func (r *CourseTimingPGSQL) GetCount() (int, error) {
-	stmt, err := r.db.Prepare(`SELECT count(*) FROM course _timing;`)
+	stmt, err := r.db.Prepare(`SELECT count(*) FROM course_timing;`)
 	if err != nil {
 		return 0, err
 	}
@@ -178,28 +180,90 @@ func (r *CourseTimingPGSQL) GetCount() (int, error) {
 func (r *CourseTimingPGSQL) scanRows(rows *sql.Rows) ([]*entity.CourseTiming, error) {
 	var cts []*entity.CourseTiming
 	for rows.Next() {
-		var ct entity.CourseTiming
-		// id, course_id, ext_id, course_date, start_time, end_time, created_at
-		var ext_id, course_date, start_time, end_time sql.NullString
-		err := rows.Scan(
-			&ct.ID,
-			&ct.CourseID,
-			&ext_id,
-			&course_date,
-			&start_time,
-			&end_time,
-			&ct.CreatedAt,
-		)
+		ct, err := r.scanRow(rows)
 		if err != nil {
 			return nil, err
 		}
-
-		ct.ExtID = &ext_id.String
-		ct.DateTime.Date = course_date.String
-		ct.DateTime.StartTime = start_time.String
-		ct.DateTime.EndTime = end_time.String
-
-		cts = append(cts, &ct)
+		cts = append(cts, ct)
 	}
 	return cts, nil
+}
+
+func (r *CourseTimingPGSQL) scanRow(rows *sql.Rows) (*entity.CourseTiming, error) {
+	var ct entity.CourseTiming
+	// id, course_id, ext_id, course_date, start_time, end_time, created_at
+	var ext_id, course_date, start_time, end_time sql.NullString
+	err := rows.Scan(
+		&ct.ID,
+		&ct.CourseID,
+		&ext_id,
+		&course_date,
+		&start_time,
+		&end_time,
+		&ct.CreatedAt,
+	)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return nil, err
+	}
+
+	ct.ExtID = &ext_id.String
+	ct.DateTime.Date = course_date.String
+	ct.DateTime.StartTime = start_time.String
+	ct.DateTime.EndTime = end_time.String
+
+	return &ct, err
+}
+
+// MultiGetCourseTiming gets course timing for the given course ids
+func (r *CourseTimingPGSQL) MultiGetCourseTiming(courseIDList []id.ID,
+) ([][]*entity.CourseTiming, error) {
+	values := func(index int) []interface{} {
+		return []interface{}{
+			courseIDList[index],
+		}
+	}
+
+	query := `
+		SELECT 
+			id, course_id, ext_id, course_date, start_time, end_time, created_at
+		FROM course_timing
+	`
+	whereIn, valueArgs := util.BuildQueryWhereClauseIn(
+		"course_id",
+		len(courseIDList),
+		values,
+	)
+
+	stmt, err := r.db.Prepare(query + whereIn)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return nil, err
+	}
+
+	l.Log.Debugf("courseIDList=%v, query=%v, values=%v", courseIDList, query+whereIn, valueArgs)
+	rows, err := stmt.Query(valueArgs...)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return nil, err
+	}
+
+	m := make(map[id.ID]int)
+	for i, cID := range courseIDList {
+		m[cID] = i
+	}
+
+	ctList := make([][]*entity.CourseTiming, len(courseIDList))
+	for rows.Next() {
+		ct, err := r.scanRow(rows)
+		if err != nil {
+			l.Log.Warnf("err=%v", err)
+			return nil, err
+		}
+
+		ctList[m[ct.CourseID]] = append(ctList[m[ct.CourseID]], ct)
+	}
+
+	defer rows.Close()
+	return ctList, err
 }
