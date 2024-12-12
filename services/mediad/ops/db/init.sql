@@ -1,3 +1,20 @@
+-- Copyright 2024 AboveCloud9.AI Products and Services Private Limited
+-- All rights reserved.
+-- This code may not be used, copied, modified, or distributed without explicit permission.
+
+CREATE DATABASE glad_mediad
+    WITH
+    OWNER = glad_user
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'en_US.UTF-8'
+    LC_CTYPE = 'en_US.UTF-8'
+    TEMPLATE = template0
+    CONNECTION LIMIT = -1;
+
+-- Connect to the new database (only works in psql)
+\c glad_mediad;
+
+
 CREATE TABLE IF NOT EXISTS metadata (
     id SERIAL PRIMARY KEY,
     version INTEGER NOT NULL DEFAULT 1,

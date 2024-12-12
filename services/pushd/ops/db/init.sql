@@ -1,5 +1,5 @@
 CREATE DATABASE glad_pushd
-    WITH 
+    WITH
     OWNER = glad_user
     ENCODING = 'UTF8'
     LC_COLLATE = 'en_US.UTF-8'

@@ -3,7 +3,7 @@
 -- This code may not be used, copied, modified, or distributed without explicit permission.
 
 CREATE DATABASE glad
-    WITH 
+    WITH
     OWNER = glad_user
     ENCODING = 'UTF8'
     LC_COLLATE = 'en_US.UTF-8'
