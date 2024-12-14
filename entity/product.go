@@ -51,7 +51,6 @@ type Product struct {
 
 // NewProduct creates a new product with the given parameters
 func NewProduct(tenantID id.ID,
-	extID string,
 	extName string,
 	title string,
 	ctype string,
@@ -64,7 +63,6 @@ func NewProduct(tenantID id.ID,
 ) (*Product, error) {
 	p := &Product{
 		ID:               id.New(),
-		ExtID:            extID,
 		TenantID:         tenantID,
 		ExtName:          extName,
 		Title:            title,
@@ -92,15 +90,7 @@ func (p *Product) Validate() error {
 		return glad.ErrInvalidEntity
 	}
 
-	if p.ExtName == "" {
-		return glad.ErrInvalidEntity
-	}
-
-	if p.Title == "" {
-		return glad.ErrInvalidEntity
-	}
-
-	if p.CType == "" {
+	if p.ExtName == "" || p.Title == "" || p.CType == "" || p.BaseProductExtID == "" {
 		return glad.ErrInvalidEntity
 	}
 

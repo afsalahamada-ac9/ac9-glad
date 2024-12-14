@@ -5,7 +5,9 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/common"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
 )
 
 // ProductPGSQL postgres repo
@@ -23,15 +25,15 @@ func NewProductPGSQL(db *sql.DB) *ProductPGSQL {
 // Create creates a product
 func (r *ProductPGSQL) Create(e *entity.Product) (id.ID, error) {
 	stmt, err := r.db.Prepare(`
-		INSERT INTO product (id, ext_id, tenant_id, ext_name, title, ctype, base_product_ext_id, 
+		INSERT INTO product
+			(id, tenant_id, ext_name, title, ctype, base_product_ext_id, 
 			duration_days, visibility, max_attendees, format, is_auto_approve, created_at)
-		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`)
+		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`)
 	if err != nil {
 		return e.ID, err
 	}
 	_, err = stmt.Exec(
 		e.ID,
-		e.ExtID,
 		e.TenantID,
 		e.ExtName,
 		e.Title,
@@ -278,4 +280,53 @@ func (r *ProductPGSQL) scanRows(rows *sql.Rows) ([]*entity.Product, error) {
 	}
 
 	return products, nil
+}
+
+// Upsert inserts or updates the product and returns the id
+func (r *ProductPGSQL) Upsert(e *entity.Product) (id.ID, error) {
+	stmt, err := r.db.Prepare(`
+		WITH upsert AS (
+			INSERT INTO product (
+				id, tenant_id, ext_id, ext_name, title, ctype, base_product_ext_id, 
+				duration_days, visibility, max_attendees, format, is_auto_approve, created_at, updated_at
+			)
+			VALUES
+				($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+			ON CONFLICT (ext_id)
+			DO UPDATE
+				SET tenant_id = $2, ext_name = $4, title = $5, ctype = $6, base_product_ext_id = $7,
+					duration_days = $8, visibility = $9, max_attendees = $10,
+					format = $11,  is_auto_approve = $12, created_at = $13, updated_at = $14
+			WHERE product.updated_at < $14
+			RETURNING id
+		)
+		`)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return id.IDInvalid, err
+	}
+
+	var productID id.ID
+	err = stmt.QueryRow(
+		e.ID,
+		e.TenantID,
+		e.ExtID,
+		e.ExtName,
+		e.Title,
+		e.CType,
+		e.BaseProductExtID,
+		e.DurationDays,
+		string(e.Visibility),
+		e.MaxAttendees,
+		string(e.Format),
+		e.IsAutoApprove,
+		e.CreatedAt.Format(common.DBFormatDateTimeMS),
+		e.UpdatedAt.Format(common.DBFormatDateTimeMS),
+	).Scan(&productID)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return id.IDInvalid, err
+	}
+
+	return productID, nil
 }

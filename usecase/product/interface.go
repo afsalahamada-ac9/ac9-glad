@@ -24,6 +24,7 @@ type Writer interface {
 	Create(product *entity.Product) (id.ID, error)
 	Update(product *entity.Product) error
 	Delete(id id.ID) error
+	Upsert(product *entity.Product) (id.ID, error)
 }
 
 // Repository interface
@@ -38,7 +39,6 @@ type UseCase interface {
 	SearchProducts(tenantID id.ID, q string, page, limit int) ([]*entity.Product, error)
 	ListProducts(tenantID id.ID, page, limit int) ([]*entity.Product, error)
 	CreateProduct(tenantID id.ID,
-		extID string,
 		extName string,
 		title string,
 		ctype string,
@@ -52,4 +52,5 @@ type UseCase interface {
 	UpdateProduct(e *entity.Product) error
 	DeleteProduct(id id.ID) error
 	GetCount(id id.ID) int
+	UpsertProduct(e *entity.Product) (id.ID, error)
 }

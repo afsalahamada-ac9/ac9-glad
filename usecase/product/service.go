@@ -7,6 +7,7 @@ import (
 	"ac9/glad/entity"
 	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
 )
 
 // Service product usecase
@@ -23,7 +24,6 @@ func NewService(r Repository) *Service {
 
 // CreateProduct creates a product
 func (s *Service) CreateProduct(tenantID id.ID,
-	extID string,
 	extName string,
 	title string,
 	ctype string,
@@ -35,7 +35,6 @@ func (s *Service) CreateProduct(tenantID id.ID,
 	isAutoApprove bool,
 ) (id.ID, error) {
 	p, err := entity.NewProduct(tenantID,
-		extID,
 		extName,
 		title,
 		ctype,
@@ -121,4 +120,21 @@ func (s *Service) GetCount(tenantID id.ID) int {
 	}
 
 	return count
+}
+
+// UpsertProduct upserts a product
+func (s *Service) UpsertProduct(p *entity.Product) (id.ID, error) {
+	if p.ID == id.IDInvalid {
+		// assign id and during update id should not be overwritten
+		p.ID = id.New()
+
+	}
+
+	err := p.Validate()
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return id.IDInvalid, err
+	}
+	p.UpdatedAt = time.Now()
+	return s.repo.Upsert(p)
 }

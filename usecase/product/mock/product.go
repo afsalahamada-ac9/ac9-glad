@@ -161,6 +161,21 @@ func (mr *MockWriterMockRecorder) Update(product interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockWriter)(nil).Update), product)
 }
 
+// Upsert mocks base method.
+func (m *MockWriter) Upsert(product *entity.Product) (id.ID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Upsert", product)
+	ret0, _ := ret[0].(id.ID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Upsert indicates an expected call of Upsert.
+func (mr *MockWriterMockRecorder) Upsert(product interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Upsert", reflect.TypeOf((*MockWriter)(nil).Upsert), product)
+}
+
 // MockRepository is a mock of Repository interface.
 type MockRepository struct {
 	ctrl     *gomock.Controller
@@ -287,6 +302,21 @@ func (mr *MockRepositoryMockRecorder) Update(product interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockRepository)(nil).Update), product)
 }
 
+// Upsert mocks base method.
+func (m *MockRepository) Upsert(product *entity.Product) (id.ID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Upsert", product)
+	ret0, _ := ret[0].(id.ID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Upsert indicates an expected call of Upsert.
+func (mr *MockRepositoryMockRecorder) Upsert(product interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Upsert", reflect.TypeOf((*MockRepository)(nil).Upsert), product)
+}
+
 // MockUseCase is a mock of UseCase interface.
 type MockUseCase struct {
 	ctrl     *gomock.Controller
@@ -311,18 +341,18 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 }
 
 // CreateProduct mocks base method.
-func (m *MockUseCase) CreateProduct(tenantID id.ID, extID, extName, title, ctype, baseProductExtID string, durationDays int32, visibility entity.ProductVisibility, maxAttendees int32, format entity.ProductFormat, isAutoApprove bool) (id.ID, error) {
+func (m *MockUseCase) CreateProduct(tenantID id.ID, extName, title, ctype, baseProductExtID string, durationDays int32, visibility entity.ProductVisibility, maxAttendees int32, format entity.ProductFormat, isAutoApprove bool) (id.ID, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateProduct", tenantID, extID, extName, title, ctype, baseProductExtID, durationDays, visibility, maxAttendees, format, isAutoApprove)
+	ret := m.ctrl.Call(m, "CreateProduct", tenantID, extName, title, ctype, baseProductExtID, durationDays, visibility, maxAttendees, format, isAutoApprove)
 	ret0, _ := ret[0].(id.ID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateProduct indicates an expected call of CreateProduct.
-func (mr *MockUseCaseMockRecorder) CreateProduct(tenantID, extID, extName, title, ctype, baseProductExtID, durationDays, visibility, maxAttendees, format, isAutoApprove interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) CreateProduct(tenantID, extName, title, ctype, baseProductExtID, durationDays, visibility, maxAttendees, format, isAutoApprove interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateProduct", reflect.TypeOf((*MockUseCase)(nil).CreateProduct), tenantID, extID, extName, title, ctype, baseProductExtID, durationDays, visibility, maxAttendees, format, isAutoApprove)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateProduct", reflect.TypeOf((*MockUseCase)(nil).CreateProduct), tenantID, extName, title, ctype, baseProductExtID, durationDays, visibility, maxAttendees, format, isAutoApprove)
 }
 
 // DeleteProduct mocks base method.
@@ -410,4 +440,19 @@ func (m *MockUseCase) UpdateProduct(e *entity.Product) error {
 func (mr *MockUseCaseMockRecorder) UpdateProduct(e interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProduct", reflect.TypeOf((*MockUseCase)(nil).UpdateProduct), e)
+}
+
+// UpsertProduct mocks base method.
+func (m *MockUseCase) UpsertProduct(e *entity.Product) (id.ID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpsertProduct", e)
+	ret0, _ := ret[0].(id.ID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpsertProduct indicates an expected call of UpsertProduct.
+func (mr *MockUseCaseMockRecorder) UpsertProduct(e interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertProduct", reflect.TypeOf((*MockUseCase)(nil).UpsertProduct), e)
 }

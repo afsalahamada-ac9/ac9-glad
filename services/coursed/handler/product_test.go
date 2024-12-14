@@ -146,7 +146,6 @@ func Test_createProduct(t *testing.T) {
 			gomock.Any(),
 			gomock.Any(),
 			gomock.Any(),
-			gomock.Any(),
 		).
 		Return(productID, nil)
 	h := createProduct(service)
@@ -189,17 +188,9 @@ func Test_createProduct(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusCreated, res.StatusCode)
 
-	var product *presenter.Product
+	var product *presenter.ProductResponse
 	json.NewDecoder(res.Body).Decode(&product)
 	assert.Equal(t, productID, product.ID)
-	assert.Equal(t, payload.ExtName, product.ExtName)
-	assert.Equal(t, payload.Title, product.Title)
-	assert.Equal(t, payload.CType, product.CType)
-	assert.Equal(t, payload.BaseProductExtID, product.BaseProductExtID)
-	assert.Equal(t, payload.DurationDays, product.DurationDays)
-	assert.Equal(t, payload.Visibility, product.Visibility)
-	assert.Equal(t, payload.MaxAttendees, product.MaxAttendees)
-	assert.Equal(t, payload.Format, product.Format)
 	assert.Equal(t, tenantAlice.String(), res.Header.Get(common.HttpHeaderTenantID))
 }
 
@@ -337,20 +328,6 @@ func Test_updateProduct(t *testing.T) {
 	r.ServeHTTP(rr, req)
 
 	assert.Equal(t, http.StatusOK, rr.Code)
-
-	var response presenter.Product
-	err = json.NewDecoder(rr.Body).Decode(&response)
-	assert.Nil(t, err)
-
-	// Verify the response contains the updated values
-	assert.Equal(t, id, response.ID)
-	assert.Equal(t, updatePayload.ExtName, response.ExtName)
-	assert.Equal(t, updatePayload.Title, response.Title)
-	assert.Equal(t, updatePayload.CType, response.CType)
-	assert.Equal(t, updatePayload.DurationDays, response.DurationDays)
-	assert.Equal(t, updatePayload.Visibility, response.Visibility)
-	assert.Equal(t, updatePayload.MaxAttendees, response.MaxAttendees)
-	assert.Equal(t, updatePayload.Format, response.Format)
 	assert.Equal(t, tenantAlice.String(), rr.Header().Get(common.HttpHeaderTenantID))
 }
 

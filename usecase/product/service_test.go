@@ -20,17 +20,17 @@ const (
 
 func newFixtureProduct() *entity.Product {
 	return &entity.Product{
-		ID:            productDefault,
-		TenantID:      tenantAlice,
-		ExtID:         aliceExtID,
-		ExtName:       "default1",
-		Title:         "Default Product 1",
-		CType:         "workshop",
-		Format:        entity.ProductFormatInPerson,
-		Visibility:    entity.ProductVisibilityUnlisted,
-		MaxAttendees:  20,
-		IsAutoApprove: true,
-		CreatedAt:     time.Now(),
+		ID:               productDefault,
+		TenantID:         tenantAlice,
+		ExtName:          "default1",
+		Title:            "Default Product 1",
+		CType:            "workshop",
+		BaseProductExtID: "P008",
+		Format:           entity.ProductFormatInPerson,
+		Visibility:       entity.ProductVisibilityUnlisted,
+		MaxAttendees:     20,
+		IsAutoApprove:    true,
+		CreatedAt:        time.Now(),
 	}
 }
 
@@ -40,7 +40,6 @@ func Test_CreateProduct(t *testing.T) {
 	tmpl := newFixtureProduct()
 	_, err := m.CreateProduct(
 		tmpl.TenantID,
-		tmpl.ExtID,
 		tmpl.ExtName,
 		tmpl.Title,
 		tmpl.CType,
@@ -63,11 +62,9 @@ func Test_SearchAndFind(t *testing.T) {
 	tmpl2 := newFixtureProduct()
 	tmpl2.ExtName = "default2"
 	tmpl2.Title = "Default Product 2"
-	tmpl2.ExtID = bobExtID
 
 	_, _ = m.CreateProduct(
 		tmpl1.TenantID,
-		tmpl1.ExtID,
 		tmpl1.ExtName,
 		tmpl1.Title,
 		tmpl1.CType,
@@ -81,7 +78,6 @@ func Test_SearchAndFind(t *testing.T) {
 
 	tID, _ := m.CreateProduct(
 		tmpl2.TenantID,
-		tmpl2.ExtID,
 		tmpl2.ExtName,
 		tmpl2.Title,
 		tmpl2.CType,
@@ -97,7 +93,6 @@ func Test_SearchAndFind(t *testing.T) {
 		res, err := m.SearchProducts(tmpl1.TenantID, "default1", 0, 0)
 		assert.Nil(t, err)
 		assert.Equal(t, 1, len(res))
-		assert.Equal(t, tmpl1.ExtID, res[0].ExtID)
 		assert.Equal(t, tmpl1.Format, res[0].Format)
 
 		// 'default' query value matches both product names
@@ -120,7 +115,6 @@ func Test_SearchAndFind(t *testing.T) {
 		saved, err := m.GetProduct(tID)
 		assert.Nil(t, err)
 		assert.Equal(t, tmpl2.TenantID, saved.TenantID)
-		assert.Equal(t, tmpl2.ExtID, saved.ExtID)
 		assert.Equal(t, tmpl2.Format, saved.Format)
 		assert.Equal(t, tmpl2.ExtName, saved.ExtName)
 		assert.Equal(t, tmpl2.Title, saved.Title)
@@ -133,7 +127,6 @@ func Test_UpdateProduct(t *testing.T) {
 	tmpl := newFixtureProduct()
 	id, err := m.CreateProduct(
 		tmpl.TenantID,
-		tmpl.ExtID,
 		tmpl.ExtName,
 		tmpl.Title,
 		tmpl.CType,
@@ -161,11 +154,9 @@ func TestDeleteProduct(t *testing.T) {
 
 	tmpl1 := newFixtureProduct()
 	tmpl2 := newFixtureProduct()
-	tmpl2.ExtID = bobExtID
 
 	id2, _ := m.CreateProduct(
 		tmpl2.TenantID,
-		tmpl2.ExtID,
 		tmpl2.ExtName,
 		tmpl2.Title,
 		tmpl2.CType,

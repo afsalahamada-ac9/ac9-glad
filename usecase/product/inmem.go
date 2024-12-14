@@ -148,6 +148,20 @@ func (r *inmem) GetCount(tenantID id.ID) (int, error) {
 	return count, nil
 }
 
+// Upsert upserts a product in memory
+func (r *inmem) Upsert(e *entity.Product) (id.ID, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
+	for _, product := range r.m {
+		if product.ExtID == e.ExtID {
+			e.ID = product.ID
+		}
+	}
+	r.m[e.ID] = e
+	return e.ID, nil
+}
+
 // Additional helper methods for testing
 func (r *inmem) Clean() {
 	r.mut.Lock()

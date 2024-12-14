@@ -65,22 +65,14 @@ func listProducts(service product.UseCase) http.Handler {
 			return
 		}
 
-		var toJ []*presenter.Product
+		var products []*presenter.Product
 		for _, d := range data {
-			toJ = append(toJ, &presenter.Product{
-				ID:               d.ID,
-				ExtName:          d.ExtName,
-				Title:            d.Title,
-				CType:            d.CType,
-				BaseProductExtID: d.BaseProductExtID,
-				DurationDays:     d.DurationDays,
-				Visibility:       d.Visibility,
-				MaxAttendees:     d.MaxAttendees,
-				Format:           d.Format,
-				IsAutoApprove:    d.IsAutoApprove,
-			})
+			product := &presenter.Product{}
+			product.FromEntityProduct(d)
+
+			products = append(products, product)
 		}
-		if err := json.NewEncoder(w).Encode(toJ); err != nil {
+		if err := json.NewEncoder(w).Encode(products); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte("Unable to encode product"))
 		}
@@ -90,18 +82,7 @@ func listProducts(service product.UseCase) http.Handler {
 func createProduct(service product.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error adding product"
-		var input struct {
-			ExtID            string                   `json:"extID"`
-			ExtName          string                   `json:"extName"`
-			Title            string                   `json:"title"`
-			CType            string                   `json:"ctype"`
-			BaseProductExtID string                   `json:"baseProductExtID"`
-			DurationDays     int32                    `json:"durationDays"`
-			Visibility       entity.ProductVisibility `json:"visibility"`
-			MaxAttendees     int32                    `json:"maxAttendees"`
-			Format           entity.ProductFormat     `json:"format"`
-			IsAutoApprove    bool                     `json:"isAutoApprove"`
-		}
+		var req presenter.ProductReq
 
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
 		tenantID, err := id.FromString(tenant)
@@ -111,7 +92,7 @@ func createProduct(service product.UseCase) http.Handler {
 			return
 		}
 
-		err = json.NewDecoder(r.Body).Decode(&input)
+		err = json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			log.Println(err.Error())
 			w.WriteHeader(http.StatusBadRequest)
@@ -119,18 +100,17 @@ func createProduct(service product.UseCase) http.Handler {
 			return
 		}
 
-		id, err := service.CreateProduct(
+		productID, err := service.CreateProduct(
 			tenantID,
-			input.ExtID,
-			input.ExtName,
-			input.Title,
-			input.CType,
-			input.BaseProductExtID,
-			input.DurationDays,
-			input.Visibility,
-			input.MaxAttendees,
-			input.Format,
-			input.IsAutoApprove,
+			req.ExtName,
+			req.Title,
+			req.CType,
+			req.BaseProductExtID,
+			req.DurationDays,
+			req.Visibility,
+			req.MaxAttendees,
+			req.Format,
+			req.IsAutoApprove,
 		)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -138,21 +118,13 @@ func createProduct(service product.UseCase) http.Handler {
 			return
 		}
 
-		toJ := &presenter.Product{
-			ID:               id,
-			ExtName:          input.ExtName,
-			Title:            input.Title,
-			CType:            input.CType,
-			BaseProductExtID: input.BaseProductExtID,
-			DurationDays:     input.DurationDays,
-			Visibility:       input.Visibility,
-			MaxAttendees:     input.MaxAttendees,
-			Format:           input.Format,
+		response := &presenter.ProductResponse{
+			ID: productID,
 		}
 
 		w.Header().Set(common.HttpHeaderTenantID, tenant)
 		w.WriteHeader(http.StatusCreated)
-		if err := json.NewEncoder(w).Encode(toJ); err != nil {
+		if err := json.NewEncoder(w).Encode(response); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage))
 			return
@@ -183,21 +155,11 @@ func getProduct(service product.UseCase) http.Handler {
 			return
 		}
 
-		toJ := &presenter.Product{
-			ID:               data.ID,
-			ExtName:          data.ExtName,
-			Title:            data.Title,
-			CType:            data.CType,
-			BaseProductExtID: data.BaseProductExtID,
-			DurationDays:     data.DurationDays,
-			Visibility:       data.Visibility,
-			MaxAttendees:     data.MaxAttendees,
-			Format:           data.Format,
-			IsAutoApprove:    data.IsAutoApprove,
-		}
+		response := &presenter.Product{}
+		response.FromEntityProduct(data)
 
 		w.Header().Set(common.HttpHeaderTenantID, data.TenantID.String())
-		if err := json.NewEncoder(w).Encode(toJ); err != nil {
+		if err := json.NewEncoder(w).Encode(response); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte("Unable to encode product"))
 		}
@@ -269,21 +231,49 @@ func updateProduct(service product.UseCase) http.Handler {
 			return
 		}
 
-		toJ := &presenter.Product{
-			ID:               input.ID,
-			ExtName:          input.ExtName,
-			Title:            input.Title,
-			CType:            input.CType,
-			BaseProductExtID: input.BaseProductExtID,
-			DurationDays:     input.DurationDays,
-			Visibility:       input.Visibility,
-			MaxAttendees:     input.MaxAttendees,
-			Format:           input.Format,
+		w.Header().Set(common.HttpHeaderTenantID, tenant)
+		w.WriteHeader(http.StatusOK)
+	})
+}
+
+func importProduct(service product.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		errorMessage := "Error importing product"
+
+		var input presenter.ProductFull
+		tenant := r.Header.Get(common.HttpHeaderTenantID)
+		_, err := id.FromString(tenant)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Missing tenant ID"))
+			return
+		}
+
+		err = json.NewDecoder(r.Body).Decode(&input)
+		if err != nil {
+			log.Println(err.Error())
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Unable to decode the data. " + err.Error()))
+			return
+		}
+
+		product := &entity.Product{}
+		input.ToEntity(product)
+
+		productID, err := service.UpsertProduct(product)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
+			return
+		}
+
+		response := &presenter.ProductResponse{
+			ID: productID,
 		}
 
 		w.Header().Set(common.HttpHeaderTenantID, tenant)
 		w.WriteHeader(http.StatusOK)
-		if err := json.NewEncoder(w).Encode(toJ); err != nil {
+		if err := json.NewEncoder(w).Encode(response); err != nil {
 			log.Println(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage))
@@ -301,6 +291,10 @@ func MakeProductHandlers(r *mux.Router, n negroni.Negroni, service product.UseCa
 	r.Handle("/v1/products", n.With(
 		negroni.Wrap(createProduct(service)),
 	)).Methods("POST", "OPTIONS").Name("createProduct")
+
+	r.Handle("/v1/products/import", n.With(
+		negroni.Wrap(importProduct(service)),
+	)).Methods("POST", "OPTIONS").Name("importProduct")
 
 	r.Handle("/v1/products/{id}", n.With(
 		negroni.Wrap(getProduct(service)),
