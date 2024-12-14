@@ -16,6 +16,7 @@ import (
 	"ac9/glad/pkg/common"
 	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
 	"ac9/glad/services/coursed/presenter"
 	"ac9/glad/usecase/product"
 
@@ -238,37 +239,42 @@ func updateProduct(service product.UseCase) http.Handler {
 
 func importProduct(service product.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		errorMessage := "Error importing product"
+		errorMessage := "Error importing products"
 
-		var input presenter.ProductFull
+		var iProducts []presenter.ProductFull
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
-		_, err := id.FromString(tenant)
+		tenantID, err := id.FromString(tenant)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("Missing tenant ID"))
 			return
 		}
 
-		err = json.NewDecoder(r.Body).Decode(&input)
+		err = json.NewDecoder(r.Body).Decode(&iProducts)
 		if err != nil {
-			log.Println(err.Error())
+			l.Log.Warnf("Unable to decode object. err=%v", err)
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("Unable to decode the data. " + err.Error()))
 			return
 		}
 
-		product := &entity.Product{}
-		input.ToEntity(product)
+		var response []*presenter.ProductImportResponse
+		for _, input := range iProducts {
+			product := &entity.Product{}
+			input.ToEntity(product)
+			product.TenantID = tenantID
 
-		productID, err := service.UpsertProduct(product)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
-			return
-		}
+			// TODO: optimize DB operations by doing multiple inserts simultaneously
+			productID, err := service.UpsertProduct(product)
+			if err != nil {
+				l.Log.Warnf("Unable to upsert product extID=%v, err=%v", product.ExtID, err)
+			}
 
-		response := &presenter.ProductResponse{
-			ID: productID,
+			response = append(response, &presenter.ProductImportResponse{
+				ID:      productID,
+				ExtID:   product.ExtID,
+				IsError: err != nil,
+			})
 		}
 
 		w.Header().Set(common.HttpHeaderTenantID, tenant)

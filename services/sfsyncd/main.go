@@ -16,6 +16,7 @@ import (
 	// Uber zap logging
 	"ac9/glad/pkg/logger"
 	"ac9/glad/services/sfsyncd/handler"
+	"ac9/glad/services/sfsyncd/usecase/sf_import"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
@@ -43,6 +44,9 @@ func main() {
 			log.Printf("Failed to sync logger: %v", err)
 		}
 	}()
+
+	importService := sf_import.NewService(
+		"http://" + util.GetStrEnvOrConfig("COURSED_ADDR", config.COURSED_ADDR))
 
 	metricService, err := metric.NewPrometheusService()
 	if err != nil {
@@ -77,8 +81,8 @@ func main() {
 	// info handler
 	util.MakeInfoHandlers(r, *n, "sfsyncd")
 
-	// test
-	handler.MakeTestHandlers(r, *n)
+	// import handler
+	handler.MakeProductHandlers(r, *n, importService)
 
 	logger := log.New(os.Stderr, "logger: ", log.Lshortfile)
 	srv := &http.Server{

@@ -300,7 +300,10 @@ func (r *ProductPGSQL) Upsert(e *entity.Product) (id.ID, error) {
 			WHERE product.updated_at < $14
 			RETURNING id
 		)
-		`)
+		SELECT id FROM upsert
+		UNION ALL
+		SELECT id FROM product WHERE ext_id = $3 AND NOT EXISTS (SELECT 1 FROM upsert);
+	`)
 	if err != nil {
 		l.Log.Warnf("err=%v", err)
 		return id.IDInvalid, err

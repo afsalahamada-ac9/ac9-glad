@@ -47,6 +47,12 @@ type ProductFull struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
+type ProductImportResponse struct {
+	ID      id.ID  `json:"id"`
+	ExtID   string `json:"extID"`
+	IsError bool   `json:"isError"`
+}
+
 // FromEntityProduct creates presenter product from entity
 func (p *Product) FromEntityProduct(e *entity.Product) error {
 	p.ID = e.ID

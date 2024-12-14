@@ -81,7 +81,7 @@ CREATE INDEX idx_tenant_country ON tenant(country);
 -- Base product (in Salesforce, it is Product) and Product sounds easier to understand.
 -- Other possible terminologies are primary product, variants, SKU, etc.
 CREATE TABLE IF NOT EXISTS product (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     -- Note: ext_id is salesforce id
     ext_id VARCHAR(32) NOT NULL UNIQUE,
     -- Note: Do not want to delete tenant if product exists
@@ -125,7 +125,7 @@ CREATE INDEX idx_product_title ON product(title);
 
 -- CENTER entity
 CREATE TABLE IF NOT EXISTS center (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     -- Note: ext_id is salesforce id
     ext_id VARCHAR(32) NOT NULL UNIQUE,
     -- Note: Do not want to delete tenant if center exists

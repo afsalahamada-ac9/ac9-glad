@@ -9,6 +9,7 @@ package entity
 import (
 	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
 	"time"
 )
 
@@ -86,11 +87,20 @@ func NewProduct(tenantID id.ID,
 
 // Validate validates the product fields
 func (p *Product) Validate() error {
-	if p.TenantID == 0 {
+	if p.TenantID == id.IDInvalid {
+		l.Log.Warnf("Invalid tenant id=%v, product extID=%v", p.TenantID, p.ExtID)
 		return glad.ErrInvalidEntity
 	}
 
-	if p.ExtName == "" || p.Title == "" || p.CType == "" || p.BaseProductExtID == "" {
+	if p.Title == "" || p.BaseProductExtID == "" {
+		// TODO: count the products with null title
+		l.Log.Warnf("Product extID=%v ctype=%v title=%v. Empty title and/or base product id",
+			p.ExtID, p.CType, p.Title)
+	}
+
+	if p.ExtName == "" || p.CType == "" {
+		l.Log.Warnf("Product extID=%v, extName=%v, ctype=%v",
+			p.ExtID, p.ExtName, p.CType)
 		return glad.ErrInvalidEntity
 	}
 
