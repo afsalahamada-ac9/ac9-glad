@@ -311,18 +311,18 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 }
 
 // CreateCenter mocks base method.
-func (m *MockUseCase) CreateCenter(tenantID id.ID, extID, extName, name string, mode entity.CenterMode, isEnabled bool) (id.ID, error) {
+func (m *MockUseCase) CreateCenter(tenantID id.ID, name string, mode entity.CenterMode, isEnabled bool) (id.ID, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateCenter", tenantID, extID, extName, name, mode, isEnabled)
+	ret := m.ctrl.Call(m, "CreateCenter", tenantID, name, mode, isEnabled)
 	ret0, _ := ret[0].(id.ID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateCenter indicates an expected call of CreateCenter.
-func (mr *MockUseCaseMockRecorder) CreateCenter(tenantID, extID, extName, name, mode, isEnabled interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) CreateCenter(tenantID, name, mode, isEnabled interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCenter", reflect.TypeOf((*MockUseCase)(nil).CreateCenter), tenantID, extID, extName, name, mode, isEnabled)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCenter", reflect.TypeOf((*MockUseCase)(nil).CreateCenter), tenantID, name, mode, isEnabled)
 }
 
 // DeleteCenter mocks base method.

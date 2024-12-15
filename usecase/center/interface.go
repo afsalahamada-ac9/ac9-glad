@@ -37,7 +37,7 @@ type UseCase interface {
 	GetCenter(id id.ID) (*entity.Center, error)
 	SearchCenters(tenantID id.ID, query string, page, limit int) ([]*entity.Center, error)
 	ListCenters(tenantID id.ID, page, limit int) ([]*entity.Center, error)
-	CreateCenter(tenantID id.ID, extID, extName, name string, mode entity.CenterMode, isEnabled bool) (id.ID, error)
+	CreateCenter(tenantID id.ID, name string, mode entity.CenterMode, isEnabled bool) (id.ID, error)
 	UpdateCenter(e *entity.Center) error
 	DeleteCenter(id id.ID) error
 	GetCount(id id.ID) int

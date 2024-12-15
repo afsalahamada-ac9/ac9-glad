@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS center (
     capacity INTEGER,
     mode center_mode DEFAULT 'in-person',
     webpage VARCHAR(255),
-    is_national_center BOOLEAN DEFAULT FALSE,
+    is_national BOOLEAN DEFAULT FALSE,
     is_enabled BOOLEAN,
 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

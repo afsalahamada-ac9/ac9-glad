@@ -15,6 +15,7 @@ import (
 	"ac9/glad/pkg/common"
 	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
 	"ac9/glad/usecase/center"
 
 	"ac9/glad/services/coursed/presenter"
@@ -32,7 +33,7 @@ import (
 func listCenters(service center.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error reading centers"
-		var data []*entity.Center
+		var centers []*entity.Center
 		var err error
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
 
@@ -51,12 +52,12 @@ func listCenters(service center.UseCase) http.Handler {
 
 		switch {
 		case search == "":
-			data, err = service.ListCenters(tenantID, page, limit)
+			centers, err = service.ListCenters(tenantID, page, limit)
 		default:
 			// TODO: search need to be reworked; need to add a count
 			// for search; also need to see how the caller generates
 			// the search query request
-			data, err = service.SearchCenters(tenantID, search, page, limit)
+			centers, err = service.SearchCenters(tenantID, search, page, limit)
 		}
 		w.Header().Set("Content-Type", "application/json")
 		if err != nil && err != glad.ErrNotFound {
@@ -68,21 +69,20 @@ func listCenters(service center.UseCase) http.Handler {
 		total := service.GetCount(tenantID)
 		w.Header().Set(common.HttpHeaderTotalCount, strconv.Itoa(total))
 
-		if data == nil {
+		if centers == nil {
 			w.WriteHeader(http.StatusNotFound)
 			_, _ = w.Write([]byte(errorMessage))
 			return
 		}
-		var toJ []*presenter.Center
-		for _, d := range data {
-			toJ = append(toJ, &presenter.Center{
-				ID:      d.ID,
-				Name:    d.Name,
-				Mode:    d.Mode,
-				ExtName: d.ExtName,
-			})
+		var responses []*presenter.Center
+		for _, center := range centers {
+			resp := &presenter.Center{}
+			resp.FromEntityCenter(center)
+			l.Log.Debugf("Entity center=%v, Center=%v", center, resp)
+
+			responses = append(responses, resp)
 		}
-		if err := json.NewEncoder(w).Encode(toJ); err != nil {
+		if err := json.NewEncoder(w).Encode(responses); err != nil {
 			w.Header().Set(common.HttpHeaderTenantID, tenant)
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte("Unable to encode center"))
@@ -94,8 +94,6 @@ func createCenter(service center.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error adding center"
 		var input struct {
-			ExtID     string            `json:"extID"`
-			ExtName   string            `json:"extName"`
 			Name      string            `json:"name"`
 			Mode      entity.CenterMode `json:"mode"`
 			IsEnabled bool              `json:"isEnabled"`
@@ -117,10 +115,8 @@ func createCenter(service center.UseCase) http.Handler {
 			return
 		}
 
-		id, err := service.CreateCenter(
+		centerID, err := service.CreateCenter(
 			tenantID,
-			input.ExtID,
-			input.ExtName,
 			input.Name,
 			input.Mode,
 			input.IsEnabled)
@@ -129,15 +125,13 @@ func createCenter(service center.UseCase) http.Handler {
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
 		}
-		toJ := &presenter.Center{
-			ID:   id,
-			Name: input.Name,
-			Mode: input.Mode,
+		resp := &presenter.CenterResponse{
+			ID: centerID,
 		}
 
 		w.Header().Set(common.HttpHeaderTenantID, tenant)
 		w.WriteHeader(http.StatusCreated)
-		if err := json.NewEncoder(w).Encode(toJ); err != nil {
+		if err := json.NewEncoder(w).Encode(resp); err != nil {
 			log.Println(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage))
@@ -150,34 +144,30 @@ func getCenter(service center.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error reading center"
 		vars := mux.Vars(r)
-		id, err := id.FromString(vars["id"])
+		centerID, err := id.FromString(vars["id"])
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
-		data, err := service.GetCenter(id)
+		center, err := service.GetCenter(centerID)
 		if err != nil && err != glad.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
 		}
 
-		if data == nil {
+		if center == nil {
 			w.WriteHeader(http.StatusNotFound)
-			_, _ = w.Write([]byte("Empty data returned"))
+			_, _ = w.Write([]byte("Center not found"))
 			return
 		}
 
-		toJ := &presenter.Center{
-			ID:      data.ID,
-			Name:    data.Name,
-			Mode:    data.Mode,
-			ExtName: data.ExtName,
-		}
+		resp := &presenter.Center{}
+		resp.FromEntityCenter(center)
 
-		w.Header().Set(common.HttpHeaderTenantID, data.TenantID.String())
-		if err := json.NewEncoder(w).Encode(toJ); err != nil {
+		w.Header().Set(common.HttpHeaderTenantID, center.TenantID.String())
+		if err := json.NewEncoder(w).Encode(resp); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte("Unable to encode center"))
 		}
@@ -249,20 +239,8 @@ func updateCenter(service center.UseCase) http.Handler {
 			return
 		}
 
-		toJ := &presenter.Center{
-			ID:   input.ID,
-			Name: input.Name,
-			Mode: input.Mode,
-		}
-
 		w.Header().Set(common.HttpHeaderTenantID, tenant)
 		w.WriteHeader(http.StatusOK)
-		if err := json.NewEncoder(w).Encode(toJ); err != nil {
-			log.Println(err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(errorMessage))
-			return
-		}
 	})
 }
 

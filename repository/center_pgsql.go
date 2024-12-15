@@ -29,24 +29,22 @@ func NewCenterPGSQL(db *sql.DB) *CenterPGSQL {
 // Create creates a center
 func (r *CenterPGSQL) Create(e *entity.Center) (id.ID, error) {
 	stmt, err := r.db.Prepare(`
-		INSERT INTO center (id, tenant_id, ext_id, ext_name, name, address, geo_location,
-		 capacity, mode, webpage, is_national_center, is_enabled, created_at)
-		VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`)
+		INSERT INTO center (id, tenant_id, name, address, geo_location,
+		 capacity, mode, webpage, is_national, is_enabled, created_at)
+		VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`)
 	if err != nil {
 		return e.ID, err
 	}
 	_, err = stmt.Exec(
 		e.ID,
 		e.TenantID,
-		e.ExtID,
-		e.ExtName,
 		e.Name,
 		e.Address,     // TODO: to be converted into json
 		e.GeoLocation, // TODO: to be converted into json
 		e.Capacity,
 		e.Mode,
 		e.WebPage,
-		e.IsNationalCenter,
+		e.IsNational,
 		e.IsEnabled,
 		time.Now().Format("2006-01-02"),
 	)
@@ -64,23 +62,21 @@ func (r *CenterPGSQL) Create(e *entity.Center) (id.ID, error) {
 // Not all fields are required for v1
 func (r *CenterPGSQL) Get(id id.ID) (*entity.Center, error) {
 	stmt, err := r.db.Prepare(`
-		SELECT id, tenant_id, ext_id, ext_name, name, mode, created_at FROM center WHERE id = $1;`)
+		SELECT id, tenant_id, name, ext_name, mode, created_at FROM center WHERE id = $1;`)
 	if err != nil {
 		return nil, err
 	}
 	var c entity.Center
-	var extID sql.NullString
 	var extName sql.NullString
 	var name sql.NullString
 	var mode sql.NullString
-	err = stmt.QueryRow(id).Scan(&c.ID, &c.TenantID, &extID, &extName, &name, &mode, &c.CreatedAt)
+	err = stmt.QueryRow(id).Scan(&c.ID, &c.TenantID, &name, &extName, &mode, &c.CreatedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 		return nil, err
 	}
-	c.ExtID = extID.String
 	c.Name = name.String
 	c.ExtName = extName.String
 	c.Mode = entity.CenterMode(mode.String)
@@ -105,7 +101,7 @@ func (r *CenterPGSQL) Search(tenantID id.ID,
 	q string, page, limit int,
 ) ([]*entity.Center, error) {
 	query := `
-		SELECT id, tenant_id, ext_id, ext_name, name, capacity, mode, created_at
+		SELECT id, tenant_id, name, ext_name, capacity, mode, created_at
 		FROM center
 		WHERE is_enabled = TRUE
 			AND tenant_id = $1
@@ -147,7 +143,7 @@ func (r *CenterPGSQL) Search(tenantID id.ID,
 // List lists centers
 func (r *CenterPGSQL) List(tenantID id.ID, page, limit int) ([]*entity.Center, error) {
 	query := `
-		SELECT id, tenant_id, ext_id, ext_name, name, capacity, mode, created_at
+		SELECT id, tenant_id, name, ext_name, capacity, mode, created_at
 		FROM center
 		WHERE is_enabled = TRUE AND tenant_id = $1
 	`
@@ -214,15 +210,14 @@ func (r *CenterPGSQL) scanRows(rows *sql.Rows) ([]*entity.Center, error) {
 	var centers []*entity.Center
 	for rows.Next() {
 		var center entity.Center
-		var ext_id, ext_name, name sql.NullString
+		var ext_name, name sql.NullString
 		var capacity sql.NullInt32
 
 		err := rows.Scan(
 			&center.ID,
 			&center.TenantID,
-			&ext_id,
-			&ext_name,
 			&name,
+			&ext_name,
 			&capacity,
 			&center.Mode,
 			&center.CreatedAt,
@@ -232,9 +227,8 @@ func (r *CenterPGSQL) scanRows(rows *sql.Rows) ([]*entity.Center, error) {
 			return nil, err
 		}
 
-		center.ExtID = ext_id.String
-		center.ExtName = ext_name.String
 		center.Name = name.String
+		center.ExtName = ext_name.String
 		center.Capacity = capacity.Int32
 
 		centers = append(centers, &center)

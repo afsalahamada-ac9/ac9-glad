@@ -9,6 +9,7 @@ package entity
 import (
 	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
 	"time"
 )
 
@@ -51,9 +52,9 @@ type Center struct {
 	Capacity int32
 	Mode     CenterMode
 
-	WebPage          string
-	IsNationalCenter bool
-	IsEnabled        bool
+	WebPage    string
+	IsNational bool
+	IsEnabled  bool
 
 	// meta data
 	CreatedAt time.Time
@@ -114,31 +115,27 @@ func (g *CenterGeoLocation) Validate() error {
 
 // NewCenter create a new center
 func NewCenter(tenantID id.ID,
-	extID string,
-	extName string,
 	name string,
 	address CenterAddress,
 	geoLocation CenterGeoLocation,
 	capacity int32,
 	mode CenterMode,
 	webPage string,
-	isNationalCenter bool,
+	isNational bool,
 	isEnabled bool,
 ) (*Center, error) {
 	c := &Center{
-		ID:               id.New(),
-		TenantID:         tenantID,
-		ExtID:            extID,
-		ExtName:          extName,
-		Name:             name,
-		Address:          address,
-		GeoLocation:      geoLocation,
-		Capacity:         capacity,
-		Mode:             mode,
-		WebPage:          webPage,
-		IsNationalCenter: isNationalCenter,
-		IsEnabled:        isEnabled,
-		CreatedAt:        time.Now(),
+		ID:          id.New(),
+		TenantID:    tenantID,
+		Name:        name,
+		Address:     address,
+		GeoLocation: geoLocation,
+		Capacity:    capacity,
+		Mode:        mode,
+		WebPage:     webPage,
+		IsNational:  isNational,
+		IsEnabled:   isEnabled,
+		CreatedAt:   time.Now(),
 	}
 	err := c.Validate()
 	if err != nil {
@@ -147,10 +144,22 @@ func NewCenter(tenantID id.ID,
 	return c, nil
 }
 
-// Validate validate center
 func (c *Center) Validate() error {
-	if c.ExtID == "" || c.Name == "" {
+	if c.TenantID == id.IDInvalid {
+		l.Log.Warnf("Invalid tenant id=%v, center extID=%v", c.TenantID, c.ExtID)
 		return glad.ErrInvalidEntity
 	}
+
+	// When external id is present then name must be present
+	if c.ExtID != "" && c.ExtName == "" {
+		l.Log.Warnf("Center extID=%v has empty extName", c.ExtID)
+		return glad.ErrInvalidEntity
+	}
+
+	if c.Name == "" {
+		l.Log.Warnf("Center extID=%v has empty name", c.ExtID)
+		return glad.ErrInvalidEntity
+	}
+
 	return nil
 }
