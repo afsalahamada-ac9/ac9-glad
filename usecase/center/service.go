@@ -122,8 +122,7 @@ func (s *Service) UpsertCenter(c *entity.Center) (id.ID, error) {
 
 	}
 
-	// Note: Salesforce data is not cleaner. Transform the data as a
-	// workaround
+	// Note: Salesforce data is not cleaner. Transform the data as a workaround
 	c.Transform()
 
 	err := c.Validate()

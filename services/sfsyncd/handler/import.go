@@ -101,7 +101,7 @@ func importCenters(service sf_import.UseCase) http.Handler {
 		for _, sfCenter := range sfCenters {
 			center := &glad.Center{}
 			sfCenter.Value.ToGladCenter(center)
-			l.Log.Warnf("sfCenter=%#v, center=%#v", sfCenter.Value, center)
+			l.Log.Debugf("sfCenter=%#v, center=%#v", sfCenter.Value, center)
 			gCenters = append(gCenters, center)
 		}
 
@@ -131,12 +131,8 @@ func importCenters(service sf_import.UseCase) http.Handler {
 }
 
 // MakeImportHandlers make import handlers
-func MakeProductHandlers(r *mux.Router, n negroni.Negroni, service sf_import.UseCase) {
+func MakeImportHandlers(r *mux.Router, n negroni.Negroni, service sf_import.UseCase) {
 	r.Handle("/v1/import/salesforce/products", n.With(
-		negroni.Wrap(importProducts(service)),
-	)).Methods(http.MethodPost, http.MethodOptions).Name("importProducts")
-
-	r.Handle("/v1/import/salesforce/product", n.With(
 		negroni.Wrap(importProducts(service)),
 	)).Methods(http.MethodPost, http.MethodOptions).Name("importProducts")
 

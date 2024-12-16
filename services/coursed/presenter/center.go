@@ -58,35 +58,21 @@ type CenterImportResponse struct {
 
 // FromEntityCenter populates center struct from center entity
 func (c *Center) FromEntityCenter(e *entity.Center) error {
-
 	deepcopier.Copy(e).To(c)
-
-	// c.ID = e.ID
-	// c.ExtName = e.ExtName
-	// c.Name = e.Name
-	// c.Address1 = e.Address.Street1
-	// c.Address2 = e.Address.Street2
-	// c.City = e.Address.City
-	// c.State = e.Address.State
-	// c.PostalCode = e.Address.Zip
-	// c.Country = e.Address.Country
-	// c.Latitude = e.GeoLocation.Lat
-	// c.Longitude = e.GeoLocation.Long
-	// c.MaxCapacity = e.MaxCapacity
-	// c.Mode = e.Mode
-	// c.IsNational = e.IsNationalCenter
-	// c.IsEnabled = e.IsEnabled
-	// c.CenterURL = e.CenterURL
 	return nil
 }
 
+// GladCenterToEntity populates entity center from glad entity
 func GladCenterToEntity(gp glad.Center, e *entity.Center) error {
 	deepcopier.Copy(gp).To(e)
 	deepcopier.Copy(gp.Address).To(&e.Address)
 	e.Mode = entity.CenterMode(gp.Mode)
+
+	// deepcopier is unable to copy these, as the names are different
+	// Note: Can add field tags and try it
 	e.GeoLocation.Lat = gp.GeoLocation.Latitude
 	e.GeoLocation.Long = gp.GeoLocation.Longitude
 
-	l.Log.Infof("Center=%v, entity.center=%v", gp, e)
+	l.Log.Debugf("Center=%v, entity.center=%v", gp, e)
 	return nil
 }

@@ -82,7 +82,7 @@ func main() {
 	util.MakeInfoHandlers(r, *n, "sfsyncd")
 
 	// import handler
-	handler.MakeProductHandlers(r, *n, importService)
+	handler.MakeImportHandlers(r, *n, importService)
 
 	logger := log.New(os.Stderr, "logger: ", log.Lshortfile)
 	srv := &http.Server{

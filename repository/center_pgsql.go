@@ -273,14 +273,14 @@ func (r *CenterPGSQL) Upsert(e *entity.Center) (id.ID, error) {
 		l.Log.Warnf("err=%v", err)
 		return id.IDInvalid, err
 	}
-	l.Log.Warnf("Address=%#v jsonAddress=%v", e.Address, jsonAddress)
+	l.Log.Debugf("Address=%#v jsonAddress=%v", e.Address, jsonAddress)
 
 	jsonGeoLocation, err := json.Marshal(e.GeoLocation)
 	if err != nil {
 		l.Log.Warnf("err=%v", err)
 		return id.IDInvalid, err
 	}
-	l.Log.Warnf("GeoLocation=%#v jsonGeoLocation=%v", e.GeoLocation, jsonGeoLocation)
+	l.Log.Debugf("GeoLocation=%#v jsonGeoLocation=%v", e.GeoLocation, jsonGeoLocation)
 
 	var centerID id.ID
 	err = stmt.QueryRow(
