@@ -31,7 +31,7 @@ func (s *Service) ImportProduct(tenantID id.ID,
 	p []*glad.Product,
 ) ([]*glad.ProductResponse, error) {
 	path := s.basePath + "/v1/products/import"
-	l.Log.Infof("path=%v", path)
+	l.Log.Debugf("path=%v", path)
 
 	jsonProducts, err := json.Marshal(p)
 	if err != nil {
@@ -78,7 +78,7 @@ func (s *Service) ImportCenter(tenantID id.ID,
 	p []*glad.Center,
 ) ([]*glad.CenterResponse, error) {
 	path := s.basePath + "/v1/centers/import"
-	l.Log.Infof("path=%v", path)
+	l.Log.Debugf("path=%v", path)
 
 	jsonCenters, err := json.Marshal(p)
 	if err != nil {
@@ -114,6 +114,53 @@ func (s *Service) ImportCenter(tenantID id.ID,
 	err = json.Unmarshal(resp.Body(), &gResponse)
 	if err != nil {
 		l.Log.Warnf("Unable to decode import center response. err=%v", err)
+		return nil, err
+	}
+
+	return gResponse, err
+}
+
+// ImportAccount imports accounts
+func (s *Service) ImportAccount(tenantID id.ID,
+	p []*glad.Account,
+) ([]*glad.AccountResponse, error) {
+	path := s.basePath + "/v1/accounts/import"
+	l.Log.Debugf("path=%v", path)
+
+	jsonAccounts, err := json.Marshal(p)
+	if err != nil {
+		l.Log.Errorf("err=%v", err)
+		return nil, err
+	}
+
+	req := fasthttp.AcquireRequest()
+	defer fasthttp.ReleaseRequest(req)
+
+	req.SetRequestURI(path)
+	req.Header.SetMethod(http.MethodPost)
+	req.Header.SetContentType("application/json")
+	req.Header.Set(common.HttpHeaderTenantID, tenantID.String())
+	req.SetBody([]byte(jsonAccounts))
+
+	resp := fasthttp.AcquireResponse()
+	defer fasthttp.ReleaseResponse(resp)
+
+	err = s.c.Do(req, resp)
+	if err != nil {
+		l.Log.Errorf("err=%v", err)
+		return nil, err
+	}
+
+	if resp.StatusCode() != fasthttp.StatusOK {
+		l.Log.Warnf("Unable to import account. resp=%v, status=%v",
+			string(resp.Body()), resp.StatusCode())
+		return nil, err
+	}
+
+	var gResponse []*glad.AccountResponse
+	err = json.Unmarshal(resp.Body(), &gResponse)
+	if err != nil {
+		l.Log.Warnf("Unable to decode import account response. err=%v", err)
 		return nil, err
 	}
 

@@ -80,7 +80,7 @@ func importCenters(service sf_import.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error importing centers"
 
-		var sfCenters []presenter.CenterWrapper
+		var sfCenters []presenter.Center
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
 		tenantID, err := id.FromString(tenant)
 		if err != nil {
@@ -100,8 +100,8 @@ func importCenters(service sf_import.UseCase) http.Handler {
 		var gCenters []*glad.Center
 		for _, sfCenter := range sfCenters {
 			center := &glad.Center{}
-			sfCenter.Value.ToGladCenter(center)
-			l.Log.Debugf("sfCenter=%#v, center=%#v", sfCenter.Value, center)
+			sfCenter.ToGladCenter(center)
+			l.Log.Debugf("sfCenter=%#v, center=%#v", sfCenter, center)
 			gCenters = append(gCenters, center)
 		}
 
@@ -130,6 +130,60 @@ func importCenters(service sf_import.UseCase) http.Handler {
 	})
 }
 
+func importAccounts(service sf_import.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		errorMessage := "Error importing accounts"
+
+		var sfAccounts []presenter.Account
+		tenant := r.Header.Get(common.HttpHeaderTenantID)
+		tenantID, err := id.FromString(tenant)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Missing tenant ID"))
+			return
+		}
+
+		err = json.NewDecoder(r.Body).Decode(&sfAccounts)
+		if err != nil {
+			log.Println(err.Error())
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Unable to decode the data. " + err.Error()))
+			return
+		}
+
+		var gAccounts []*glad.Account
+		for _, sfAccount := range sfAccounts {
+			account := &glad.Account{}
+			sfAccount.ToGladAccount(account)
+			l.Log.Debugf("sfAccount=%#v, account=%#v", sfAccount, account)
+			gAccounts = append(gAccounts, account)
+		}
+
+		gResponses, err := service.ImportAccount(tenantID, gAccounts)
+		if err != nil {
+			l.Log.Warnf("Unable to import accounts tenantID=%v, err=%v", tenantID, err)
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte("Unable to import accounts. " + err.Error()))
+		}
+
+		var sfResponses []*presenter.AccountResponse
+		for _, gResponse := range gResponses {
+			resp := &presenter.AccountResponse{}
+			deepcopier.Copy(gResponse).To(resp)
+			sfResponses = append(sfResponses, resp)
+		}
+
+		w.Header().Set(common.HttpHeaderTenantID, tenant)
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(sfResponses); err != nil {
+			log.Println(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage))
+			return
+		}
+	})
+}
+
 // MakeImportHandlers make import handlers
 func MakeImportHandlers(r *mux.Router, n negroni.Negroni, service sf_import.UseCase) {
 	r.Handle("/v1/import/salesforce/products", n.With(
@@ -139,5 +193,9 @@ func MakeImportHandlers(r *mux.Router, n negroni.Negroni, service sf_import.UseC
 	r.Handle("/v1/import/salesforce/centers", n.With(
 		negroni.Wrap(importCenters(service)),
 	)).Methods(http.MethodPost, http.MethodOptions).Name("importCenters")
+
+	r.Handle("/v1/import/salesforce/accounts", n.With(
+		negroni.Wrap(importAccounts(service)),
+	)).Methods(http.MethodPost, http.MethodOptions).Name("importAccounts")
 
 }

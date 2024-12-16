@@ -55,6 +55,7 @@ CREATE TYPE account_type AS ENUM ('assistant-teacher'
 CREATE TYPE account_status AS ENUM ('active'
     , 'inactive'
     , 'disabled'
+    , 'failed'
     );
 CREATE TYPE center_mode AS ENUM ('in-person'
     , 'online'

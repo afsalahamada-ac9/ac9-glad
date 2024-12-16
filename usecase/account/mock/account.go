@@ -204,6 +204,21 @@ func (mr *MockWriterMockRecorder) Update(e interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockWriter)(nil).Update), e)
 }
 
+// Upsert mocks base method.
+func (m *MockWriter) Upsert(e *entity.Account) (id.ID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Upsert", e)
+	ret0, _ := ret[0].(id.ID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Upsert indicates an expected call of Upsert.
+func (mr *MockWriterMockRecorder) Upsert(e interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Upsert", reflect.TypeOf((*MockWriter)(nil).Upsert), e)
+}
+
 // MockRepository is a mock of Repository interface.
 type MockRepository struct {
 	ctrl     *gomock.Controller
@@ -373,6 +388,21 @@ func (mr *MockRepositoryMockRecorder) Update(e interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockRepository)(nil).Update), e)
 }
 
+// Upsert mocks base method.
+func (m *MockRepository) Upsert(e *entity.Account) (id.ID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Upsert", e)
+	ret0, _ := ret[0].(id.ID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Upsert indicates an expected call of Upsert.
+func (mr *MockRepositoryMockRecorder) Upsert(e interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Upsert", reflect.TypeOf((*MockRepository)(nil).Upsert), e)
+}
+
 // MockUseCase is a mock of UseCase interface.
 type MockUseCase struct {
 	ctrl     *gomock.Controller
@@ -397,17 +427,17 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 }
 
 // CreateAccount mocks base method.
-func (m *MockUseCase) CreateAccount(tenantID id.ID, extID, cognitoID, username, first_name, last_name, phone, email string, at entity.AccountType, as entity.AccountStatus) error {
+func (m *MockUseCase) CreateAccount(tenantID id.ID, cognitoID, username, first_name, last_name, phone, email string, at entity.AccountType, as entity.AccountStatus) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateAccount", tenantID, extID, cognitoID, username, first_name, last_name, phone, email, at, as)
+	ret := m.ctrl.Call(m, "CreateAccount", tenantID, cognitoID, username, first_name, last_name, phone, email, at, as)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateAccount indicates an expected call of CreateAccount.
-func (mr *MockUseCaseMockRecorder) CreateAccount(tenantID, extID, cognitoID, username, first_name, last_name, phone, email, at, as interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) CreateAccount(tenantID, cognitoID, username, first_name, last_name, phone, email, at, as interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAccount", reflect.TypeOf((*MockUseCase)(nil).CreateAccount), tenantID, extID, cognitoID, username, first_name, last_name, phone, email, at, as)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAccount", reflect.TypeOf((*MockUseCase)(nil).CreateAccount), tenantID, cognitoID, username, first_name, last_name, phone, email, at, as)
 }
 
 // DeleteAccount mocks base method.
@@ -539,4 +569,19 @@ func (m *MockUseCase) UpdateAccount(e *entity.Account) error {
 func (mr *MockUseCaseMockRecorder) UpdateAccount(e interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAccount", reflect.TypeOf((*MockUseCase)(nil).UpdateAccount), e)
+}
+
+// UpsertAccount mocks base method.
+func (m *MockUseCase) UpsertAccount(e *entity.Account) (id.ID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpsertAccount", e)
+	ret0, _ := ret[0].(id.ID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpsertAccount indicates an expected call of UpsertAccount.
+func (mr *MockUseCaseMockRecorder) UpsertAccount(e interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertAccount", reflect.TypeOf((*MockUseCase)(nil).UpsertAccount), e)
 }

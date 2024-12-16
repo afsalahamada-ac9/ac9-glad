@@ -256,7 +256,7 @@ func (r *CenterPGSQL) Upsert(e *entity.Center) (id.ID, error) {
 				SET tenant_id = $2, ext_name = $4, name = $5, address = $6, geo_location = $7,
 					capacity = $8, mode = $9, web_page = $10,
 					is_national = $11,  is_enabled = $12, created_at = $13, updated_at = $14
-			WHERE center.updated_at < $14
+			WHERE center.updated_at <= $14
 			RETURNING id
 		)
 		SELECT id FROM upsert

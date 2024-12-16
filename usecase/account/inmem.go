@@ -11,29 +11,37 @@ import (
 	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	"strings"
+	"sync"
 )
 
 // inmem in memory repo
 type inmem struct {
-	m map[id.ID]*entity.Account
+	m   map[id.ID]*entity.Account
+	mut *sync.RWMutex
 }
 
 // newInmem create new repository
 func newInmem() *inmem {
-	var m = map[id.ID]*entity.Account{}
 	return &inmem{
-		m: m,
+		m:   map[id.ID]*entity.Account{},
+		mut: &sync.RWMutex{},
 	}
 }
 
 // Create an account
 func (r *inmem) Create(e *entity.Account) error {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
 	r.m[e.ID] = e
 	return nil
 }
 
 // Get retrieves an account
 func (r *inmem) Get(id id.ID) (*entity.Account, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
 	for _, j := range r.m {
 		if j.ID == id {
 			return r.m[j.ID], nil
@@ -45,6 +53,9 @@ func (r *inmem) Get(id id.ID) (*entity.Account, error) {
 
 // GetByName retrieves an account using username
 func (r *inmem) GetByName(tenantID id.ID, username string) (*entity.Account, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
 	for _, j := range r.m {
 		if j.Username == username && j.TenantID == tenantID {
 			return r.m[j.ID], nil
@@ -56,23 +67,23 @@ func (r *inmem) GetByName(tenantID id.ID, username string) (*entity.Account, err
 
 // Update an account
 func (r *inmem) Update(e *entity.Account) error {
-	account := r.m[e.ID]
-	if account == nil {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
+	_, ok := r.m[e.ID]
+	if !ok {
 		return glad.ErrNotFound
 	}
 
-	account.ExtID = e.ExtID
-	account.Username = e.Username
-	account.Type = e.Type
-	account.CreatedAt = e.CreatedAt
-	account.UpdatedAt = e.UpdatedAt
-
-	r.m[e.ID] = account
+	r.m[e.ID] = e
 	return nil
 }
 
 // List list accounts
 func (r *inmem) List(tenantID id.ID, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
 	var d []*entity.Account
 	for _, j := range r.m {
 		// TenantID check removed
@@ -94,9 +105,12 @@ func (r *inmem) List(tenantID id.ID, page, limit int, at entity.AccountType) ([]
 
 // Delete deletes an account
 func (r *inmem) Delete(id id.ID) error {
-	account, err := r.Get(id)
-	if err != nil {
-		return err
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
+	account := r.m[id]
+	if account == nil {
+		return glad.ErrNotFound
 	}
 
 	r.m[account.ID] = nil
@@ -111,6 +125,9 @@ func (r *inmem) DeleteByName(tenantID id.ID, username string) error {
 		return err
 	}
 
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
 	r.m[account.ID] = nil
 	delete(r.m, account.ID)
 	return nil
@@ -118,6 +135,9 @@ func (r *inmem) DeleteByName(tenantID id.ID, username string) error {
 
 // GetCount gets total accounts for a given tenant
 func (r *inmem) GetCount(tenantID id.ID) (int, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
 	count := 0
 	for _, j := range r.m {
 		if j.TenantID == tenantID {
@@ -129,6 +149,9 @@ func (r *inmem) GetCount(tenantID id.ID) (int, error) {
 
 // Search search accounts
 func (r *inmem) Search(tenantID id.ID, query string, page, limit int, at entity.AccountType) ([]*entity.Account, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
 	var d []*entity.Account
 	for _, j := range r.m {
 		if j.TenantID == tenantID &&
@@ -153,6 +176,9 @@ func (r *inmem) Search(tenantID id.ID, query string, page, limit int, at entity.
 
 // GetByEmail retrieves an account using email
 func (r *inmem) GetByEmail(tenantID id.ID, email string) (*entity.Account, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
 	for _, j := range r.m {
 		if j.Email == email && j.TenantID == tenantID {
 			return r.m[j.ID], nil
@@ -160,4 +186,18 @@ func (r *inmem) GetByEmail(tenantID id.ID, email string) (*entity.Account, error
 	}
 
 	return nil, glad.ErrNotFound
+}
+
+// Upsert upserts an account in memory
+func (r *inmem) Upsert(e *entity.Account) (id.ID, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
+	for _, account := range r.m {
+		if account.ExtID == e.ExtID {
+			e.ID = account.ID
+		}
+	}
+	r.m[e.ID] = e
+	return e.ID, nil
 }

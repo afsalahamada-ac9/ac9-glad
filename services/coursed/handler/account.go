@@ -306,16 +306,8 @@ func updateAccount(service account.UseCase) http.Handler {
 		vars := mux.Vars(r)
 		username := vars["username"]
 
-		var input entity.Account
-		// tenant := r.Header.Get(common.HttpHeaderTenantID)
-		// tenantID, err := id.FromString(tenant)
-		// if err != nil {
-		// 	w.WriteHeader(http.StatusBadRequest)
-		// 	_, _ = w.Write([]byte("Missing tenant ID"))
-		// 	return
-		// }
-
-		err := json.NewDecoder(r.Body).Decode(&input)
+		var account entity.Account
+		err := json.NewDecoder(r.Body).Decode(&account)
 		if err != nil {
 			log.Println(err.Error())
 			w.WriteHeader(http.StatusBadRequest)
@@ -323,27 +315,62 @@ func updateAccount(service account.UseCase) http.Handler {
 			return
 		}
 
-		input.Username = username
-		err = service.UpdateAccount(&input)
+		account.Username = username
+		err = service.UpdateAccount(&account)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
 		}
 
-		toJ := &presenter.Account{
-			ID:        input.ID,
-			Username:  input.Username,
-			FirstName: input.FirstName,
-			LastName:  input.LastName,
-			Phone:     input.Phone,
-			Email:     input.Email,
-			Type:      input.Type,
+		w.Header().Set(common.HttpHeaderTenantID, r.Header.Get(common.HttpHeaderTenantID))
+		w.WriteHeader(http.StatusOK)
+	})
+}
+
+func importAccount(service account.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		errorMessage := "Error importing accounts"
+
+		var iAccounts []glad.Account
+		tenant := r.Header.Get(common.HttpHeaderTenantID)
+		tenantID, err := id.FromString(tenant)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Missing tenant ID"))
+			return
 		}
 
-		w.Header().Set(common.HttpHeaderTenantID, "")
+		err = json.NewDecoder(r.Body).Decode(&iAccounts)
+		if err != nil {
+			l.Log.Warnf("Unable to decode object. err=%v", err)
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Unable to decode the data. " + err.Error()))
+			return
+		}
+
+		var response []*presenter.AccountImportResponse
+		for _, input := range iAccounts {
+			account := &entity.Account{}
+			presenter.GladAccountToEntity(input, account)
+			account.TenantID = tenantID
+
+			// TODO: optimize DB operations by doing multiple inserts simultaneously
+			accountID, err := service.UpsertAccount(account)
+			if err != nil {
+				l.Log.Warnf("Unable to upsert account extID=%v, err=%v", account.ExtID, err)
+			}
+
+			response = append(response, &presenter.AccountImportResponse{
+				ID:      accountID,
+				ExtID:   account.ExtID,
+				IsError: err != nil,
+			})
+		}
+
+		w.Header().Set(common.HttpHeaderTenantID, tenant)
 		w.WriteHeader(http.StatusOK)
-		if err := json.NewEncoder(w).Encode(toJ); err != nil {
+		if err := json.NewEncoder(w).Encode(response); err != nil {
 			log.Println(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage))
@@ -356,29 +383,33 @@ func updateAccount(service account.UseCase) http.Handler {
 func MakeAccountHandlers(r *mux.Router, n negroni.Negroni, service account.UseCase) {
 	r.Handle("/v1/accounts", n.With(
 		negroni.Wrap(listAccounts(service)),
-	)).Methods("GET", "OPTIONS").Name("listAccounts")
+	)).Methods(http.MethodGet, http.MethodOptions).Name("listAccounts")
 
 	// r.Handle("/v1/accounts", n.With(
 	// 	negroni.Wrap(createAccount(service)),
-	// )).Methods("POST", "OPTIONS").Name("createAccount")
+	// )).Methods(http.MethodPost, http.MethodOptions).Name("createAccount")
+
+	r.Handle("/v1/accounts/import", n.With(
+		negroni.Wrap(importAccount(service)),
+	)).Methods(http.MethodPost, http.MethodOptions).Name("importAccount")
 
 	r.Handle("/v1/accounts/{id}", n.With(
 		negroni.Wrap(getAccount(service)),
-	)).Methods("GET", "OPTIONS").Name("getAccount")
+	)).Methods(http.MethodGet, http.MethodOptions).Name("getAccount")
 
 	r.Handle("/v1/accounts/{id}", n.With(
 		negroni.Wrap(deleteAccount(service)),
-	)).Methods("DELETE", "OPTIONS").Name("deleteAccount")
+	)).Methods(http.MethodDelete, http.MethodOptions).Name("deleteAccount")
 
 	r.Handle("/v1/accounts/username/{username}", n.With(
 		negroni.Wrap(getAccountByUsername(service)),
-	)).Methods("GET", "OPTIONS").Name("getAccountByUsername")
+	)).Methods(http.MethodGet, http.MethodOptions).Name("getAccountByUsername")
 
 	r.Handle("/v1/accounts/username/{username}", n.With(
 		negroni.Wrap(deleteAccountByUsername(service)),
-	)).Methods("DELETE", "OPTIONS").Name("deleteAccountByUsername")
+	)).Methods(http.MethodDelete, http.MethodOptions).Name("deleteAccountByUsername")
 
 	r.Handle("/v1/accounts/{id}", n.With(
 		negroni.Wrap(updateAccount(service)),
-	)).Methods("PUT", "OPTIONS").Name("updateAccount")
+	)).Methods(http.MethodPut, http.MethodOptions).Name("updateAccount")
 }

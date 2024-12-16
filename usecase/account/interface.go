@@ -27,6 +27,7 @@ type Writer interface {
 	Update(e *entity.Account) error
 	Delete(accountID id.ID) error
 	DeleteByName(tenantID id.ID, username string) error
+	Upsert(e *entity.Account) (id.ID, error)
 }
 
 // Repository interface
@@ -39,7 +40,6 @@ type Repository interface {
 type UseCase interface {
 	CreateAccount(
 		tenantID id.ID,
-		extID string,
 		cognitoID string,
 		username string,
 		first_name string,
@@ -58,4 +58,5 @@ type UseCase interface {
 	GetCount(tenantId id.ID) int
 	SearchAccounts(tenantID id.ID, query string, page, limit int, at entity.AccountType) ([]*entity.Account, error)
 	GetAccountByEmail(tenantID id.ID, email string) (*entity.Account, error)
+	UpsertAccount(e *entity.Account) (id.ID, error)
 }

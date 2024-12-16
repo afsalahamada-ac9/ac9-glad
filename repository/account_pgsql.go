@@ -11,7 +11,9 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/common"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
 )
 
 // AccountPGSQL mysql repo
@@ -329,4 +331,58 @@ func (r *AccountPGSQL) GetByEmail(tenantID id.ID, email string) (*entity.Account
 	t.CognitoID = cognito_id.String
 	t.Type = entity.AccountType(acct_type.String)
 	return &t, nil
+}
+
+// Upsert inserts or updates the account and returns the id
+func (r *AccountPGSQL) Upsert(e *entity.Account) (id.ID, error) {
+	l.Log.Debugf("Upsert: Account=%#v", e)
+	stmt, err := r.db.Prepare(`
+		WITH upsert AS (
+			INSERT INTO account (
+				id, tenant_id, ext_id, cognito_id, username, first_name, last_name,
+				phone, email, type, status, full_photo_url,
+				created_at, updated_at
+			)
+			VALUES
+				($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+			ON CONFLICT (ext_id)
+			DO UPDATE
+				SET tenant_id = $2, cognito_id = $4, username = $5, first_name = $6, last_name = $7,
+					phone = $8, email = $9, type = $10, status = $11, full_photo_url = $12,
+					created_at = $13, updated_at = $14
+			WHERE account.updated_at <= $14
+			RETURNING id
+		)
+		SELECT id FROM upsert
+		UNION ALL
+		SELECT id FROM account WHERE ext_id = $3 AND NOT EXISTS (SELECT 1 FROM upsert);
+	`)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return id.IDInvalid, err
+	}
+
+	var accountID id.ID
+	err = stmt.QueryRow(
+		e.ID,
+		e.TenantID,
+		e.ExtID,
+		e.CognitoID,
+		e.Username,
+		e.FirstName,
+		e.LastName,
+		e.Phone,
+		e.Email,
+		string(e.Type),
+		string(e.Status),
+		e.FullPhotoURL,
+		e.CreatedAt.Format(common.DBFormatDateTimeMS),
+		e.UpdatedAt.Format(common.DBFormatDateTimeMS),
+	).Scan(&accountID)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return id.IDInvalid, err
+	}
+
+	return accountID, nil
 }

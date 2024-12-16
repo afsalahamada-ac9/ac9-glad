@@ -297,7 +297,7 @@ func (r *ProductPGSQL) Upsert(e *entity.Product) (id.ID, error) {
 				SET tenant_id = $2, ext_name = $4, title = $5, ctype = $6, base_product_ext_id = $7,
 					duration_days = $8, visibility = $9, max_attendees = $10,
 					format = $11,  is_auto_approve = $12, created_at = $13, updated_at = $14
-			WHERE product.updated_at < $14
+			WHERE product.updated_at <= $14
 			RETURNING id
 		)
 		SELECT id FROM upsert

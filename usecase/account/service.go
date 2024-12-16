@@ -12,6 +12,7 @@ import (
 	"ac9/glad/entity"
 	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
 )
 
 // Service account usecase
@@ -29,7 +30,6 @@ func NewService(r Repository) *Service {
 // CreateAccount creates an account
 func (s *Service) CreateAccount(
 	tenantID id.ID,
-	extID string,
 	cognitoID string,
 	username string,
 	first_name string,
@@ -40,7 +40,6 @@ func (s *Service) CreateAccount(
 	as entity.AccountStatus,
 ) error {
 	account, err := entity.NewAccount(tenantID,
-		extID,
 		cognitoID,
 		username,
 		first_name,
@@ -163,4 +162,23 @@ func (s *Service) GetAccountByEmail(tenantID id.ID, email string) (*entity.Accou
 	}
 
 	return account, nil
+}
+
+// UpsertAccount upserts an account
+func (s *Service) UpsertAccount(a *entity.Account) (id.ID, error) {
+	if a.ID == id.IDInvalid {
+		// assign id and during update id should not be overwritten
+		a.ID = id.New()
+
+	}
+
+	// Note: Salesforce data is not cleaner. Transform the data as a workaround
+	a.Transform()
+
+	err := a.Validate()
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return id.IDInvalid, err
+	}
+	return s.repo.Upsert(a)
 }

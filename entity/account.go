@@ -9,6 +9,8 @@ package entity
 import (
 	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
+	"strings"
 	"time"
 )
 
@@ -21,6 +23,10 @@ const (
 	AccountOrganizer        AccountType = "organizer"
 	AccountMember           AccountType = "member"
 	AccountUser             AccountType = "user"
+	AccountCoOrdinator      AccountType = "coordinator"
+	AccountVolunteer        AccountType = "volunteer"
+	AccountStudent          AccountType = "student"
+	AccountOther            AccountType = "other"
 	// Add new types here
 )
 
@@ -41,22 +47,22 @@ type Account struct {
 	ExtID     string
 	CognitoID string
 
-	Username  string
-	FirstName string
-	LastName  string
-	Phone     string
-	Email     string
-	Type      AccountType
-	Status    AccountStatus
+	Username     string
+	FirstName    string
+	LastName     string
+	Phone        string
+	Email        string
+	Type         AccountType
+	Status       AccountStatus
+	FullPhotoURL string
 
 	// meta data
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
-// NewAccount create a new account
+// NewAccount creates a new account
 func NewAccount(tenantID id.ID,
-	extID string,
 	cognitoID string,
 	username string,
 	first_name string,
@@ -69,7 +75,6 @@ func NewAccount(tenantID id.ID,
 	t := &Account{
 		ID:        id.New(),
 		TenantID:  tenantID,
-		ExtID:     extID,
 		CognitoID: cognitoID,
 		Username:  username,
 		FirstName: first_name,
@@ -87,9 +92,34 @@ func NewAccount(tenantID id.ID,
 	return t, nil
 }
 
+// Transform fixes the data issues, if any
+func (a *Account) Transform() {
+	l.Log.Debugf("Before transform, account=%#v", a)
+	a.Type = AccountType(strings.ToLower(string(a.Type)))
+
+	// TODO: Need to figure out what these (other, co-ord) types are
+	switch string(a.Type) {
+	case "co-ord":
+		a.Type = AccountCoOrdinator
+	case "assistant teacher":
+		a.Type = AccountAssistantTeacher
+	default:
+		// TODO: Add a metric to keep track of this
+		a.Type = AccountUser
+	}
+
+	a.Status = AccountStatus(strings.ToLower(string(a.Status)))
+	l.Log.Debugf("After transform, account=%#v", a)
+}
+
 // Validate validate account
-func (t *Account) Validate() error {
-	if t.Username == "" {
+func (a *Account) Validate() error {
+	if a.TenantID == id.IDInvalid {
+		l.Log.Warnf("Invalid tenant id=%v, product extID=%v", a.TenantID, a.ExtID)
+		return glad.ErrInvalidEntity
+	}
+	if a.Username == "" {
+		l.Log.Warnf("Account extID=%v, has empty username", a.ExtID)
 		return glad.ErrInvalidEntity
 	}
 

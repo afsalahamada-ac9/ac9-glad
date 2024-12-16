@@ -56,7 +56,6 @@ func Test_Create(t *testing.T) {
 	m := NewService(repo)
 	account := newFixtureAccount()
 	err := m.CreateAccount(tenantAlice,
-		account.ExtID,
 		account.CognitoID,
 		account.Username,
 		account.FirstName,
@@ -81,7 +80,6 @@ func Test_SearchAndFind(t *testing.T) {
 	account2.CognitoID = alice2CognitoID
 
 	_ = m.CreateAccount(tenantAlice,
-		account1.ExtID,
 		account1.CognitoID,
 		account1.Username,
 		account1.FirstName,
@@ -92,7 +90,6 @@ func Test_SearchAndFind(t *testing.T) {
 		account1.Status,
 	)
 	_ = m.CreateAccount(tenantAlice,
-		account2.ExtID,
 		account2.CognitoID,
 		account2.Username,
 		account2.FirstName,
@@ -112,7 +109,6 @@ func Test_SearchAndFind(t *testing.T) {
 	t.Run("get", func(t *testing.T) {
 		saved, err := m.GetAccountByName(tenantAlice, account1.Username)
 		assert.Nil(t, err)
-		assert.Equal(t, account1.ExtID, saved.ExtID)
 		assert.Equal(t, account1.Type, saved.Type)
 		assert.Equal(t, account1.Username, saved.Username)
 	})
@@ -125,7 +121,6 @@ func Test_Update(t *testing.T) {
 	m := NewService(repo)
 	account := newFixtureAccount()
 	err := m.CreateAccount(tenantAlice,
-		account.ExtID,
 		account.CognitoID,
 		account.Username,
 		account.FirstName,
@@ -160,7 +155,6 @@ func TestDelete(t *testing.T) {
 	account2.Username = accountUsername2Alice
 	account2.ExtID = alice2ExtID
 	_ = m.CreateAccount(tenantAlice,
-		account2.ExtID,
 		account2.CognitoID,
 		account2.Username,
 		account2.FirstName,

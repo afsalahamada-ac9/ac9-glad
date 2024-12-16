@@ -21,10 +21,7 @@ type Client interface {
 
 // UseCase defines the interface for product business logic
 type UseCase interface {
-	ImportProduct(tenantID id.ID,
-		p []*glad.Product,
-	) ([]*glad.ProductResponse, error)
-	ImportCenter(tenantID id.ID,
-		p []*glad.Center,
-	) ([]*glad.CenterResponse, error)
+	ImportProduct(tenantID id.ID, p []*glad.Product) ([]*glad.ProductResponse, error)
+	ImportCenter(tenantID id.ID, p []*glad.Center) ([]*glad.CenterResponse, error)
+	ImportAccount(tenantID id.ID, p []*glad.Account) ([]*glad.AccountResponse, error)
 }

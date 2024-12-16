@@ -83,6 +83,6 @@ func GladProductToEntity(gp glad.Product, e *entity.Product) error {
 	e.Visibility = entity.ProductVisibility(gp.Visibility)
 	e.Format = entity.ProductFormat(gp.Format)
 
-	l.Log.Infof("Product=%#v, entity.product=%#v", gp, e)
+	l.Log.Debugf("Product=%#v, entity.product=%#v", gp, e)
 	return nil
 }

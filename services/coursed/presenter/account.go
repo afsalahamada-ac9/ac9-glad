@@ -8,7 +8,9 @@ package presenter
 
 import (
 	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
 
 	"github.com/ulule/deepcopier"
 )
@@ -26,9 +28,25 @@ type Account struct {
 	CognitoID string             `json:"cognitoID,omitempty"`
 }
 
+type AccountImportResponse struct {
+	ID      id.ID  `json:"id"`
+	ExtID   string `json:"extID"`
+	IsError bool   `json:"isError"`
+}
+
 // FromAccountEntity creates account response from account entity
 func (c *Account) FromAccountEntity(e *entity.Account) error {
-
 	deepcopier.Copy(e).To(c)
+	return nil
+}
+
+// GladAccountToEntity populates account entity from glad account object
+func GladAccountToEntity(ga glad.Account, e *entity.Account) error {
+	deepcopier.Copy(ga).To(e)
+
+	e.Type = entity.AccountType(ga.Type)
+	e.Status = entity.AccountStatus(ga.Status)
+
+	l.Log.Infof("Account=%#v, entity.account=%#v", ga, e)
 	return nil
 }

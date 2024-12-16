@@ -145,7 +145,7 @@ func NewCenter(tenantID id.ID,
 	return c, nil
 }
 
-// Transform fixes the data issues in Salesforce
+// Transform fixes the data issues, if any
 func (c *Center) Transform() {
 	if c.Name == "" {
 		// TODO: count the centers with empty name (center name in SF)

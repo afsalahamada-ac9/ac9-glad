@@ -1,3 +1,9 @@
+/*
+ * Copyright 2024 AboveCloud9.AI Products and Services Private Limited
+ * All rights reserved.
+ * This code may not be used, copied, modified, or distributed without explicit permission.
+ */
+
 package presenter
 
 import (
@@ -6,12 +12,6 @@ import (
 
 	"github.com/ulule/deepcopier"
 )
-
-type CenterWrapper struct {
-	Object    string `json:"object"`
-	Operation string `json:"operation"`
-	Value     Center `json:"value"`
-}
 
 type Center struct {
 	ExtID       string    `json:"Id"`
