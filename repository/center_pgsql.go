@@ -8,10 +8,13 @@ package repository
 
 import (
 	"database/sql"
+	"encoding/json"
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/common"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
 )
 
 // CenterPGSQL mysql repo
@@ -30,7 +33,7 @@ func NewCenterPGSQL(db *sql.DB) *CenterPGSQL {
 func (r *CenterPGSQL) Create(e *entity.Center) (id.ID, error) {
 	stmt, err := r.db.Prepare(`
 		INSERT INTO center (id, tenant_id, name, address, geo_location,
-		 capacity, mode, webpage, is_national, is_enabled, created_at)
+		 capacity, mode, web_page, is_national, is_enabled, created_at)
 		VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`)
 	if err != nil {
 		return e.ID, err
@@ -235,4 +238,71 @@ func (r *CenterPGSQL) scanRows(rows *sql.Rows) ([]*entity.Center, error) {
 
 	}
 	return centers, nil
+}
+
+// Upsert inserts or updates the center and returns the id
+func (r *CenterPGSQL) Upsert(e *entity.Center) (id.ID, error) {
+	stmt, err := r.db.Prepare(`
+		WITH upsert AS (
+			INSERT INTO center (
+				id, tenant_id, ext_id, ext_name, name, address,
+				geo_location, capacity, mode, web_page,
+				is_national, is_enabled, created_at, updated_at
+			)
+			VALUES
+				($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+			ON CONFLICT (ext_id)
+			DO UPDATE
+				SET tenant_id = $2, ext_name = $4, name = $5, address = $6, geo_location = $7,
+					capacity = $8, mode = $9, web_page = $10,
+					is_national = $11,  is_enabled = $12, created_at = $13, updated_at = $14
+			WHERE center.updated_at < $14
+			RETURNING id
+		)
+		SELECT id FROM upsert
+		UNION ALL
+		SELECT id FROM center WHERE ext_id = $3 AND NOT EXISTS (SELECT 1 FROM upsert);
+	`)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return id.IDInvalid, err
+	}
+
+	jsonAddress, err := json.Marshal(e.Address)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return id.IDInvalid, err
+	}
+	l.Log.Warnf("Address=%#v jsonAddress=%v", e.Address, jsonAddress)
+
+	jsonGeoLocation, err := json.Marshal(e.GeoLocation)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return id.IDInvalid, err
+	}
+	l.Log.Warnf("GeoLocation=%#v jsonGeoLocation=%v", e.GeoLocation, jsonGeoLocation)
+
+	var centerID id.ID
+	err = stmt.QueryRow(
+		e.ID,
+		e.TenantID,
+		e.ExtID,
+		e.ExtName,
+		e.Name,
+		string(jsonAddress),
+		string(jsonGeoLocation),
+		e.Capacity,
+		string(e.Mode),
+		e.WebPage,
+		e.IsNational,
+		e.IsEnabled,
+		e.CreatedAt.Format(common.DBFormatDateTimeMS),
+		e.UpdatedAt.Format(common.DBFormatDateTimeMS),
+	).Scan(&centerID)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return id.IDInvalid, err
+	}
+
+	return centerID, nil
 }

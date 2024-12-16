@@ -8,8 +8,9 @@ package presenter
 
 import (
 	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
-	"time"
+	l "ac9/glad/pkg/logger"
 
 	"github.com/ulule/deepcopier"
 )
@@ -49,14 +50,6 @@ type Center struct {
 	CenterResponse
 }
 
-type CenterFull struct {
-	ExtID string `json:"extID"`
-	CenterReq
-	CenterResponse
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-}
-
 type CenterImportResponse struct {
 	ID      id.ID  `json:"id"`
 	ExtID   string `json:"extID"`
@@ -84,5 +77,16 @@ func (c *Center) FromEntityCenter(e *entity.Center) error {
 	// c.IsNational = e.IsNationalCenter
 	// c.IsEnabled = e.IsEnabled
 	// c.CenterURL = e.CenterURL
+	return nil
+}
+
+func GladCenterToEntity(gp glad.Center, e *entity.Center) error {
+	deepcopier.Copy(gp).To(e)
+	deepcopier.Copy(gp.Address).To(&e.Address)
+	e.Mode = entity.CenterMode(gp.Mode)
+	e.GeoLocation.Lat = gp.GeoLocation.Latitude
+	e.GeoLocation.Long = gp.GeoLocation.Longitude
+
+	l.Log.Infof("Center=%v, entity.center=%v", gp, e)
 	return nil
 }

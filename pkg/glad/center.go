@@ -6,12 +6,12 @@ import (
 
 // Note: Ideally these should be proto files and we should use grpc between services
 type CenterAddress struct {
-	Street1    string `json:"street1"`
-	Street2    string `json:"street2"`
-	City       string `json:"city"`
-	State      string `json:"state"`
-	PostalCode string `json:"zip"`
-	Country    string `json:"country"`
+	Street1 string `json:"street1" deepcopier:"field:Address1"`
+	Street2 string `json:"street2"`
+	City    string `json:"city"`
+	State   string `json:"state"`
+	Zip     string `json:"zip"`
+	Country string `json:"country"`
 }
 
 type CenterGeoLocation struct {

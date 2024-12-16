@@ -57,9 +57,6 @@ func (s *Service) ImportProduct(tenantID id.ID,
 		return nil, err
 	}
 
-	// Print response body
-	println(string(resp.Body()))
-
 	if resp.StatusCode() != fasthttp.StatusOK {
 		l.Log.Warnf("Unable to import product. resp=%v, status=%v",
 			string(resp.Body()), resp.StatusCode())
@@ -69,7 +66,54 @@ func (s *Service) ImportProduct(tenantID id.ID,
 	var gResponse []*glad.ProductResponse
 	err = json.Unmarshal(resp.Body(), &gResponse)
 	if err != nil {
-		l.Log.Warnf("Unable to decode import response. err=%v", err)
+		l.Log.Warnf("Unable to decode import product response. err=%v", err)
+		return nil, err
+	}
+
+	return gResponse, err
+}
+
+// ImportCenter imports centers
+func (s *Service) ImportCenter(tenantID id.ID,
+	p []*glad.Center,
+) ([]*glad.CenterResponse, error) {
+	path := s.basePath + "/v1/centers/import"
+	l.Log.Infof("path=%v", path)
+
+	jsonCenters, err := json.Marshal(p)
+	if err != nil {
+		l.Log.Errorf("err=%v", err)
+		return nil, err
+	}
+
+	req := fasthttp.AcquireRequest()
+	defer fasthttp.ReleaseRequest(req)
+
+	req.SetRequestURI(path)
+	req.Header.SetMethod(http.MethodPost)
+	req.Header.SetContentType("application/json")
+	req.Header.Set(common.HttpHeaderTenantID, tenantID.String())
+	req.SetBody([]byte(jsonCenters))
+
+	resp := fasthttp.AcquireResponse()
+	defer fasthttp.ReleaseResponse(resp)
+
+	err = s.c.Do(req, resp)
+	if err != nil {
+		l.Log.Errorf("err=%v", err)
+		return nil, err
+	}
+
+	if resp.StatusCode() != fasthttp.StatusOK {
+		l.Log.Warnf("Unable to import center. resp=%v, status=%v",
+			string(resp.Body()), resp.StatusCode())
+		return nil, err
+	}
+
+	var gResponse []*glad.CenterResponse
+	err = json.Unmarshal(resp.Body(), &gResponse)
+	if err != nil {
+		l.Log.Warnf("Unable to decode import center response. err=%v", err)
 		return nil, err
 	}
 

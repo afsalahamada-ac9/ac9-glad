@@ -8,8 +8,8 @@ package presenter
 
 import (
 	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
-	"time"
 
 	l "ac9/glad/pkg/logger"
 
@@ -39,13 +39,13 @@ type Product struct {
 	ProductResponse
 }
 
-type ProductFull struct {
-	ExtID string `json:"extID"`
-	ProductReq
-	ProductResponse
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-}
+// type ProductFull struct {
+// 	ExtID string `json:"extID"`
+// 	ProductReq
+// 	ProductResponse
+// 	CreatedAt time.Time `json:"createdAt"`
+// 	UpdatedAt time.Time `json:"updatedAt"`
+// }
 
 type ProductImportResponse struct {
 	ID      id.ID  `json:"id"`
@@ -69,8 +69,20 @@ func (p *Product) FromEntityProduct(e *entity.Product) error {
 	return nil
 }
 
-func (pf ProductFull) ToEntity(e *entity.Product) error {
+// ToEntity populates product entity from presenter product object
+func (pf Product) ToEntity(e *entity.Product) error {
 	deepcopier.Copy(pf).To(e)
 	l.Log.Infof("Product full=%v, product=%v", pf, e)
+	return nil
+}
+
+// GladProductToEntity populates product entity from glad product object
+func GladProductToEntity(gp glad.Product, e *entity.Product) error {
+	deepcopier.Copy(gp).To(e)
+
+	e.Visibility = entity.ProductVisibility(gp.Visibility)
+	e.Format = entity.ProductFormat(gp.Format)
+
+	l.Log.Infof("Product=%#v, entity.product=%#v", gp, e)
 	return nil
 }

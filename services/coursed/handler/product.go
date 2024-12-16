@@ -241,7 +241,7 @@ func importProduct(service product.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error importing products"
 
-		var iProducts []presenter.ProductFull
+		var iProducts []glad.Product
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
 		tenantID, err := id.FromString(tenant)
 		if err != nil {
@@ -261,7 +261,7 @@ func importProduct(service product.UseCase) http.Handler {
 		var response []*presenter.ProductImportResponse
 		for _, input := range iProducts {
 			product := &entity.Product{}
-			input.ToEntity(product)
+			presenter.GladProductToEntity(input, product)
 			product.TenantID = tenantID
 
 			// TODO: optimize DB operations by doing multiple inserts simultaneously

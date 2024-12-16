@@ -31,7 +31,7 @@ func NewCoursePGSQL(db *sql.DB) *CoursePGSQL {
 
 // Insert creates a course
 func (r *CoursePGSQL) Create(e *entity.Course) (id.ID, error) {
-	addressJSON, err := json.Marshal(e.Address)
+	jsonAddress, err := json.Marshal(e.Address)
 	if err != nil {
 		return e.ID, err
 	}
@@ -55,7 +55,7 @@ func (r *CoursePGSQL) Create(e *entity.Course) (id.ID, error) {
 		e.Name,
 		e.Notes,
 		e.Timezone,
-		string(addressJSON),
+		string(jsonAddress),
 		e.Status,
 		e.Mode,
 		e.MaxAttendees,
@@ -84,9 +84,9 @@ func (r *CoursePGSQL) Get(id id.ID) (*entity.Course, error) {
 	}
 	var c entity.Course
 	var ext_id sql.NullString
-	var name, notes, timezone, address_json, status, mode sql.NullString
+	var name, notes, timezone, jsonAddress, status, mode sql.NullString
 	err = stmt.QueryRow(id).Scan(&c.ID, &c.TenantID, &ext_id, &c.CenterID, &c.ProductID, &name, &notes, &timezone,
-		&address_json, &status, &mode, &c.MaxAttendees, &c.NumAttendees, &c.CreatedAt)
+		&jsonAddress, &status, &mode, &c.MaxAttendees, &c.NumAttendees, &c.CreatedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -94,8 +94,8 @@ func (r *CoursePGSQL) Get(id id.ID) (*entity.Course, error) {
 		return nil, err
 	}
 
-	if address_json.Valid && address_json.String != "" {
-		err = json.Unmarshal([]byte(address_json.String), &c.Address)
+	if jsonAddress.Valid && jsonAddress.String != "" {
+		err = json.Unmarshal([]byte(jsonAddress.String), &c.Address)
 		if err != nil {
 			return nil, err
 		}
@@ -114,7 +114,7 @@ func (r *CoursePGSQL) Get(id id.ID) (*entity.Course, error) {
 // Update updates a course
 func (r *CoursePGSQL) Update(e *entity.Course) error {
 	e.UpdatedAt = time.Now()
-	addressJSON, err := json.Marshal(e.Address)
+	jsonAddress, err := json.Marshal(e.Address)
 	if err != nil {
 		return err
 	}
@@ -125,7 +125,7 @@ func (r *CoursePGSQL) Update(e *entity.Course) error {
 			updated_at = $10, product_id = $11
 		WHERE id = $12;
 		`,
-		e.CenterID, e.Name, e.Notes, e.Timezone, string(addressJSON), (e.Status), (e.Mode),
+		e.CenterID, e.Name, e.Notes, e.Timezone, string(jsonAddress), (e.Status), (e.Mode),
 		e.MaxAttendees, e.NumAttendees, e.UpdatedAt.Format("2006-01-02"), e.ProductID,
 		e.ID)
 	if err != nil {
@@ -361,7 +361,7 @@ func (r *CoursePGSQL) scanRows(rows *sql.Rows) ([]*entity.Course, error) {
 	var courses []*entity.Course
 	for rows.Next() {
 		var course entity.Course
-		var ext_id, name, notes, timezone, address_json, status, mode sql.NullString
+		var ext_id, name, notes, timezone, jsonAddress, status, mode sql.NullString
 		err := rows.Scan(
 			&course.ID,
 			&course.TenantID,
@@ -371,7 +371,7 @@ func (r *CoursePGSQL) scanRows(rows *sql.Rows) ([]*entity.Course, error) {
 			&name,
 			&notes,
 			&timezone,
-			&address_json,
+			&jsonAddress,
 			&status,
 			&mode,
 			&course.MaxAttendees,
@@ -390,8 +390,8 @@ func (r *CoursePGSQL) scanRows(rows *sql.Rows) ([]*entity.Course, error) {
 		course.Status = entity.CourseStatus(status.String)
 		course.Mode = entity.CourseMode(mode.String)
 
-		if address_json.Valid && address_json.String != "" {
-			err = json.Unmarshal([]byte(address_json.String), &course.Address)
+		if jsonAddress.Valid && jsonAddress.String != "" {
+			err = json.Unmarshal([]byte(jsonAddress.String), &course.Address)
 			if err != nil {
 				l.Log.Warnf("err=%v", err)
 				return nil, err

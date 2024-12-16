@@ -19,6 +19,7 @@ type CenterMode string
 const (
 	CenterInPerson CenterMode = "in-person"
 	CenterOnline   CenterMode = "online"
+	CenterNotSet   CenterMode = "not-set"
 	// Add new types here
 )
 
@@ -142,6 +143,19 @@ func NewCenter(tenantID id.ID,
 		return nil, glad.ErrInvalidEntity
 	}
 	return c, nil
+}
+
+// Transform fixes the data issues in Salesforce
+func (c *Center) Transform() {
+	if c.Name == "" {
+		// TODO: count the centers with empty name (center name in SF)
+		c.Name = c.ExtName
+	}
+
+	if c.Mode == "" {
+		// TODO: count the centers with empty mode (center mode in SF)
+		c.Mode = CenterNotSet
+	}
 }
 
 func (c *Center) Validate() error {

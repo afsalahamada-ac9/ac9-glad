@@ -8,6 +8,7 @@ package center
 
 import (
 	"strings"
+	"sync"
 
 	"ac9/glad/entity"
 	"ac9/glad/pkg/glad"
@@ -16,25 +17,33 @@ import (
 
 // inmem in memory repo
 type inmem struct {
-	m map[id.ID]*entity.Center
+	m   map[id.ID]*entity.Center
+	mut *sync.RWMutex
 }
 
 // newInmem create new repository
 func newInmem() *inmem {
 	var m = map[id.ID]*entity.Center{}
 	return &inmem{
-		m: m,
+		m:   m,
+		mut: &sync.RWMutex{},
 	}
 }
 
 // Create a center
 func (r *inmem) Create(e *entity.Center) (id.ID, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
 	r.m[e.ID] = e
 	return e.ID, nil
 }
 
 // Get a center
 func (r *inmem) Get(id id.ID) (*entity.Center, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
 	if r.m[id] == nil {
 		return nil, glad.ErrNotFound
 	}
@@ -43,10 +52,14 @@ func (r *inmem) Get(id id.ID) (*entity.Center, error) {
 
 // Update a center
 func (r *inmem) Update(e *entity.Center) error {
-	_, err := r.Get(e.ID)
-	if err != nil {
-		return err
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
+	_, ok := r.m[e.ID]
+	if !ok {
+		return glad.ErrNotFound
 	}
+
 	r.m[e.ID] = e
 	return nil
 }
@@ -56,6 +69,9 @@ func (r *inmem) Search(tenantID id.ID,
 	query string,
 	page, limit int,
 ) ([]*entity.Center, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
 	var centers []*entity.Center
 	for _, j := range r.m {
 		if j.TenantID == tenantID &&
@@ -82,6 +98,9 @@ func (r *inmem) Search(tenantID id.ID,
 
 // List centers
 func (r *inmem) List(tenantID id.ID, page, limit int) ([]*entity.Center, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
 	var centers []*entity.Center
 	for _, j := range r.m {
 		if j.TenantID == tenantID {
@@ -106,6 +125,9 @@ func (r *inmem) List(tenantID id.ID, page, limit int) ([]*entity.Center, error) 
 
 // Delete a center
 func (r *inmem) Delete(id id.ID) error {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
 	if r.m[id] == nil {
 		return glad.ErrNotFound
 	}
@@ -123,4 +145,18 @@ func (r *inmem) GetCount(tenantID id.ID) (int, error) {
 		}
 	}
 	return count, nil
+}
+
+// Upsert upserts a center in memory
+func (r *inmem) Upsert(e *entity.Center) (id.ID, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
+	for _, center := range r.m {
+		if center.ExtID == e.ExtID {
+			e.ID = center.ID
+		}
+	}
+	r.m[e.ID] = e
+	return e.ID, nil
 }

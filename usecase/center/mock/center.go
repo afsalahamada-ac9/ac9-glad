@@ -161,6 +161,21 @@ func (mr *MockWriterMockRecorder) Update(e interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockWriter)(nil).Update), e)
 }
 
+// Upsert mocks base method.
+func (m *MockWriter) Upsert(e *entity.Center) (id.ID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Upsert", e)
+	ret0, _ := ret[0].(id.ID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Upsert indicates an expected call of Upsert.
+func (mr *MockWriterMockRecorder) Upsert(e interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Upsert", reflect.TypeOf((*MockWriter)(nil).Upsert), e)
+}
+
 // MockRepository is a mock of Repository interface.
 type MockRepository struct {
 	ctrl     *gomock.Controller
@@ -287,6 +302,21 @@ func (mr *MockRepositoryMockRecorder) Update(e interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockRepository)(nil).Update), e)
 }
 
+// Upsert mocks base method.
+func (m *MockRepository) Upsert(e *entity.Center) (id.ID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Upsert", e)
+	ret0, _ := ret[0].(id.ID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Upsert indicates an expected call of Upsert.
+func (mr *MockRepositoryMockRecorder) Upsert(e interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Upsert", reflect.TypeOf((*MockRepository)(nil).Upsert), e)
+}
+
 // MockUseCase is a mock of UseCase interface.
 type MockUseCase struct {
 	ctrl     *gomock.Controller
@@ -410,4 +440,19 @@ func (m *MockUseCase) UpdateCenter(e *entity.Center) error {
 func (mr *MockUseCaseMockRecorder) UpdateCenter(e interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCenter", reflect.TypeOf((*MockUseCase)(nil).UpdateCenter), e)
+}
+
+// UpsertCenter mocks base method.
+func (m *MockUseCase) UpsertCenter(e *entity.Center) (id.ID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpsertCenter", e)
+	ret0, _ := ret[0].(id.ID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpsertCenter indicates an expected call of UpsertCenter.
+func (mr *MockUseCaseMockRecorder) UpsertCenter(e interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertCenter", reflect.TypeOf((*MockUseCase)(nil).UpsertCenter), e)
 }

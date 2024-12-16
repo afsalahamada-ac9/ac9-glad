@@ -13,6 +13,7 @@ import (
 	"ac9/glad/entity"
 	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
 )
 
 // Service center usecase
@@ -111,4 +112,24 @@ func (s *Service) GetCount(tenantID id.ID) int {
 	}
 
 	return count
+}
+
+// UpsertCenter upserts a center
+func (s *Service) UpsertCenter(c *entity.Center) (id.ID, error) {
+	if c.ID == id.IDInvalid {
+		// assign id and during update id should not be overwritten
+		c.ID = id.New()
+
+	}
+
+	// Note: Salesforce data is not cleaner. Transform the data as a
+	// workaround
+	c.Transform()
+
+	err := c.Validate()
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return id.IDInvalid, err
+	}
+	return s.repo.Upsert(c)
 }

@@ -58,6 +58,7 @@ CREATE TYPE account_status AS ENUM ('active'
     );
 CREATE TYPE center_mode AS ENUM ('in-person'
     , 'online'
+    , 'not-set'
     );
 CREATE TYPE teaching_eligibility_type AS ENUM ('primary'
     , 'assistant'
@@ -146,8 +147,8 @@ CREATE TABLE IF NOT EXISTS center (
     geo_location JSONB,
     -- maximum occupancy
     capacity INTEGER,
-    mode center_mode DEFAULT 'in-person',
-    webpage VARCHAR(255),
+    mode center_mode DEFAULT 'not-set',
+    web_page VARCHAR(255),
     is_national BOOLEAN DEFAULT FALSE,
     is_enabled BOOLEAN,
 

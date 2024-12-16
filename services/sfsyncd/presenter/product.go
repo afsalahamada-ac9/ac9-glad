@@ -23,7 +23,7 @@ type ProductWrapper struct {
 // Master entity from Salesforce maps to Product entity in GLAD
 type Product struct {
 	ExtID         string    `json:"Id"`
-	ExtName       string    `json:"name"`
+	ExtName       string    `json:"Name"`
 	TenantID      id.ID     `json:"Tenant_id"`
 	BaseProductID string    `json:"Product__c,omitempty"`
 	CType         string    `json:"CType_Id__c"`

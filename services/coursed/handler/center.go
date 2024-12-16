@@ -244,6 +244,57 @@ func updateCenter(service center.UseCase) http.Handler {
 	})
 }
 
+func importCenter(service center.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		errorMessage := "Error importing centers"
+
+		var gCenters []glad.Center
+		tenant := r.Header.Get(common.HttpHeaderTenantID)
+		tenantID, err := id.FromString(tenant)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Missing tenant ID"))
+			return
+		}
+
+		err = json.NewDecoder(r.Body).Decode(&gCenters)
+		if err != nil {
+			l.Log.Warnf("Unable to decode object. err=%v", err)
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Unable to decode the data. " + err.Error()))
+			return
+		}
+
+		var response []*presenter.CenterImportResponse
+		for _, gCenter := range gCenters {
+			center := &entity.Center{}
+			presenter.GladCenterToEntity(gCenter, center)
+			center.TenantID = tenantID
+
+			// TODO: optimize DB operations by doing multiple inserts simultaneously
+			centerID, err := service.UpsertCenter(center)
+			if err != nil {
+				l.Log.Warnf("Unable to upsert center extID=%v, err=%v", center.ExtID, err)
+			}
+
+			response = append(response, &presenter.CenterImportResponse{
+				ID:      centerID,
+				ExtID:   center.ExtID,
+				IsError: err != nil,
+			})
+		}
+
+		w.Header().Set(common.HttpHeaderTenantID, tenant)
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			log.Println(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage))
+			return
+		}
+	})
+}
+
 // MakeCenterHandlers make url handlers
 func MakeCenterHandlers(r *mux.Router, n negroni.Negroni, service center.UseCase) {
 	r.Handle("/v1/centers", n.With(
@@ -253,6 +304,10 @@ func MakeCenterHandlers(r *mux.Router, n negroni.Negroni, service center.UseCase
 	r.Handle("/v1/centers", n.With(
 		negroni.Wrap(createCenter(service)),
 	)).Methods("POST", "OPTIONS").Name("createCenter")
+
+	r.Handle("/v1/centers/import", n.With(
+		negroni.Wrap(importCenter(service)),
+	)).Methods("POST", "OPTIONS").Name("importCenter")
 
 	r.Handle("/v1/centers/{id}", n.With(
 		negroni.Wrap(getCenter(service)),

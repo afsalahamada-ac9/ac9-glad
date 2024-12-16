@@ -27,7 +27,7 @@ func importProducts(service sf_import.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error importing products"
 
-		var sfProducts []presenter.ProductWrapper
+		var sfProducts []presenter.Product
 		tenant := r.Header.Get(common.HttpHeaderTenantID)
 		tenantID, err := id.FromString(tenant)
 		if err != nil {
@@ -47,7 +47,7 @@ func importProducts(service sf_import.UseCase) http.Handler {
 		var gProducts []*glad.Product
 		for _, sfProduct := range sfProducts {
 			product := &glad.Product{}
-			deepcopier.Copy(sfProduct.Value).To(product)
+			deepcopier.Copy(sfProduct).To(product)
 			gProducts = append(gProducts, product)
 		}
 
@@ -76,13 +76,72 @@ func importProducts(service sf_import.UseCase) http.Handler {
 	})
 }
 
-// MakeProductHandlers make product handlers
+func importCenters(service sf_import.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		errorMessage := "Error importing centers"
+
+		var sfCenters []presenter.CenterWrapper
+		tenant := r.Header.Get(common.HttpHeaderTenantID)
+		tenantID, err := id.FromString(tenant)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Missing tenant ID"))
+			return
+		}
+
+		err = json.NewDecoder(r.Body).Decode(&sfCenters)
+		if err != nil {
+			log.Println(err.Error())
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Unable to decode the data. " + err.Error()))
+			return
+		}
+
+		var gCenters []*glad.Center
+		for _, sfCenter := range sfCenters {
+			center := &glad.Center{}
+			sfCenter.Value.ToGladCenter(center)
+			l.Log.Warnf("sfCenter=%#v, center=%#v", sfCenter.Value, center)
+			gCenters = append(gCenters, center)
+		}
+
+		gResponses, err := service.ImportCenter(tenantID, gCenters)
+		if err != nil {
+			l.Log.Warnf("Unable to import centers tenantID=%v, err=%v", tenantID, err)
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte("Unable to import centers. " + err.Error()))
+		}
+
+		var sfResponses []*presenter.CenterResponse
+		for _, gResponse := range gResponses {
+			resp := &presenter.CenterResponse{}
+			deepcopier.Copy(gResponse).To(resp)
+			sfResponses = append(sfResponses, resp)
+		}
+
+		w.Header().Set(common.HttpHeaderTenantID, tenant)
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(sfResponses); err != nil {
+			log.Println(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage))
+			return
+		}
+	})
+}
+
+// MakeImportHandlers make import handlers
 func MakeProductHandlers(r *mux.Router, n negroni.Negroni, service sf_import.UseCase) {
 	r.Handle("/v1/import/salesforce/products", n.With(
 		negroni.Wrap(importProducts(service)),
-	)).Methods("POST", "OPTIONS").Name("importProducts")
+	)).Methods(http.MethodPost, http.MethodOptions).Name("importProducts")
 
 	r.Handle("/v1/import/salesforce/product", n.With(
 		negroni.Wrap(importProducts(service)),
-	)).Methods("POST", "OPTIONS").Name("importProducts")
+	)).Methods(http.MethodPost, http.MethodOptions).Name("importProducts")
+
+	r.Handle("/v1/import/salesforce/centers", n.With(
+		negroni.Wrap(importCenters(service)),
+	)).Methods(http.MethodPost, http.MethodOptions).Name("importCenters")
+
 }

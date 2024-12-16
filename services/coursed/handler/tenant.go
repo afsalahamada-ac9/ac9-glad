@@ -262,7 +262,7 @@ func updateTenant(service tenant.UseCase) http.Handler {
 	})
 }
 
-// MakeTenantHandlers make url handlers
+// MakeTenantHandlers make tenant handlers
 func MakeTenantHandlers(r *mux.Router, n negroni.Negroni, service tenant.UseCase) {
 	r.Handle("/v1/tenants", n.With(
 		negroni.Wrap(listTenants(service)),

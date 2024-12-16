@@ -24,6 +24,7 @@ type Writer interface {
 	Create(e *entity.Center) (id.ID, error)
 	Update(e *entity.Center) error
 	Delete(id id.ID) error
+	Upsert(e *entity.Center) (id.ID, error)
 }
 
 // Repository interface
@@ -41,4 +42,5 @@ type UseCase interface {
 	UpdateCenter(e *entity.Center) error
 	DeleteCenter(id id.ID) error
 	GetCount(id id.ID) int
+	UpsertCenter(e *entity.Center) (id.ID, error)
 }
