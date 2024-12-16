@@ -17,6 +17,7 @@ type Reader interface {
 	Search(tenantID id.ID, query string, page, limit int) ([]*entity.Center, error)
 	List(tenantID id.ID, page, limit int) ([]*entity.Center, error)
 	GetCount(id id.ID) (int, error)
+	GetByExtID(tenantID id.ID, extID string) (*entity.Center, error)
 }
 
 // Writer center writer
@@ -43,4 +44,5 @@ type UseCase interface {
 	DeleteCenter(id id.ID) error
 	GetCount(id id.ID) int
 	UpsertCenter(e *entity.Center) (id.ID, error)
+	GetIDByExtID(tenantID id.ID, extID string) (id.ID, error)
 }

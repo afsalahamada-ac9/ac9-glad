@@ -132,3 +132,18 @@ func (s *Service) UpsertCenter(c *entity.Center) (id.ID, error) {
 	}
 	return s.repo.Upsert(c)
 }
+
+// GetIDByExtID gets product id using external id
+func (s *Service) GetIDByExtID(tenantID id.ID, extID string) (id.ID, error) {
+	c, err := s.repo.GetByExtID(tenantID, extID)
+	if c == nil {
+		l.Log.Warnf("tenantID=%v, extID=%v, err=%v", tenantID, extID, err)
+		return id.IDInvalid, glad.ErrNotFound
+	}
+	if err != nil {
+		l.Log.Warnf("tenantID=%v, extID=%v, err=%v", tenantID, extID, err)
+		return id.IDInvalid, err
+	}
+
+	return c.ID, nil
+}

@@ -333,3 +333,57 @@ func (r *ProductPGSQL) Upsert(e *entity.Product) (id.ID, error) {
 
 	return productID, nil
 }
+
+// GetByExtID retrieves a product using external id
+func (r *ProductPGSQL) GetByExtID(tenantID id.ID,
+	extID string,
+) (*entity.Product, error) {
+	stmt, err := r.db.Prepare(`
+		SELECT
+		 	id, tenant_id, ext_id, ext_name, title, ctype, base_product_ext_id, 
+			duration_days, visibility, max_attendees, format, is_auto_approve,
+			created_at 
+		FROM product
+		WHERE
+			tenant_id = $1 AND ext_id = $2;
+	`)
+	if err != nil {
+		l.Log.Warnf("tenantID=%v, extID=%v, err=%v", tenantID, extID, err)
+		return nil, err
+	}
+
+	var p entity.Product
+	var ext_id, base_product_ext_id, visibility, format sql.NullString
+	var duration_days, max_attendees sql.NullInt32
+
+	err = stmt.QueryRow(tenantID, extID).Scan(
+		&p.ID,
+		&p.TenantID,
+		&ext_id,
+		&p.ExtName,
+		&p.Title,
+		&p.CType,
+		&base_product_ext_id,
+		&duration_days,
+		&visibility,
+		&max_attendees,
+		&format,
+		&p.IsAutoApprove,
+		&p.CreatedAt,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	p.ExtID = ext_id.String
+	p.BaseProductExtID = base_product_ext_id.String
+	p.DurationDays = duration_days.Int32
+	p.Visibility = entity.ProductVisibility(visibility.String)
+	p.MaxAttendees = max_attendees.Int32
+	p.Format = entity.ProductFormat(format.String)
+
+	return &p, nil
+}

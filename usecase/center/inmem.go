@@ -160,3 +160,16 @@ func (r *inmem) Upsert(e *entity.Center) (id.ID, error) {
 	r.m[e.ID] = e
 	return e.ID, nil
 }
+
+// GetByExtID retrieves id using external id
+func (r *inmem) GetByExtID(tenantID id.ID, extID string) (*entity.Center, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
+	for _, center := range r.m {
+		if center.TenantID == tenantID && center.ExtID == extID {
+			return center, nil
+		}
+	}
+	return nil, glad.ErrNotFound
+}

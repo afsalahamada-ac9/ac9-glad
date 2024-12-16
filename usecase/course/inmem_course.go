@@ -8,6 +8,7 @@ package course
 
 import (
 	"strings"
+	"sync"
 
 	"ac9/glad/entity"
 	"ac9/glad/pkg/glad"
@@ -16,36 +17,44 @@ import (
 
 // inmemCourse in memory repo
 type inmemCourse struct {
-	m map[id.ID]*entity.Course
+	m   map[id.ID]*entity.Course
+	mut *sync.RWMutex
 }
 
 // newinmemCourse create new repository
 func newInmemCourse() *inmemCourse {
 	var m = map[id.ID]*entity.Course{}
 	return &inmemCourse{
-		m: m,
+		m:   m,
+		mut: &sync.RWMutex{},
 	}
 }
 
 // Create a course
 func (r *inmemCourse) Create(e *entity.Course) (id.ID, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
 	r.m[e.ID] = e
 	return e.ID, nil
 }
 
 // Get a course
 func (r *inmemCourse) Get(courseID id.ID) (*entity.Course, error) {
-	if r.m[courseID] == nil {
-		return nil, glad.ErrNotFound
+	r.mut.RLock()
+	defer r.mut.RUnlock()
+	if course, ok := r.m[courseID]; ok {
+		return course, nil
 	}
-	return r.m[courseID], nil
+	return nil, glad.ErrNotFound
 }
 
 // Update a course
 func (r *inmemCourse) Update(e *entity.Course) error {
-	_, err := r.Get(e.ID)
-	if err != nil {
-		return err
+	r.mut.Lock()
+	defer r.mut.Unlock()
+	_, ok := r.m[e.ID]
+	if !ok {
+		return glad.ErrNotFound
 	}
 	r.m[e.ID] = e
 	return nil
@@ -55,11 +64,13 @@ func (r *inmemCourse) Update(e *entity.Course) error {
 func (r *inmemCourse) Search(tenantID id.ID,
 	query string, page, limit int,
 ) ([]*entity.Course, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
 	var courses []*entity.Course
-	for _, j := range r.m {
-		if j.TenantID == tenantID &&
-			strings.Contains(strings.ToLower(j.Name), query) {
-			courses = append(courses, j)
+	for _, course := range r.m {
+		if course.TenantID == tenantID &&
+			strings.Contains(strings.ToLower(course.Name), query) {
+			courses = append(courses, course)
 		}
 	}
 
@@ -80,10 +91,12 @@ func (r *inmemCourse) Search(tenantID id.ID,
 
 // List courses
 func (r *inmemCourse) List(tenantID id.ID, page, limit int) ([]*entity.Course, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
 	var courses []*entity.Course
-	for _, j := range r.m {
-		if j.TenantID == tenantID {
-			courses = append(courses, j)
+	for _, course := range r.m {
+		if course.TenantID == tenantID {
+			courses = append(courses, course)
 		}
 	}
 	return courses, nil
@@ -91,19 +104,24 @@ func (r *inmemCourse) List(tenantID id.ID, page, limit int) ([]*entity.Course, e
 
 // Delete a course
 func (r *inmemCourse) Delete(courseID id.ID) error {
-	if r.m[courseID] == nil {
-		return glad.ErrNotFound
+	r.mut.Lock()
+	defer r.mut.Unlock()
+	if _, ok := r.m[courseID]; ok {
+
+		r.m[courseID] = nil
+		delete(r.m, courseID)
+		return nil
 	}
-	r.m[courseID] = nil
-	delete(r.m, courseID)
-	return nil
+	return glad.ErrNotFound
 }
 
 // GetCount gets total courses for a given tenant
 func (r *inmemCourse) GetCount(tenantID id.ID) (int, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
 	count := 0
-	for _, j := range r.m {
-		if j.TenantID == tenantID {
+	for _, course := range r.m {
+		if course.TenantID == tenantID {
 			count++
 		}
 	}
@@ -115,6 +133,19 @@ func (r *inmemCourse) GetCount(tenantID id.ID) (int, error) {
 func (r *inmemCourse) GetByAccount(tenantID id.ID, accountID id.ID, page, limit int,
 ) (int, []*entity.Course, error) {
 	return 0, nil, nil
+}
+
+func (r *inmemCourse) Upsert(e *entity.Course) (id.ID, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
+	for _, course := range r.m {
+		if course.ExtID == e.ExtID {
+			e.ID = course.ID
+		}
+	}
+	r.m[e.ID] = e
+	return e.ID, nil
 }
 
 // --------------------------------------------------------------------------------

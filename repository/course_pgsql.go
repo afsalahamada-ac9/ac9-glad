@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"ac9/glad/entity"
+	"ac9/glad/pkg/common"
 	"ac9/glad/pkg/id"
 	l "ac9/glad/pkg/logger"
 	"ac9/glad/pkg/util"
@@ -401,6 +402,76 @@ func (r *CoursePGSQL) scanRows(rows *sql.Rows) ([]*entity.Course, error) {
 		courses = append(courses, &course)
 	}
 	return courses, nil
+}
+
+// Upsert inserts or updates the course and returns the id
+func (r *CoursePGSQL) Upsert(e *entity.Course) (id.ID, error) {
+	stmt, err := r.db.Prepare(`
+		WITH upsert AS (
+			INSERT INTO course (
+				id, ext_id, tenant_id, product_id, center_id,
+				name, notes, timezone,
+				address, status, mode,
+				max_attendees, num_attendees,
+				url, checkout_url,
+				created_at, updated_at
+			)
+			VALUES
+				($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) 
+			ON CONFLICT (ext_id)
+			DO UPDATE
+				SET tenant_id = $3, product_id = $4, center_id = $5, name = $6, notes = $7,
+				 	timezone = $8, address = $9, status = $10, mode = $11,
+					max_attendees = $12, num_attendees = $13, url = $14, checkout_url = $15,
+					created_at = $16, updated_at = $17
+			WHERE course.updated_at <= $17
+			RETURNING id
+		)
+		SELECT id FROM upsert
+		UNION ALL
+		SELECT id FROM course WHERE ext_id = $2 AND NOT EXISTS (SELECT 1 FROM upsert);
+	`)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return id.IDInvalid, err
+	}
+
+	// TODO: Retrieve productID, centerID using the extID for product & center
+	// + accounts as well
+
+	jsonAddress, err := json.Marshal(e.Address)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return id.IDInvalid, err
+	}
+	l.Log.Debugf("Address=%#v jsonAddress=%v", e.Address, jsonAddress)
+
+	var courseId id.ID
+	err = stmt.QueryRow(
+		e.ID,
+		e.ExtID,
+		e.TenantID,
+		e.ProductID,
+		e.CenterID,
+		e.Name,
+		e.Notes,
+		e.Timezone,
+		jsonAddress,
+		string(e.Status),
+		string(e.Mode),
+		e.MaxAttendees,
+		e.NumAttendees,
+		e.URL,
+		e.CheckoutURL,
+		e.CreatedAt.Format(common.DBFormatDateTimeMS),
+		e.UpdatedAt.Format(common.DBFormatDateTimeMS),
+	).Scan(&courseId)
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return id.IDInvalid, err
+	}
+
+	return courseId, nil
 }
 
 // --------------------------------------------------------------------------------

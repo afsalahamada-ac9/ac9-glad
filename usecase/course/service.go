@@ -306,3 +306,22 @@ func (s *Service) GetCourseByAccount(courseID id.ID,
 
 	return count, cfList, err
 }
+
+// UpsertCourse upserts a course
+func (s *Service) UpsertCourse(c *entity.Course) (id.ID, error) {
+	if c.ID == id.IDInvalid {
+		// assign id and during update id should not be overwritten
+		c.ID = id.New()
+
+	}
+
+	// Note: Salesforce data is not cleaner. Transform the data as a workaround
+	c.Transform()
+
+	err := c.Validate()
+	if err != nil {
+		l.Log.Warnf("err=%v", err)
+		return id.IDInvalid, err
+	}
+	return s.cRepo.Upsert(c)
+}

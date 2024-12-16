@@ -184,6 +184,61 @@ func importAccounts(service sf_import.UseCase) http.Handler {
 	})
 }
 
+func importCourses(service sf_import.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		errorMessage := "Error importing courses"
+
+		var sfCourses []presenter.CourseWrapper
+		tenant := r.Header.Get(common.HttpHeaderTenantID)
+		tenantID, err := id.FromString(tenant)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Missing tenant ID"))
+			return
+		}
+
+		err = json.NewDecoder(r.Body).Decode(&sfCourses)
+		if err != nil {
+			log.Println(err.Error())
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Unable to decode the data. " + err.Error()))
+			return
+		}
+
+		var gCourses []*glad.Course
+		for _, sfCourse := range sfCourses {
+			course := &glad.Course{}
+			sfCourse.Value.ToGladCourse(course)
+			l.Log.Debugf("sfCourse=%#v, course=%#v", sfCourse, course)
+			gCourses = append(gCourses, course)
+		}
+
+		gResponses, err := service.ImportCourse(tenantID, gCourses)
+		if err != nil {
+			l.Log.Warnf("Unable to import courses tenantID=%v, err=%v", tenantID, err)
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte("Unable to import courses. " + err.Error()))
+		}
+
+		var sfResponses []*presenter.CourseResponse
+		for _, gResponse := range gResponses {
+			resp := &presenter.CourseResponse{}
+			deepcopier.Copy(gResponse).To(resp)
+			sfResponses = append(sfResponses, resp)
+		}
+
+		w.Header().Set(common.HttpHeaderTenantID, tenant)
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(sfResponses); err != nil {
+			log.Println(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage))
+			return
+		}
+	})
+}
+
+
 // MakeImportHandlers make import handlers
 func MakeImportHandlers(r *mux.Router, n negroni.Negroni, service sf_import.UseCase) {
 	r.Handle("/v1/import/salesforce/products", n.With(
@@ -198,4 +253,7 @@ func MakeImportHandlers(r *mux.Router, n negroni.Negroni, service sf_import.UseC
 		negroni.Wrap(importAccounts(service)),
 	)).Methods(http.MethodPost, http.MethodOptions).Name("importAccounts")
 
+	r.Handle("/v1/import/salesforce/courses", n.With(
+		negroni.Wrap(importCourses(service)),
+	)).Methods(http.MethodPost, http.MethodOptions).Name("importCourses")
 }

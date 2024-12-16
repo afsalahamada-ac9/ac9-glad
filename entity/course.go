@@ -9,6 +9,8 @@ package entity
 import (
 	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
+	"strings"
 	"time"
 )
 
@@ -18,6 +20,7 @@ type CourseMode string
 const (
 	CourseInPerson CourseMode = "in-person"
 	CourseOnline   CourseMode = "online"
+	CourseNotSet   CourseMode = "not-set"
 	// Add new types here
 )
 
@@ -85,13 +88,14 @@ type Course struct {
 	Timezone string
 
 	Address CourseAddress
-
-	Status CourseStatus
-
-	Mode CourseMode
+	Status  CourseStatus
+	Mode    CourseMode
 
 	MaxAttendees int32
 	NumAttendees int32
+
+	URL         string
+	CheckoutURL string
 
 	// meta data
 	CreatedAt time.Time
@@ -122,8 +126,11 @@ func NewCourseAddress(street1 string,
 }
 
 // Validate validates course address
-func (l *CourseAddress) Validate() error {
-	if l.Street1 == "" || l.City == "" || l.State == "" || l.Zip == "" || l.Country == "" {
+func (ca *CourseAddress) Validate() error {
+	if (ca.Street1 == "" && ca.Street2 == "") ||
+		ca.City == "" || ca.State == "" ||
+		ca.Zip == "" || ca.Country == "" {
+		l.Log.Warnf("Address is not valid=%v", ca)
 		return glad.ErrInvalidEntity
 	}
 	return nil
@@ -181,10 +188,22 @@ func (c Course) New() (*Course, error) {
 	return course, nil
 }
 
+// Transform fixes the data issues, if any
+func (c *Course) Transform() {
+	c.Status = CourseStatus(strings.ToLower(string(c.Status)))
+	c.Mode = CourseMode(strings.ToLower(string(c.Mode)))
+
+	if c.Mode == "" {
+		// TODO: Add a metric to keep track of this
+		c.Mode = CourseNotSet
+	}
+}
+
 // Validate validate course
 func (c *Course) Validate() error {
 	if c.Name == "" {
+		l.Log.Warnf("Course name is empty; extID=%v", c.ExtID)
 		return glad.ErrInvalidEntity
 	}
-	return nil
+	return c.Address.Validate()
 }

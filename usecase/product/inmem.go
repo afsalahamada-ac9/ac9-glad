@@ -162,6 +162,19 @@ func (r *inmem) Upsert(e *entity.Product) (id.ID, error) {
 	return e.ID, nil
 }
 
+// GetByExtID retrieves id using external id
+func (r *inmem) GetByExtID(tenantID id.ID, extID string) (*entity.Product, error) {
+	r.mut.Lock()
+	defer r.mut.Unlock()
+
+	for _, product := range r.m {
+		if product.TenantID == tenantID && product.ExtID == extID {
+			return product, nil
+		}
+	}
+	return nil, glad.ErrNotFound
+}
+
 // Additional helper methods for testing
 func (r *inmem) Clean() {
 	r.mut.Lock()

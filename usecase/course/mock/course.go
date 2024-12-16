@@ -177,6 +177,21 @@ func (mr *MockCourseWriterMockRecorder) Update(e interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockCourseWriter)(nil).Update), e)
 }
 
+// Upsert mocks base method.
+func (m *MockCourseWriter) Upsert(course *entity.Course) (id.ID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Upsert", course)
+	ret0, _ := ret[0].(id.ID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Upsert indicates an expected call of Upsert.
+func (mr *MockCourseWriterMockRecorder) Upsert(course interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Upsert", reflect.TypeOf((*MockCourseWriter)(nil).Upsert), course)
+}
+
 // MockCourseOrganizerWriter is a mock of CourseOrganizerWriter interface.
 type MockCourseOrganizerWriter struct {
 	ctrl     *gomock.Controller
@@ -1191,6 +1206,21 @@ func (mr *MockCourseRepositoryMockRecorder) UpdateCourseTeacher(arg0, arg1 inter
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCourseTeacher", reflect.TypeOf((*MockCourseRepository)(nil).UpdateCourseTeacher), arg0, arg1)
 }
 
+// Upsert mocks base method.
+func (m *MockCourseRepository) Upsert(course *entity.Course) (id.ID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Upsert", course)
+	ret0, _ := ret[0].(id.ID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Upsert indicates an expected call of Upsert.
+func (mr *MockCourseRepositoryMockRecorder) Upsert(course interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Upsert", reflect.TypeOf((*MockCourseRepository)(nil).Upsert), course)
+}
+
 // MockCourseTimingReader is a mock of CourseTimingReader interface.
 type MockCourseTimingReader struct {
 	ctrl     *gomock.Controller
@@ -1606,4 +1636,19 @@ func (m *MockUseCase) UpdateCourse(course entity.Course, cos []*entity.CourseOrg
 func (mr *MockUseCaseMockRecorder) UpdateCourse(course, cos, cts, ccs, cns, courseTimings interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCourse", reflect.TypeOf((*MockUseCase)(nil).UpdateCourse), course, cos, cts, ccs, cns, courseTimings)
+}
+
+// UpsertCourse mocks base method.
+func (m *MockUseCase) UpsertCourse(course *entity.Course) (id.ID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpsertCourse", course)
+	ret0, _ := ret[0].(id.ID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpsertCourse indicates an expected call of UpsertCourse.
+func (mr *MockUseCaseMockRecorder) UpsertCourse(course interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertCourse", reflect.TypeOf((*MockUseCase)(nil).UpsertCourse), course)
 }

@@ -50,6 +50,21 @@ func (mr *MockReaderMockRecorder) Get(id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockReader)(nil).Get), id)
 }
 
+// GetByExtID mocks base method.
+func (m *MockReader) GetByExtID(tenantID id.ID, extID string) (*entity.Center, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByExtID", tenantID, extID)
+	ret0, _ := ret[0].(*entity.Center)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByExtID indicates an expected call of GetByExtID.
+func (mr *MockReaderMockRecorder) GetByExtID(tenantID, extID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByExtID", reflect.TypeOf((*MockReader)(nil).GetByExtID), tenantID, extID)
+}
+
 // GetCount mocks base method.
 func (m *MockReader) GetCount(id id.ID) (int, error) {
 	m.ctrl.T.Helper()
@@ -243,6 +258,21 @@ func (mr *MockRepositoryMockRecorder) Get(id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockRepository)(nil).Get), id)
 }
 
+// GetByExtID mocks base method.
+func (m *MockRepository) GetByExtID(tenantID id.ID, extID string) (*entity.Center, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByExtID", tenantID, extID)
+	ret0, _ := ret[0].(*entity.Center)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByExtID indicates an expected call of GetByExtID.
+func (mr *MockRepositoryMockRecorder) GetByExtID(tenantID, extID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByExtID", reflect.TypeOf((*MockRepository)(nil).GetByExtID), tenantID, extID)
+}
+
 // GetCount mocks base method.
 func (m *MockRepository) GetCount(id id.ID) (int, error) {
 	m.ctrl.T.Helper()
@@ -396,6 +426,21 @@ func (m *MockUseCase) GetCount(id id.ID) int {
 func (mr *MockUseCaseMockRecorder) GetCount(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCount", reflect.TypeOf((*MockUseCase)(nil).GetCount), id)
+}
+
+// GetIDByExtID mocks base method.
+func (m *MockUseCase) GetIDByExtID(tenantID id.ID, extID string) (id.ID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetIDByExtID", tenantID, extID)
+	ret0, _ := ret[0].(id.ID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetIDByExtID indicates an expected call of GetIDByExtID.
+func (mr *MockUseCaseMockRecorder) GetIDByExtID(tenantID, extID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIDByExtID", reflect.TypeOf((*MockUseCase)(nil).GetIDByExtID), tenantID, extID)
 }
 
 // ListCenters mocks base method.

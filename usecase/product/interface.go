@@ -17,6 +17,7 @@ type Reader interface {
 	List(tenantID id.ID, page, limit int) ([]*entity.Product, error)
 	Search(tenantID id.ID, q string, page, limit int) ([]*entity.Product, error)
 	GetCount(tenantID id.ID) (int, error)
+	GetByExtID(tenantID id.ID, extID string) (*entity.Product, error)
 }
 
 // Writer defines write-only operations for products
@@ -53,4 +54,5 @@ type UseCase interface {
 	DeleteProduct(id id.ID) error
 	GetCount(id id.ID) int
 	UpsertProduct(e *entity.Product) (id.ID, error)
+	GetIDByExtID(tenantID id.ID, extID string) (id.ID, error)
 }

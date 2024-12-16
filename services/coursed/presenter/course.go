@@ -8,7 +8,9 @@ package presenter
 
 import (
 	"ac9/glad/entity"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
+	l "ac9/glad/pkg/logger"
 
 	"github.com/ulule/deepcopier"
 )
@@ -60,6 +62,13 @@ type CourseResponse struct {
 	ID         id.ID   `json:"id"`
 	DateTimeID []id.ID `json:"dateID,omitempty"`
 	ShortURL   *string `json:"shortURL,omitempty"`
+}
+
+type ImportCourseResponse struct {
+	// todo: check the struct definition
+	ID      id.ID  `json:"id"`
+	ExtID   string `json:"extID"`
+	IsError bool   `json:"isError"`
 }
 
 // ToCourse creates course entity from course request
@@ -240,5 +249,24 @@ func (c *Course) FromCourseTiming(cts []*entity.CourseTiming) error {
 			})
 	}
 
+	return nil
+}
+
+// ToEntity populates entity course from presenter course
+func (c Course) ToEntity(e *entity.Course) error {
+	deepcopier.Copy(c).To(e)
+	l.Log.Infof("course full=%v, course=%v", c, e)
+	return nil
+}
+
+// GladCourseToEntity populates entity course from glad entity
+func GladCourseToEntity(gc glad.Course, e *entity.Course) error {
+	deepcopier.Copy(gc).To(e)
+	deepcopier.Copy(gc.Address).To(&e.Address)
+	e.Mode = entity.CourseMode(gc.Mode)
+	e.Status = entity.CourseStatus(gc.Status)
+	e.ExtID = &gc.ExtID
+
+	l.Log.Debugf("Course=%#v, entity.course=%#v", gc, e)
 	return nil
 }

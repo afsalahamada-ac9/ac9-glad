@@ -135,6 +135,20 @@ func (s *Service) UpsertProduct(p *entity.Product) (id.ID, error) {
 		l.Log.Warnf("err=%v", err)
 		return id.IDInvalid, err
 	}
-	p.UpdatedAt = time.Now()
 	return s.repo.Upsert(p)
+}
+
+// GetIDByExtID gets product id using external id
+func (s *Service) GetIDByExtID(tenantID id.ID, extID string) (id.ID, error) {
+	p, err := s.repo.GetByExtID(tenantID, extID)
+	if p == nil {
+		l.Log.Warnf("tenantID=%v, extID=%v, err=%v", tenantID, extID, err)
+		return id.IDInvalid, glad.ErrNotFound
+	}
+	if err != nil {
+		l.Log.Warnf("tenantID=%v, extID=%v, err=%v", tenantID, extID, err)
+		return id.IDInvalid, err
+	}
+
+	return p.ID, nil
 }

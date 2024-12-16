@@ -13,6 +13,7 @@ import (
 
 	"ac9/glad/entity"
 	"ac9/glad/pkg/common"
+	"ac9/glad/pkg/glad"
 	"ac9/glad/pkg/id"
 	l "ac9/glad/pkg/logger"
 )
@@ -305,4 +306,38 @@ func (r *CenterPGSQL) Upsert(e *entity.Center) (id.ID, error) {
 	}
 
 	return centerID, nil
+}
+
+// GetByExtID retrieves a center using external id
+// Not all fields are required for v1
+func (r *CenterPGSQL) GetByExtID(tenantID id.ID,
+	extID string,
+) (*entity.Center, error) {
+	stmt, err := r.db.Prepare(`
+		SELECT
+			id, tenant_id, name, ext_name, mode, created_at
+		FROM center
+		WHERE tenant_id = $1 AND ext_id = $2;
+	`)
+	if err != nil {
+		l.Log.Warnf("tenantID=%v, extID=%v, err=%v", tenantID, extID, err)
+		return nil, err
+	}
+	var c entity.Center
+	var extName sql.NullString
+	var name sql.NullString
+	var mode sql.NullString
+	err = stmt.QueryRow(tenantID, extID).Scan(&c.ID, &c.TenantID, &name, &extName, &mode, &c.CreatedAt)
+	if err != nil {
+		l.Log.Warnf("tenantID=%v, extID=%v, err=%v", tenantID, extID, err)
+		if err == sql.ErrNoRows {
+			return nil, glad.ErrNotFound
+		}
+		return nil, err
+	}
+	c.Name = name.String
+	c.ExtName = extName.String
+	c.Mode = entity.CenterMode(mode.String)
+
+	return &c, nil
 }

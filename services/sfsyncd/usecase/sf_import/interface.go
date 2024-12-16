@@ -24,4 +24,5 @@ type UseCase interface {
 	ImportProduct(tenantID id.ID, p []*glad.Product) ([]*glad.ProductResponse, error)
 	ImportCenter(tenantID id.ID, p []*glad.Center) ([]*glad.CenterResponse, error)
 	ImportAccount(tenantID id.ID, p []*glad.Account) ([]*glad.AccountResponse, error)
+	ImportCourse(tenantID id.ID, p []*glad.Course) ([]*glad.CourseResponse, error)
 }

@@ -1,3 +1,9 @@
+/*
+ * Copyright 2024 AboveCloud9.AI Products and Services Private Limited
+ * All rights reserved.
+ * This code may not be used, copied, modified, or distributed without explicit permission.
+ */
+
 package glad
 
 import (
@@ -6,7 +12,7 @@ import (
 
 // Note: Ideally these should be proto files and we should use grpc between services
 type CenterAddress struct {
-	Street1 string `json:"street1" deepcopier:"field:Address1"`
+	Street1 string `json:"street1"`
 	Street2 string `json:"street2"`
 	City    string `json:"city"`
 	State   string `json:"state"`

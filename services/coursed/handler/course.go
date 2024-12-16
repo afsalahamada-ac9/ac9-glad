@@ -17,7 +17,9 @@ import (
 	"ac9/glad/pkg/id"
 	l "ac9/glad/pkg/logger"
 	"ac9/glad/usecase/account"
+	"ac9/glad/usecase/center"
 	"ac9/glad/usecase/course"
+	"ac9/glad/usecase/product"
 
 	"ac9/glad/services/coursed/presenter"
 
@@ -70,7 +72,7 @@ func listCourses(service course.UseCase) http.Handler {
 			_, _ = w.Write([]byte(errorMessage))
 			return
 		}
-		var toJ []*presenter.Course
+		var courses []*presenter.Course
 		for _, d := range data {
 			pc := &presenter.Course{}
 			pc.FromEntityCourse(d)
@@ -78,9 +80,9 @@ func listCourses(service course.UseCase) http.Handler {
 			pc.Address = &presenter.Address{}
 			pc.Address.CopyFrom(d.Address)
 
-			toJ = append(toJ, pc)
+			courses = append(courses, pc)
 		}
-		if err := json.NewEncoder(w).Encode(toJ); err != nil {
+		if err := json.NewEncoder(w).Encode(courses); err != nil {
 			w.Header().Set(common.HttpHeaderTenantID, tenant)
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte("Unable to encode course"))
@@ -143,14 +145,14 @@ func createCourse(service course.UseCase) http.Handler {
 			_, _ = w.Write([]byte(errorMessage + ":" + err.Error()))
 			return
 		}
-		toJ := &presenter.CourseResponse{
+		response := &presenter.CourseResponse{
 			ID:         courseID,
 			DateTimeID: courseTimingsID,
 		}
 
 		w.Header().Set(common.HttpHeaderTenantID, tenant)
 		w.WriteHeader(http.StatusCreated)
-		if err := json.NewEncoder(w).Encode(toJ); err != nil {
+		if err := json.NewEncoder(w).Encode(response); err != nil {
 			l.Log.Errorf(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage))
@@ -182,11 +184,11 @@ func getCourse(service course.UseCase) http.Handler {
 			return
 		}
 
-		toJ := &presenter.Course{}
-		toJ.FromEntityCourseFull(courseFull)
+		response := &presenter.Course{}
+		response.FromEntityCourseFull(courseFull)
 
 		w.Header().Set(common.HttpHeaderTenantID, courseFull.Course.TenantID.String())
-		if err := json.NewEncoder(w).Encode(toJ); err != nil {
+		if err := json.NewEncoder(w).Encode(response); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte("Unable to encode course"))
 		}
@@ -392,7 +394,7 @@ func updateCourse(service course.UseCase) http.Handler {
 			return
 		}
 
-		toJ := &presenter.Course{
+		response := &presenter.Course{
 			CourseResponse: presenter.CourseResponse{
 				ID: course.ID,
 			},
@@ -400,7 +402,87 @@ func updateCourse(service course.UseCase) http.Handler {
 
 		w.Header().Set(common.HttpHeaderTenantID, tenant)
 		w.WriteHeader(http.StatusOK)
-		if err := json.NewEncoder(w).Encode(toJ); err != nil {
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			log.Println(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(errorMessage))
+			return
+		}
+	})
+}
+
+func importCourse(service course.UseCase,
+	accountService account.UseCase,
+	productService product.UseCase,
+	centerService center.UseCase,
+) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		errorMessage := "Error importing courses"
+
+		var gCourses []glad.Course
+		tenant := r.Header.Get(common.HttpHeaderTenantID)
+		tenantID, err := id.FromString(tenant)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Missing tenant ID"))
+			return
+		}
+
+		err = json.NewDecoder(r.Body).Decode(&gCourses)
+		if err != nil {
+			l.Log.Warnf("Unable to decode object. err = %v", err)
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("Unable to decode the data. " + err.Error()))
+			return
+		}
+
+		var response []*presenter.ImportCourseResponse
+		for _, gCourse := range gCourses {
+			course := &entity.Course{}
+			presenter.GladCourseToEntity(gCourse, course)
+			course.TenantID = tenantID
+
+			productID, err :=
+				productService.GetIDByExtID(tenantID, gCourse.ProductExtID)
+			if err != nil {
+				l.Log.Warnf("Unable to get product id extID=%v, err=%v", gCourse.ProductExtID, err)
+				response = append(response, &presenter.ImportCourseResponse{
+					ExtID:   gCourse.ExtID,
+					IsError: err != nil,
+				})
+				continue
+			}
+
+			centerID, err :=
+				centerService.GetIDByExtID(tenantID, gCourse.CenterExtID)
+			if err != nil {
+				l.Log.Warnf("Unable to get center id extID=%v, err=%v", gCourse.CenterExtID, err)
+				response = append(response, &presenter.ImportCourseResponse{
+					ExtID:   gCourse.ExtID,
+					IsError: err != nil,
+				})
+				continue
+			}
+
+			course.ProductID = productID
+			course.CenterID = centerID
+
+			// TODO: optimize DB operations by doing multiple inserts simultaneously
+			courseID, err := service.UpsertCourse(course)
+			if err != nil {
+				l.Log.Warnf("Unable to upsert course extID=%v, err=%v", course.ExtID, err)
+			}
+
+			response = append(response, &presenter.ImportCourseResponse{
+				ID:      courseID,
+				ExtID:   *course.ExtID,
+				IsError: err != nil,
+			})
+		}
+
+		w.Header().Set(common.HttpHeaderTenantID, tenant)
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
 			log.Println(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(errorMessage))
@@ -413,7 +495,10 @@ func updateCourse(service course.UseCase) http.Handler {
 func MakeCourseHandlers(r *mux.Router,
 	n negroni.Negroni,
 	service course.UseCase,
-	accountService account.UseCase) {
+	accountService account.UseCase,
+	productService product.UseCase,
+	centerService center.UseCase,
+) {
 	r.Handle("/v1/courses", n.With(
 		negroni.Wrap(listCourses(service)),
 	)).Methods("GET", "OPTIONS").Name("listCourses")
@@ -421,6 +506,10 @@ func MakeCourseHandlers(r *mux.Router,
 	r.Handle("/v1/courses", n.With(
 		negroni.Wrap(createCourse(service)),
 	)).Methods("POST", "OPTIONS").Name("createCourse")
+
+	r.Handle("/v1/courses/import", n.With(
+		negroni.Wrap(importCourse(service, accountService, productService, centerService)),
+	)).Methods("POST", "OPTIONS").Name("importCourse")
 
 	// get courses by account-id
 	r.Handle("/v1/courses/account/{accountID}", n.With(

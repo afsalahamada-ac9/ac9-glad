@@ -28,6 +28,7 @@ type CourseWriter interface {
 	Create(e *entity.Course) (id.ID, error)
 	Update(e *entity.Course) error
 	Delete(id id.ID) error
+	Upsert(course *entity.Course) (id.ID, error)
 }
 
 // CourseOrganizerWriter course organizer writer
@@ -149,4 +150,5 @@ type UseCase interface {
 	) (int, []*entity.CourseFull, error)
 	DeleteCourse(id id.ID) error
 	GetCount(id id.ID) int
+	UpsertCourse(course *entity.Course) (id.ID, error)
 }

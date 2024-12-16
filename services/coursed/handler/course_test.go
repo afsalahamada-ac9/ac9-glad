@@ -20,7 +20,9 @@ import (
 	"ac9/glad/services/coursed/presenter"
 
 	amock "ac9/glad/usecase/account/mock"
+	cmock "ac9/glad/usecase/center/mock"
 	mock "ac9/glad/usecase/course/mock"
+	pmock "ac9/glad/usecase/product/mock"
 
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
@@ -28,14 +30,25 @@ import (
 	"github.com/urfave/negroni"
 )
 
+func getMocks(controller *gomock.Controller,
+) (*mock.MockUseCase,
+	*amock.MockUseCase,
+	*pmock.MockUseCase,
+	*cmock.MockUseCase,
+) {
+	return mock.NewMockUseCase(controller),
+		amock.NewMockUseCase(controller),
+		pmock.NewMockUseCase(controller),
+		cmock.NewMockUseCase(controller)
+}
+
 func Test_listCourses(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	service := mock.NewMockUseCase(controller)
-	aservice := amock.NewMockUseCase(controller)
+	svc, asvc, psvc, csvc := getMocks(controller)
 	r := mux.NewRouter()
 	n := negroni.New()
-	MakeCourseHandlers(r, *n, service, aservice)
+	MakeCourseHandlers(r, *n, svc, asvc, psvc, csvc)
 	path, err := r.GetRoute("listCourses").GetPathTemplate()
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/courses", path)
@@ -44,11 +57,11 @@ func Test_listCourses(t *testing.T) {
 		TenantID: tenantAlice,
 		Name:     "default-0",
 	}
-	service.EXPECT().GetCount(course.TenantID).Return(1)
-	service.EXPECT().
+	svc.EXPECT().GetCount(course.TenantID).Return(1)
+	svc.EXPECT().
 		ListCourses(course.TenantID, gomock.Any(), gomock.Any()).
 		Return([]*entity.Course{course}, nil)
-	ts := httptest.NewServer(listCourses(service))
+	ts := httptest.NewServer(listCourses(svc))
 	defer ts.Close()
 
 	client := &http.Client{}
@@ -111,11 +124,10 @@ func Test_listCourses_Search(t *testing.T) {
 func Test_createCourse(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	service := mock.NewMockUseCase(controller)
-	aservice := amock.NewMockUseCase(controller)
+	svc, asvc, psvc, csvc := getMocks(controller)
 	r := mux.NewRouter()
 	n := negroni.New()
-	MakeCourseHandlers(r, *n, service, aservice)
+	MakeCourseHandlers(r, *n, svc, asvc, psvc, csvc)
 	path, err := r.GetRoute("createCourse").GetPathTemplate()
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/courses", path)
@@ -123,7 +135,7 @@ func Test_createCourse(t *testing.T) {
 	courseID := id.New()
 	// TODO: Check the length of the courseTimings and same number of
 	// courseTimingIDs to be returned
-	service.EXPECT().
+	svc.EXPECT().
 		CreateCourse(gomock.Any(),
 			gomock.Any(),
 			gomock.Any(),
@@ -131,7 +143,7 @@ func Test_createCourse(t *testing.T) {
 			gomock.Any(),
 			gomock.Any()).
 		Return(courseID, nil, nil)
-	h := createCourse(service)
+	h := createCourse(svc)
 
 	ts := httptest.NewServer(h)
 	defer ts.Close()
@@ -172,11 +184,10 @@ func Test_createCourse(t *testing.T) {
 func Test_getCourse(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	service := mock.NewMockUseCase(controller)
-	aservice := amock.NewMockUseCase(controller)
+	svc, asvc, psvc, csvc := getMocks(controller)
 	r := mux.NewRouter()
 	n := negroni.New()
-	MakeCourseHandlers(r, *n, service, aservice)
+	MakeCourseHandlers(r, *n, svc, asvc, psvc, csvc)
 	path, err := r.GetRoute("getCourse").GetPathTemplate()
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/courses/{id}", path)
@@ -191,10 +202,10 @@ func Test_getCourse(t *testing.T) {
 	courseFull := &entity.CourseFull{
 		Course: course,
 	}
-	service.EXPECT().
+	svc.EXPECT().
 		GetCourse(course.ID).
 		Return(courseFull, nil)
-	handler := getCourse(service)
+	handler := getCourse(svc)
 	r.Handle("/v1/courses/{id}", handler)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
@@ -216,18 +227,17 @@ func Test_getCourse(t *testing.T) {
 func Test_deleteCourse(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	service := mock.NewMockUseCase(controller)
-	aservice := amock.NewMockUseCase(controller)
+	svc, asvc, psvc, csvc := getMocks(controller)
 	r := mux.NewRouter()
 	n := negroni.New()
-	MakeCourseHandlers(r, *n, service, aservice)
+	MakeCourseHandlers(r, *n, svc, asvc, psvc, csvc)
 	path, err := r.GetRoute("deleteCourse").GetPathTemplate()
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/courses/{id}", path)
 
 	id := id.New()
-	service.EXPECT().DeleteCourse(id).Return(nil)
-	handler := deleteCourse(service)
+	svc.EXPECT().DeleteCourse(id).Return(nil)
+	handler := deleteCourse(svc)
 	req, _ := http.NewRequest("DELETE", "/v1/courses/"+id.String(), nil)
 	r.Handle("/v1/courses/{id}", handler).Methods("DELETE", "OPTIONS")
 	rr := httptest.NewRecorder()
@@ -238,18 +248,17 @@ func Test_deleteCourse(t *testing.T) {
 func Test_deleteCourseNonExistent(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	service := mock.NewMockUseCase(controller)
-	aservice := amock.NewMockUseCase(controller)
+	svc, asvc, psvc, csvc := getMocks(controller)
 	r := mux.NewRouter()
 	n := negroni.New()
-	MakeCourseHandlers(r, *n, service, aservice)
+	MakeCourseHandlers(r, *n, svc, asvc, psvc, csvc)
 	path, err := r.GetRoute("deleteCourse").GetPathTemplate()
 	assert.Nil(t, err)
 	assert.Equal(t, "/v1/courses/{id}", path)
 
 	id := id.New()
-	service.EXPECT().DeleteCourse(id).Return(glad.ErrNotFound)
-	handler := deleteCourse(service)
+	svc.EXPECT().DeleteCourse(id).Return(glad.ErrNotFound)
+	handler := deleteCourse(svc)
 	req, _ := http.NewRequest("DELETE", "/v1/courses/"+id.String(), nil)
 	r.Handle("/v1/courses/{id}", handler).Methods("DELETE", "OPTIONS")
 	rr := httptest.NewRecorder()

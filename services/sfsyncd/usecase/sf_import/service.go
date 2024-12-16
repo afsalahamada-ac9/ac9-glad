@@ -166,3 +166,50 @@ func (s *Service) ImportAccount(tenantID id.ID,
 
 	return gResponse, err
 }
+
+// ImportCourse imports courses
+func (s *Service) ImportCourse(tenantID id.ID,
+	p []*glad.Course,
+) ([]*glad.CourseResponse, error) {
+	path := s.basePath + "/v1/courses/import"
+	l.Log.Debugf("path=%v", path)
+
+	jsonCourses, err := json.Marshal(p)
+	if err != nil {
+		l.Log.Errorf("err=%v", err)
+		return nil, err
+	}
+
+	req := fasthttp.AcquireRequest()
+	defer fasthttp.ReleaseRequest(req)
+
+	req.SetRequestURI(path)
+	req.Header.SetMethod(http.MethodPost)
+	req.Header.SetContentType("application/json")
+	req.Header.Set(common.HttpHeaderTenantID, tenantID.String())
+	req.SetBody([]byte(jsonCourses))
+
+	resp := fasthttp.AcquireResponse()
+	defer fasthttp.ReleaseResponse(resp)
+
+	err = s.c.Do(req, resp)
+	if err != nil {
+		l.Log.Errorf("err=%v", err)
+		return nil, err
+	}
+
+	if resp.StatusCode() != fasthttp.StatusOK {
+		l.Log.Warnf("Unable to import course. resp=%v, status=%v",
+			string(resp.Body()), resp.StatusCode())
+		return nil, err
+	}
+
+	var gResponse []*glad.CourseResponse
+	err = json.Unmarshal(resp.Body(), &gResponse)
+	if err != nil {
+		l.Log.Warnf("Unable to decode import course response. err=%v", err)
+		return nil, err
+	}
+
+	return gResponse, err
+}

@@ -34,7 +34,9 @@ CREATE TYPE course_status AS ENUM ('draft'
     , 'inactive'
     );
 CREATE TYPE course_mode AS ENUM ('in-person'
-    , 'online');
+    , 'online'
+    , 'not-set'
+    );
 CREATE TYPE timezone_type AS ENUM ('EST'
     , 'CST'
     , 'MST'
@@ -180,21 +182,24 @@ CREATE TABLE IF NOT EXISTS course (
     -- Note: Do not want to delete tenant if course exists
     tenant_id BIGINT NOT NULL REFERENCES tenant(id),
     product_id BIGINT NOT NULL REFERENCES product(id),
+    center_id BIGINT NOT NULL REFERENCES center(id) ON DELETE RESTRICT,
 
     name VARCHAR(128) NOT NULL,
     notes TEXT,
-    status course_status NOT NULL DEFAULT 'draft',
-    max_attendees INTEGER,
     timezone timezone_type,
+
     -- Note: address format: {"street_1": ..., "street_2": ..., "city": ..., "state": ..., "zip": ..., "country": ...}
     -- When multitenancy is introduced, then country can be removed.
     address JSONB,
-    center_id BIGINT NOT NULL REFERENCES center(id) ON DELETE RESTRICT,
+    status course_status NOT NULL DEFAULT 'draft',
     mode course_mode NOT NULL DEFAULT 'in-person',
+
+    max_attendees INTEGER,
     num_attendees INTEGER DEFAULT 0,
 
     -- Note: Details page URL is good enough
     url VARCHAR(512),
+    checkout_url VARCHAR(512),
     short_url VARCHAR(64),
 
     -- is_auto_approve does not make sense here. In Salesforce this seems like copied from Master (Product)
